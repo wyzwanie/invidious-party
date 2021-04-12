@@ -1,9 +1,11 @@
 <script>
-    import { onMount } from 'svelte'
+    import { onMount, beforeUpdate } from 'svelte'
     import Header from '$lib/Header.svelte'
 
     import { store, chosen } from '$lib/_store'
 
+    let currentPage
+    let searchTerm
     let filteredInstances = {}
 
     const getInstances = async () => {
@@ -40,16 +42,15 @@
         }
         $chosen = chooseInstance($store.instances)
         store.chosen = $chosen
-
-        console.log(localStorage)
-        console.log('local', localStorage.instances)
-        console.log('store', $store)
     })
-    // $: if($store && $store.chosen) $chosen = $store.chosen
+    beforeUpdate(() => {
+        currentPage = window.location.pathname
+        if(currentPage === '/search') searchTerm = window.location.search.split('=')[1]
+    })
     $: console.log($chosen)
 </script>
 
-<Header chosen={$chosen} on:next={() => {store.nextChosen();$chosen=$store.chosen}} />
+<Header {currentPage} {searchTerm} chosen={$chosen} on:next={() => {store.nextChosen();$chosen=$store.chosen}} />
 
 <main>
     <slot></slot>
@@ -63,5 +64,7 @@
 :global(body) {
     max-width: 83.33333%;
     margin: 0 auto;
+    background: var(--bg-dark);
+    color: var(--txt-dark);
 }
 </style>

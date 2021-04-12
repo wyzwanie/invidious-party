@@ -11,7 +11,12 @@ module.exports = {
 
 		// hydrate the <div id="svelte"> element in src/app.html
 		target: 'body',
-
+		prerender: {
+			crawl: true,
+			enabled: true,
+			force: false,
+			pages: ['*']
+		},
 		vite: {
 			ssr: {
 				noExternal: Object.keys(pkg.dependencies || {})
