@@ -6,7 +6,6 @@
     const dispatch = createEventDispatcher()
 
     $: dispatch('status', status)
-    $: console.log(status)
 </script>
 
 <label class="switch">
