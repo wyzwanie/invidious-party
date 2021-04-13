@@ -33,7 +33,5 @@ function createStore() {
     }
 }
 
-// export const store = writable({})
 export const store = createStore()
-export const chosen = writable()
-//next chosen
+export const chosen = writable(null)

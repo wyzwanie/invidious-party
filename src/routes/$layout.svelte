@@ -33,24 +33,41 @@
         if(!localStorage.instances || localStorage.instances === '{}') {
             await getInstances()
             localStorage.instances = JSON.stringify(filteredInstances)
-            $store.instances = filteredInstances
             localStorage.lastUpdate = new Date().toJSON()
+            localStorage.theme = false
+            $store.instances = filteredInstances
             $store.lastUpdate = localStorage.lastUpdate
+            $store.theme = false
         } else {
             $store.instances = JSON.parse(localStorage.instances)
             $store.lastUpdate = localStorage.lastUpdate
+            $store.theme = JSON.parse(localStorage.theme)
         }
         $chosen = chooseInstance($store.instances)
         store.chosen = $chosen
+        $store = $store
+        if($store.theme) document.documentElement.classList.toggle('light')
+        console.log($store.theme)
     })
     beforeUpdate(() => {
         currentPage = window.location.pathname
         if(currentPage === '/search') searchTerm = window.location.search.split('=')[1]
     })
-    $: console.log($chosen)
+    const changeTheme = e => {
+        $store.theme = e.detail
+        $store = $store
+        localStorage.theme = $store.theme
+		localStorage.lastUpdate = new Date().getTime()
+        document.documentElement.classList.toggle('light')
+    }
+    $: console.log($store.theme)
 </script>
 
-<Header {currentPage} {searchTerm} chosen={$chosen} on:next={() => {store.nextChosen();$chosen=$store.chosen}} />
+<Header {currentPage} {searchTerm} chosen={$chosen}
+    on:next={() => {store.nextChosen();$chosen=$store.chosen}}
+    status={$store.theme}
+    on:theme={changeTheme}
+/>
 
 <main>
     <slot></slot>
@@ -62,9 +79,20 @@
 
 <style>
 :global(body) {
-    max-width: 83.33333%;
-    margin: 0 auto;
     background: var(--bg-dark);
     color: var(--txt-dark);
+    position: relative;
+}
+:global(html.light) {
+    filter: invert(1) hue-rotate(180deg);
+}
+:global(html.light img) {
+    filter: invert(1) hue-rotate(180deg);
+}
+:global(main) {
+    max-width: 83.33333%;
+    margin: 0 auto;
+    padding-left: 94px;
+    padding-top: 1em;
 }
 </style>

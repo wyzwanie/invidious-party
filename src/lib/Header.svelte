@@ -1,6 +1,8 @@
 <script>
     import { createEventDispatcher } from 'svelte'
 
+    import Toggle from './Toggle.svelte'
+    
     export let chosen
     export let currentPage
     export let searchTerm
@@ -12,36 +14,62 @@
 </script>
 
 <header>
-    <div class="container">
-        <div class="topRow">
-            <div class="logo" style="color:var(--accent)">
-                INVIDIOUS<br><span style="font-weight: 100;font-size: 90%; color: white;">instance: {chosen ? new URL(chosen).hostname : 'loading'}</span>
-            </div>
-            <div class="search">
-                <input type="text" bind:value={searchTerm} placeholder="search" on:keyup={handleSearch}>
-            </div>
-            <div class="stuff">
-                notification/settings
-            </div>
-        </div>
-        <div class="botRow">
-            <div class="menu">
-                <ul>
-                    <li><a href="/" class={currentPage === '/' ? 'active' : ''}>POPULAR</a></li>
-                    <li>TRENDING</li>
-                    <li>SUBSCRIPTIONS</li>
-                    <li>PLAYLISTS</li>
-                </ul>
-            </div>
-        </div>
+    <div class="logo">
+        INVIDIOUS<br>
+        <span>instance: {chosen ? new URL(chosen).hostname : 'loading'}</span>
+    </div>
+    <div class="search">
+        <input type="text" bind:value={searchTerm} placeholder="search" on:keyup={handleSearch}>
+    </div>
+    <div class="mode">
+        <Toggle on:status={e => dispatch('theme', e.detail)} />
+    </div>
+    <div class="settings">
+        notification/settings
     </div>
 </header>
+<div class="sidebar">
+    <ul class="menu">
+        <li><a href="/" class={currentPage === '/' ? 'active' : ''}>POPULAR</a></li>
+        <li>TRENDING</li>
+        <li>SUB<span style="font-size: 8px;">SCRIPTIONS</span></li>
+        <li>PLAYLISTS</li>
+    </ul> 
+</div>
 
 <style>
-    header {
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 55px;
+        background: var(--bg-dark-second);
+        border-right: 1px solid rgba(255,255,255,0.05);
+        width: 96px;
+        height: 100%;
+    }
+    .menu {
+        display: flex;
+        list-style: none;
+        justify-content: center;
+        flex-flow: column;
+    }
+    .menu li {
         padding: 9px;
     }
-    a {
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.125);
+        background: var(--bg-dark-second);
+        padding: 9px;
+    }
+    .logo {
+        color: var(--accent);
+    }
+    .logo span {
+        font-weight: 100;
+        font-size: 90%;
         color: white;
     }
     .active {
@@ -50,10 +78,6 @@
     }
     .logo {
         font-weight: bold;
-    }
-    .topRow {
-        display: flex;
-        justify-content: space-between;
     }
     .search {
         flex-grow: 0.618;
@@ -69,14 +93,5 @@
     input:focus {
         outline: none;
         border-bottom: 2px solid var(--accent)
-    }
-    
-    ul {
-        display: flex;
-        list-style: none;
-        justify-content: center
-    }
-    li {
-        padding: 9px;
     }
 </style>
