@@ -9,12 +9,13 @@
     let loading
 
     onMount(async () => {
+        console.log(window.location)
         searchTerm = window.location.search.split('=')[1]
     })
 
     const fetchResult = async searchTerm => {
+        loading = true
         try {
-            loading = true
             const fetchResponse = await fetch(`${$chosen}api/v1/search?q=${searchTerm}`)
             searchResult = await fetchResponse.json()
             loading = false
@@ -22,17 +23,16 @@
             console.log(err)
             store.nextChosen()
             $chosen = $store.chosen
-            fetchResult(searchTerm)
+            await fetchResult(searchTerm)
             loading = false
         }
-
     }
 
     $: if(searchTerm && $chosen) fetchResult(searchTerm)
+    $: console.log('searchTerm', searchTerm)
 </script>
 {#if loading}
     <Loader />
-{/if}
-{#if searchResult && $chosen}
+{:else if searchResult && $chosen}
     <Videos videos={searchResult} chosen={$chosen} on:empty={() => { store.nextChosen();$chosen = $store.chosen; }} />
 {/if}

@@ -47,7 +47,6 @@
         store.chosen = $chosen
         $store = $store
         if($store.theme) document.documentElement.classList.toggle('light')
-        console.log($store.theme)
     })
     beforeUpdate(() => {
         currentPage = window.location.pathname
@@ -60,7 +59,6 @@
 		localStorage.lastUpdate = new Date().getTime()
         document.documentElement.classList.toggle('light')
     }
-    $: console.log($store.theme)
 </script>
 
 <Header {currentPage} {searchTerm} chosen={$chosen}
