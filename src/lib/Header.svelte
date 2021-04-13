@@ -12,12 +12,11 @@
     const handleSearch = e => {
         if(e.keyCode === 13) window.location.href = `/search?q=${searchTerm}`
     }
-    $: console.log('Header:searchTerm', searchTerm)
 </script>
 
 <header>
     <div class="logo">
-        INVIDIOUS<span style="font-size: 69%; color: unset;">&nbsp;v0.1.6</span><br>
+        INVIDIOUS<span style="font-size: 69%; color: unset;">&nbsp;v0.1.7</span><br>
         <span>instance: {#if chosen}<a style="color: white;" href="{chosen}">{new URL(chosen).hostname}</a>{:else}...initializing...{/if}</span>
     </div>
     <div class="search">

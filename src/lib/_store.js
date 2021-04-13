@@ -27,7 +27,6 @@ function createStore() {
                 chosen: chooseInstance(currentStore.instances),
                 lastUpdate: new Date().toJSON()
             }
-            console.log(newStore)
             return newStore
         })
     }
