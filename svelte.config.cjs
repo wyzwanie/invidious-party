@@ -18,6 +18,9 @@ module.exports = {
 			pages: ['*']
 		},
 		vite: {
+			build: {
+				sourcemap: true
+			},
 			ssr: {
 				noExternal: Object.keys(pkg.dependencies || {})
 			}
