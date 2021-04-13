@@ -7,15 +7,14 @@ export const getInstances = async () => {
     allInstances.forEach(instance => {
         if(instance[1].type === 'https' && instance[1].monitor && instance[1].monitor.statusClass === 'success') {
             const name = instance[0]
-            const { flag, uri, openRegistrations, lastChannelRefreshedAt } = instance[1]
-            // const version = instance[1].software.version.split('-')[1] || ''
+            const { flag, uri, openRegistrations, lastChannelRefreshedAt, stats } = instance[1]
 
             parsedInstances = [...parsedInstances, [ name, {
                 flag,
                 uri: uri[uri.length-1] !== '/' ? `${uri}/` : uri,
                 openRegistrations,
                 lastChannelRefreshedAt,
-                // version,
+                version: (stats && stats.software) ? stats.software.version.split('-')[1] : '',
                 enabled: true
             }]]
         }
@@ -25,11 +24,10 @@ export const getInstances = async () => {
 
 // input: parsedInstances, output: chosen
 export const chooseInstance = instances => {
-    console.log(instances)
     if(!instances || instances.length < 1) return 'oops something went wrong'
     let filteredInstances = []
     for(let i of instances) {
-        if(i[1].enabled) filteredInstances.push(i[1].uri)
+        if(i[1].enabled) filteredInstances.push(i[0])
     }
     if(!filteredInstances.length) return 'no valid instances'
     console.log(filteredInstances)
@@ -37,8 +35,10 @@ export const chooseInstance = instances => {
 }
 
 //save parameter to localStorage
-export const saveLocal = async (instances, theme) => {
-    localStorage.instances = JSON.stringify(instances)
-    if(instances) localStorage.lastUpdate = new Date().toJSON()
-    localStorage.theme = theme
+export const saveLocal = async data => {
+    const { instances, theme, rss } = data
+    if(instances) localStorage.instances = JSON.stringify(instances)
+    if(instances || rss) localStorage.lastUpdate = new Date().toJSON()
+    if(theme) localStorage.theme = theme
+    if(rss) localStorage.rss = rss
 }

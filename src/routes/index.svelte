@@ -13,14 +13,15 @@
 		if(!instance) return false
 		loading = true
 		try {
-			const popularRequest = await fetch(`${instance}api/v1/popular`)
+			const popularRequest = await fetch(`https://${instance}/api/v1/popular`)
 			popular = await popularRequest.json()
 			loading = false
 			if(popular.length > 0) return popular
 			else $chosen = chooseInstance($store.instances)
 		} catch(err) {
-			console.log(err)
 			$chosen = chooseInstance($store.instances)
+			error = 'No results or an error!'
+			await fetchPopular($chosen)
 			loading = false
 		}
 	}
@@ -36,6 +37,6 @@
 		<Videos videos={popular} chosen={$chosen} />
 	{/if}
 	{#if error}
-		No results or an error! <button on:click={() => { store.nextChosen();$chosen = $store.chosen; }}>Try another instance?</button>
+		{error} <button on:click={() => $chosen = chooseInstance($store.instances)}>Try another instance?</button>
 	{/if}
 </div>

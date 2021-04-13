@@ -13,15 +13,19 @@
             ...$store,
             theme: e.detail
         }
-        saveLocal(false, e.detail)
+        saveLocal({ theme: e.detail })
         document.documentElement.classList.toggle('light')
     }
 
     onMount(async () => {
+        console.log(localStorage)
+        console.log(!localStorage.instances)
         if(!localStorage.instances || localStorage.instances === '{}') {
             const instances = await getInstances()
-            //save instances and set default theme to localStorage
-            saveLocal(instances, false)
+            saveLocal({
+                instances,
+                theme: false
+            })
             $store = {
                 instances,
                 lastUpdate: localStorage.lastUpdate,
@@ -31,7 +35,7 @@
             $store = {
                 instances: JSON.parse(localStorage.instances),
                 lastUpdate: localStorage.lastUpdate,
-                theme: localStorage.theme === undefined ? false : JSON.parse(localStorage.theme),
+                theme: localStorage.theme === 'undefined' ? false : JSON.parse(localStorage.theme),
             }
         }
         $chosen = chooseInstance($store.instances)
@@ -46,9 +50,8 @@
     })
 </script>
 
-<Header {currentPage} {searchTerm} chosen={$chosen}
-    on:next={() => {store.nextChosen();$chosen=$store.chosen}}
-    status={$store.theme}
+<Header {currentPage} {searchTerm} chosen={$chosen} status={$store.theme}
+    on:changeInstance={() => $chosen = chooseInstance($store.instances)}
     on:theme={changeTheme}
 />
 

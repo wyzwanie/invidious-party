@@ -28,11 +28,11 @@
             <div class="video-inner">
                 <div class="card">
                     <a class="thumbnail" href="/watch?v={video.videoId}">
-                        <img alt="thumbnail" src="{chosen}vi/{video.videoId}/mqdefault.jpg">
+                        <img alt="thumbnail" src="https://{chosen}/vi/{video.videoId}/mqdefault.jpg">
                         <div class="duration">{secToMin(video.lengthSeconds)}</div>
                     </a>
                     <h3 class="title"><a href="/watch?v={video.videoId}">{video.title}</a></h3>
-                    <h4 class="author"><a href="{chosen}channel/{video.authorId}">{video.author}</a></h4>
+                    <h4 class="author"><a href="https://{chosen}/channel/{video.authorId}">{video.author}</a></h4>
                     <div class="stats">
                         <span>Shared {video.publishedText}</span>
                         <span>{watchCount(video.viewCount)}</span>
@@ -72,6 +72,7 @@
 }
 .thumbnail img {
     width: 100%;
+    /* height: 215px; */
     flex-grow: 1;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;

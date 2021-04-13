@@ -7,16 +7,23 @@
     export let currentPage
     export let searchTerm
 
+    let rotate = false
+
     const dispatch = createEventDispatcher()
     const handleSearch = e => {
         if(e.keyCode === 13) window.location.href = `/search?q=${searchTerm}`
+    }
+    const changeInstance = () => {
+        rotate = !rotate
+        dispatch('changeInstance')
     }
 </script>
 
 <header>
     <div class="logo">
-        INVIDIOUS<span style="font-size: 69%; color: unset;">&nbsp;v0.2.0</span><br>
-        <span>instance: {#if chosen}<a style="color: white;" href="{chosen}">{new URL(chosen).hostname}</a>{:else}...initializing...{/if}</span>
+        INVIDIOUS<span style="font-size: 69%; color: unset;">&nbsp;v0.2.3</span><br>
+        <span>instance: {#if chosen}<a style="color: white;" href="{chosen}">{chosen}</a>{:else}...initializing...{/if}</span>
+        <img class:rotate on:click={changeInstance} src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE5LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgdmlld0JveD0iMCAwIDM4My43NDggMzgzLjc0OCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMzgzLjc0OCAzODMuNzQ4OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNNjIuNzcyLDk1LjA0MkM5MC45MDQsNTQuODk5LDEzNy40OTYsMzAsMTg3LjM0MywzMGM4My43NDMsMCwxNTEuODc0LDY4LjEzLDE1MS44NzQsMTUxLjg3NGgzMA0KCQlDMzY5LjIxNyw4MS41ODgsMjg3LjYyOSwwLDE4Ny4zNDMsMGMtMzUuMDM4LDAtNjkuMDYxLDkuOTg5LTk4LjM5MSwyOC44ODhDNzAuMzY4LDQwLjg2Miw1NC4yNDUsNTYuMDMyLDQxLjIyMSw3My41OTMNCgkJTDIuMDgxLDM0LjY0MXYxMTMuMzY1aDExMy45MUw2Mi43NzIsOTUuMDQyeiIvPg0KCTxwYXRoIGQ9Ik0zODEuNjY3LDIzNS43NDJoLTExMy45MWw1My4yMTksNTIuOTY1Yy0yOC4xMzIsNDAuMTQyLTc0LjcyNCw2NS4wNDItMTI0LjU3MSw2NS4wNDINCgkJYy04My43NDQsMC0xNTEuODc0LTY4LjEzLTE1MS44NzQtMTUxLjg3NGgtMzBjMCwxMDAuMjg2LDgxLjU4OCwxODEuODc0LDE4MS44NzQsMTgxLjg3NGMzNS4wMzgsMCw2OS4wNjItOS45ODksOTguMzkxLTI4Ljg4OA0KCQljMTguNTg0LTExLjk3NSwzNC43MDctMjcuMTQ1LDQ3LjczMS00NC43MDZsMzkuMTM5LDM4Ljk1MlYyMzUuNzQyeiIvPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPC9zdmc+DQo=" alt="refresh" >
     </div>
     <div class="search">
         <input type="text" bind:value={searchTerm} placeholder="search" on:keyup={handleSearch}>
@@ -75,6 +82,17 @@ header {
     font-weight: 100;
     font-size: 90%;
     color: white;
+}
+.logo img {
+    height: 1em;
+    margin-left: 9px;
+    margin-bottom: -2px;
+    filter: invert(0.6);
+    cursor: pointer;
+    transition: 0.4s;
+}
+.logo img.rotate {
+    transform: rotate(360deg);
 }
 .active {
     font-weight: bold;
