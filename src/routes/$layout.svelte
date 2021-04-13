@@ -59,6 +59,7 @@
 		localStorage.lastUpdate = new Date().getTime()
         document.documentElement.classList.toggle('light')
     }
+    $: console.log('currentPage', currentPage)
 </script>
 
 {#key searchTerm}
