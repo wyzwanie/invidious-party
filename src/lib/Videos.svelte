@@ -46,87 +46,66 @@
     No results or an error! <button on:click={() => dispatch('empty')}>Try another instance?</button>
 {/if}
 <style>    
-    .videos {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-    }
-    .video-outer {
-        /* display: flex;
-        flex-direction: row;
-        flex-wrap: wrap; */
-        width: calc(25% - 1em);
-        margin-bottom: 1em;
-
-        /* flex: 1 0 500px;
-        box-sizing: border-box;
-        margin: 1rem .25em;
-        display: flex;
-        flex-direction: column; */
-    }
-    .video-inner {
-        display: flex;
-        flex-direction: row;
-        background: var(--bg-dark-second)
-    }
-    .card {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-    }
-    .thumbnail {
-        position: relative;
-        display: flex;
-    }
-    .thumbnail img {
-        width: 100%;
-        flex-grow: 1;
-    }
-    .title {
-        font-weight: 400;
-        flex-grow: 1;
-        margin: 0;
-        padding: 7px;
-        height: 38px;
-    }
-    .author {
-        margin: 0;
-        padding: 7px;
-    }
-    .stats {
-        display: flex;
-        justify-content: space-between;
-        padding: 7px
-    }
-    .stats span {
-        font-size: 90%;
-        font-weight: bold;
-    }
-    /* .info {
-        display: flex;
-        background: var(--bg-dark-second);
-        padding: 7px;
-    } */
-    .duration {
-        position: absolute;
-        bottom: 7px;
-        right: 3px;
-        background: rgba(0,0,0,0.6);
-        padding: 3px;
-        color: white;
-    }
-    .author {
-        flex-grow: 1;
-        color: var(--accent-hover);
-    }
-    /* @media screen and (min-width: 40em) { 
-        .video {
-            flex: 0 1 calc(100% - 1em);
-        }
-    }
-    @media screen and (min-width: 85em) {
-        .video {
-            flex: 0 1 calc(23% - 1em);
-        }
-    } */
+.videos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.video-outer {
+    width: calc(25% - 1em);
+    margin-bottom: 1em;
+}
+.video-inner {
+    display: flex;
+    flex-direction: row;
+    background: rgb(0 0 0 / 35%);
+    border-radius: 5px;
+}
+.card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.thumbnail {
+    position: relative;
+    display: flex;
+}
+.thumbnail img {
+    width: 100%;
+    flex-grow: 1;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.title {
+    font-weight: 400;
+    flex-grow: 1;
+    margin: 0;
+    padding: 7px;
+    height: 38px;
+}
+.author {
+    margin: 0;
+    padding: 7px;
+}
+.stats {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px
+}
+.stats span {
+    font-size: 90%;
+    font-weight: bold;
+}
+.duration {
+    position: absolute;
+    bottom: 7px;
+    right: 3px;
+    background: rgba(0,0,0,0.6);
+    padding: 3px;
+    color: white;
+}
+.author {
+    flex-grow: 1;
+    color: var(--accent-hover);
+}
 </style>
