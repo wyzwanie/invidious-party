@@ -17,8 +17,8 @@
 
 <header>
     <div class="logo">
-        INVIDIOUS<span style="font-size: 69%;"> v0.1.4</span><br>
-        <span>instance: {chosen ? new URL(chosen).hostname : 'loading'}</span>
+        INVIDIOUS<span style="font-size: 69%; color: unset;">&nbsp;v0.1.6</span><br>
+        <span>instance: {#if chosen}<a style="color: white;" href="{chosen}">{new URL(chosen).hostname}</a>{:else}...initializing...{/if}</span>
     </div>
     <div class="search">
         <input type="text" bind:value={searchTerm} placeholder="search" on:keyup={handleSearch}>

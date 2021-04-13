@@ -61,11 +61,13 @@
     }
 </script>
 
-<Header {currentPage} {searchTerm} chosen={$chosen}
-    on:next={() => {store.nextChosen();$chosen=$store.chosen}}
-    status={$store.theme}
-    on:theme={changeTheme}
-/>
+{#key searchTerm}
+    <Header {currentPage} {searchTerm} chosen={$chosen}
+        on:next={() => {store.nextChosen();$chosen=$store.chosen}}
+        status={$store.theme}
+        on:theme={changeTheme}
+    />
+{/key}
 
 <main>
     <slot></slot>
