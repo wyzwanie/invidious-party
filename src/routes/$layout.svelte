@@ -51,7 +51,7 @@
     })
     beforeUpdate(() => {
         currentPage = window.location.pathname
-        if(currentPage === '/search') searchTerm = window.location.search.split('=')[1]
+        if(currentPage === '/search') searchTerm = window.decodeURI(window.location.search.split('=')[1])
     })
     const changeTheme = e => {
         $store.theme = e.detail

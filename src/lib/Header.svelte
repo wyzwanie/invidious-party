@@ -10,9 +10,8 @@
 
     const dispatch = createEventDispatcher()
     const handleSearch = e => {
-        if(e.keyCode === 13) goto(`/search?q=${searchTerm}`)
+        if(e.keyCode === 13) window.location.href = `/search?q=${searchTerm}`
     }
-    $: searchTerm = decodeURI(searchTerm)
 </script>
 
 <header>
