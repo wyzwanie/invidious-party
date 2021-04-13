@@ -35,7 +35,7 @@
             $store = {
                 instances: JSON.parse(localStorage.instances),
                 lastUpdate: localStorage.lastUpdate,
-                theme: localStorage.theme === 'undefined' ? false : JSON.parse(localStorage.theme),
+                theme: (localStorage.theme === 'undefined' || localStorage.theme === undefined) ? false : JSON.parse(localStorage.theme),
             }
         }
         $chosen = chooseInstance($store.instances)

@@ -21,7 +21,7 @@
 
         loading = true
         try {
-            const fetchResponse = await fetch(`${$chosen}api/v1/search?q=${searchQuery}`)
+            const fetchResponse = await fetch(`https://${$chosen}/api/v1/search?q=${searchQuery}`)
             searchResult = await fetchResponse.json()
             loading = false
         } catch(err) {
