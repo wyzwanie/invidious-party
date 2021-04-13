@@ -1,16 +1,18 @@
 <script>
+    import { goto } from '$app/navigation'
     import { createEventDispatcher } from 'svelte'
 
     import Toggle from './Toggle.svelte'
-    
+
     export let chosen
     export let currentPage
     export let searchTerm
 
     const dispatch = createEventDispatcher()
     const handleSearch = e => {
-        if(e.keyCode === 13) window.location.href = `/search?q=${searchTerm}`
+        if(e.keyCode === 13) goto(`/search?q=${searchTerm}`)
     }
+    $: searchTerm = decodeURI(searchTerm)
 </script>
 
 <header>

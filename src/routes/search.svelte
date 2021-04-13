@@ -28,9 +28,6 @@
 
     }
 
-    $: console.log(searchResult)
-    $: console.log(searchTerm)
-
     $: if(searchTerm && $chosen) fetchResult(searchTerm)
 </script>
 {#if loading}
