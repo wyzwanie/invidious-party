@@ -1,5 +1,4 @@
 <script>
-    import { goto } from '$app/navigation'
     import { createEventDispatcher } from 'svelte'
 
     import Toggle from './Toggle.svelte'
@@ -16,7 +15,7 @@
 
 <header>
     <div class="logo">
-        INVIDIOUS<span style="font-size: 69%; color: unset;">&nbsp;v0.1.7</span><br>
+        INVIDIOUS<span style="font-size: 69%; color: unset;">&nbsp;v0.2.0</span><br>
         <span>instance: {#if chosen}<a style="color: white;" href="{chosen}">{new URL(chosen).hostname}</a>{:else}...initializing...{/if}</span>
     </div>
     <div class="search">

@@ -1,11 +1,11 @@
 <script>
+	import { chooseInstance } from '$lib/_helper'
 	import { store, chosen } from '$lib/_store'
 	
 	import Loader from '$lib/Loader.svelte'
 	import Videos from '$lib/Videos.svelte'
 
 	let error
-	let filteredInstances
 	let loading
 	let popular
 
@@ -17,14 +17,10 @@
 			popular = await popularRequest.json()
 			loading = false
 			if(popular.length > 0) return popular
-			else {
-				store.nextChosen()
-				$chosen = $store.chosen
-			}
+			else $chosen = chooseInstance($store.instances)
 		} catch(err) {
 			console.log(err)
-			store.nextChosen()
-			$chosen = $store.chosen
+			$chosen = chooseInstance($store.instances)
 			loading = false
 		}
 	}

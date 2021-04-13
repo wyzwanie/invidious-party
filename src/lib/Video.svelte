@@ -1,6 +1,5 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-    import { onMount } from 'svelte'
 
     export let chosen
     export let videoId

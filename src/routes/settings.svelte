@@ -32,3 +32,12 @@
     <button on:click={saveSettings}>Save</button>
     <button on:click={() => window.location = chosen}>Back To Invidious</button>
 {/if}
+
+<!-- fetch('https://yewtu.be/feed/private?token=RBugBT8LPiRzvjkyXm3NZ2MttL2mk23d_XE1tHQ7C4s=')
+  .then(response => response.text())
+  .then(str => new window.DOMParser().parseFromString(str, "text/xml"))
+  .then(data => {
+    console.log(data);
+    const items = data.querySelectorAll("item");
+    let html = ``;
+    items.forEach(el => { -->

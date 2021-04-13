@@ -1,73 +1,56 @@
 <script>
-    import { onMount, beforeUpdate } from 'svelte'
+    import { onMount, afterUpdate } from 'svelte'
     import Header from '$lib/Header.svelte'
 
     import { store, chosen } from '$lib/_store'
+    import { getInstances, chooseInstance, saveLocal } from '$lib/_helper'
 
     let currentPage
     let searchTerm
-    let filteredInstances = {}
 
-    const getInstances = async () => {
-        let instancesRequest = await fetch('https://api.invidious.io/instances.json?pretty=0')
-        let allInstances = await instancesRequest.json()
-        allInstances.forEach(instance => {
-            if(instance[1].type === 'https' && instance[1].monitor && instance[1].monitor.statusClass === 'success') {
-                let uri = instance[1].uri
-                if(uri[uri.length-1] !== '/') uri = `${uri}/`
-                filteredInstances[uri] = instance[1].flag
-            }
-        })
-    }
-    const chooseInstance = instances => {
-        let tempInstances = []
-        if(!Object.keys(instances).length) return 'oops something went wrong'
-        Object.keys(instances).forEach(i => {
-            if(instances[i]) tempInstances.push(i)
-        })
-        if(!tempInstances.length) return 'no valid instances'
-        return tempInstances[Math.floor(Math.random()*tempInstances.length)]
+    const changeTheme = e => {
+        $store = {
+            ...$store,
+            theme: e.detail
+        }
+        saveLocal(false, e.detail)
+        document.documentElement.classList.toggle('light')
     }
 
     onMount(async () => {
         if(!localStorage.instances || localStorage.instances === '{}') {
-            await getInstances()
-            localStorage.instances = JSON.stringify(filteredInstances)
-            localStorage.lastUpdate = new Date().toJSON()
-            localStorage.theme = false
-            $store.instances = filteredInstances
-            $store.lastUpdate = localStorage.lastUpdate
-            $store.theme = false
+            const instances = await getInstances()
+            //save instances and set default theme to localStorage
+            saveLocal(instances, false)
+            $store = {
+                instances,
+                lastUpdate: localStorage.lastUpdate,
+                theme: false,
+            }
         } else {
-            $store.instances = JSON.parse(localStorage.instances)
-            $store.lastUpdate = localStorage.lastUpdate
-            $store.theme = localStorage.theme === undefined ? false : JSON.parse(localStorage.theme)
+            $store = {
+                instances: JSON.parse(localStorage.instances),
+                lastUpdate: localStorage.lastUpdate,
+                theme: localStorage.theme === undefined ? false : JSON.parse(localStorage.theme),
+            }
         }
         $chosen = chooseInstance($store.instances)
-        store.chosen = $chosen
-        $store = $store
+        //if light theme toggle class
         if($store.theme) document.documentElement.classList.toggle('light')
     })
-    beforeUpdate(() => {
+
+
+    afterUpdate(() => {
         currentPage = window.location.pathname
-        if(currentPage === '/search/') searchTerm = window.decodeURI(window.location.search.split('=')[1])
+        if(currentPage.includes('/search')) searchTerm = window.decodeURI(window.location.search.split('=')[1])
     })
-    const changeTheme = e => {
-        $store.theme = e.detail
-        $store = $store
-        localStorage.theme = $store.theme
-		localStorage.lastUpdate = new Date().getTime()
-        document.documentElement.classList.toggle('light')
-    }
 </script>
 
-{#key searchTerm}
-    <Header {currentPage} {searchTerm} chosen={$chosen}
-        on:next={() => {store.nextChosen();$chosen=$store.chosen}}
-        status={$store.theme}
-        on:theme={changeTheme}
-    />
-{/key}
+<Header {currentPage} {searchTerm} chosen={$chosen}
+    on:next={() => {store.nextChosen();$chosen=$store.chosen}}
+    status={$store.theme}
+    on:theme={changeTheme}
+/>
 
 <main>
     <slot></slot>
