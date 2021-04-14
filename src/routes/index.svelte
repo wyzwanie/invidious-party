@@ -13,6 +13,7 @@
 		if(!instance) return false
 		loading = true
 		try {
+			///api/v1/videos/aqz-KE-bpKQ?fields=videoId,title,description
 			const popularRequest = await fetch(`https://${instance}/api/v1/popular`)
 			popular = await popularRequest.json()
 			loading = false

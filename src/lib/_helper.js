@@ -30,7 +30,6 @@ export const chooseInstance = instances => {
         if(i[1].enabled) filteredInstances.push(i[0])
     }
     if(!filteredInstances.length) return 'no valid instances'
-    console.log(filteredInstances)
     return filteredInstances[Math.floor(Math.random()*filteredInstances.length)]
 }
 
@@ -42,3 +41,12 @@ export const saveLocal = async data => {
     if(theme) localStorage.theme = theme
     if(rss) localStorage.rss = rss
 }
+
+// export const routes = {
+//     popular: '/api/v1/popular',
+//     trending: '/api/v1/trending',
+//     top: '/api/v1/top',
+//     channels: '/api/v1/channels',
+//     videos: '/api/v1/videos',
+
+// }

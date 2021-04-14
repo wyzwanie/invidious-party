@@ -19,7 +19,6 @@
 
     onMount(async () => {
         console.log(localStorage)
-        console.log(!localStorage.instances)
         if(!localStorage.instances || localStorage.instances === '{}') {
             const instances = await getInstances()
             saveLocal({
@@ -35,7 +34,8 @@
             $store = {
                 instances: JSON.parse(localStorage.instances),
                 lastUpdate: localStorage.lastUpdate,
-                theme: (localStorage.theme === 'undefined' || localStorage.theme === undefined) ? false : JSON.parse(localStorage.theme),
+                theme: !localStorage.theme ? false : JSON.parse(localStorage.theme),
+                rss: localStorage.rss || undefined
             }
         }
         $chosen = chooseInstance($store.instances)
