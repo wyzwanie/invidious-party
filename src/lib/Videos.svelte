@@ -17,8 +17,6 @@
         newSeconds = newSeconds < 10 ? `0${newSeconds}` : newSeconds
         return `${newMinutes}:${newSeconds}`
     }
-    // $: if(videos[0].el) height = videos[0].el.offsetWidth
-    // $: console.log(height)
 </script>
 
 <svelte:window bind:innerWidth={vw} />
