@@ -6,6 +6,8 @@
     export let chosen
     export let videos
 
+    let vw
+
     const dispatch = createEventDispatcher()
 
     const secToMin = seconds => {
@@ -15,17 +17,20 @@
         newSeconds = newSeconds < 10 ? `0${newSeconds}` : newSeconds
         return `${newMinutes}:${newSeconds}`
     }
-    $: if(videos[0].el) console.log(videos[0].el.offsetWidth)
+    // $: if(videos[0].el) height = videos[0].el.offsetWidth
+    // $: console.log(height)
 </script>
 
-{#if videos.length > 0}
+<svelte:window bind:innerWidth={vw} />
+
+{#if vw && videos.length > 0}
 <div class="videos">
     {#each videos as video}
         <div class="video-outer" bind:this={video.el}>
             <div class="video-inner">
                 <div class="card">
                     <a class="thumbnail" href="/watch?v={video.videoId}">
-                        <Lazy height={video.el ? video.el.offsetWidth : 0}>
+                        <Lazy height={Math.floor(vw*0.11)} placeholder=...loading...>
                             <img alt="thumbnail" src="https://{chosen}/vi/{video.videoId}/mqdefault.jpg">
                         </Lazy>
                         <div class="duration">{secToMin(video.lengthSeconds)}</div>
@@ -68,6 +73,8 @@
 .thumbnail {
     position: relative;
     display: flex;
+    justify-content: center;
+    align-content: center;
 }
 .thumbnail img {
     width: 100%;
@@ -108,4 +115,6 @@
     flex-grow: 1;
     color: var(--accent-hover);
 }
+/*  */
+
 </style>
