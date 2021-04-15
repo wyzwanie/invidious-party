@@ -8,6 +8,7 @@
     export let searchTerm
 
     let rotate = false
+    let isOpen = true
 
     const dispatch = createEventDispatcher()
     const handleSearch = e => {
@@ -21,7 +22,7 @@
 
 <header>
     <div class="logo">
-        invidious.party<span style="font-size: 69%; color: unset;">&nbsp;v0.2.6</span><br>
+        invidious.party<span style="font-size: 69%; color: unset;">&nbsp;v0.3.0</span><br>
         <span>instance: {#if chosen}<a style="color: white;" href="{chosen}">{chosen}</a>{:else}...initializing...{/if}</span>
         <img class:rotate on:click={changeInstance} src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE5LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgdmlld0JveD0iMCAwIDM4My43NDggMzgzLjc0OCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMzgzLjc0OCAzODMuNzQ4OyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNNjIuNzcyLDk1LjA0MkM5MC45MDQsNTQuODk5LDEzNy40OTYsMzAsMTg3LjM0MywzMGM4My43NDMsMCwxNTEuODc0LDY4LjEzLDE1MS44NzQsMTUxLjg3NGgzMA0KCQlDMzY5LjIxNyw4MS41ODgsMjg3LjYyOSwwLDE4Ny4zNDMsMGMtMzUuMDM4LDAtNjkuMDYxLDkuOTg5LTk4LjM5MSwyOC44ODhDNzAuMzY4LDQwLjg2Miw1NC4yNDUsNTYuMDMyLDQxLjIyMSw3My41OTMNCgkJTDIuMDgxLDM0LjY0MXYxMTMuMzY1aDExMy45MUw2Mi43NzIsOTUuMDQyeiIvPg0KCTxwYXRoIGQ9Ik0zODEuNjY3LDIzNS43NDJoLTExMy45MWw1My4yMTksNTIuOTY1Yy0yOC4xMzIsNDAuMTQyLTc0LjcyNCw2NS4wNDItMTI0LjU3MSw2NS4wNDINCgkJYy04My43NDQsMC0xNTEuODc0LTY4LjEzLTE1MS44NzQtMTUxLjg3NGgtMzBjMCwxMDAuMjg2LDgxLjU4OCwxODEuODc0LDE4MS44NzQsMTgxLjg3NGMzNS4wMzgsMCw2OS4wNjItOS45ODksOTguMzkxLTI4Ljg4OA0KCQljMTguNTg0LTExLjk3NSwzNC43MDctMjcuMTQ1LDQ3LjczMS00NC43MDZsMzkuMTM5LDM4Ljk1MlYyMzUuNzQyeiIvPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPC9zdmc+DQo=" alt="refresh" >
     </div>
@@ -39,24 +40,44 @@
         </a>
     </div>
 </header>
-<div class="sidebar">
-    <ul class="menu">
-        <li><a href="/" class={currentPage === '/' ? 'active' : ''}>POPULAR</a></li>
-        <li>TRENDING</li>
-        <li>SUB<span style="font-size: 8px;">SCRIPTIONS</span></li>
-        <li>PLAYLISTS</li>
-    </ul> 
-</div>
+{#if !isOpen}
+    <!-- <div class="toggler"on:click={() => isOpen = !isOpen}>v</div> -->
+{:else}
+    <div class="sidebar">
+        <!-- <div class="toggler"on:click={() => isOpen = !isOpen}>x</div> -->
+        <ul class="menu">
+            <li><a href="/" class={currentPage === '/' ? 'active' : ''}>POPULAR</a></li>
+            <li>TRENDING</li>
+            <li>SUB<span style="font-size: 8px;">SCRIPTIONS</span></li>
+            <li>PLAYLISTS</li>
+        </ul> 
+    </div>
+{/if}
 
 <style>
+    .toggler {
+        position: absolute;
+        top: 69px;
+        left: 5px;
+        background: var(--accent);
+        width: 2em;
+        height: 2em;
+        color: var(--bg-dark);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        cursor: pointer;
+    }
 .sidebar {
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 64px;
     background: var(--bg-dark-second);
     border-right: 1px solid rgba(255,255,255,0.05);
     width: 96px;
-    height: calc(100vh - 64px);
+    height: calc(100% - 64px);
+    min-height: calc(100vh - 64px);
 }
 .menu {
     display: flex;

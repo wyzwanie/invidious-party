@@ -1,41 +1,39 @@
 <script>
     import { onMount } from 'svelte'
-    import Video from '$lib/Video.svelte'
+    import { chooseInstance } from '$lib/_helper'
     import { store, chosen } from '$lib/_store'
+    import Video from '$lib/Video.svelte'
 
-    let videoId
+    let videoID
     let author
+    let loading
 
     onMount(async () => {
-        videoId = window.location.search.split('=')[1]
+        videoID = window.location.search.split('=')[1]
     })
-    $: if($chosen && videoId) fetchVideoInformation()
     
-    const fetchVideoInformation = async () => {
+    const fetchVideoInformation = async (instance, videoID) => {
+        loading = true
         try {
-            const videoResponse = await fetch(`${$chosen}api/v1/videos/${videoId}`)
+            const videoResponse = await fetch(`https://${instance}/api/v1/videos/${videoID}`)
             const videoData = await videoResponse.json()
-            console.log('vd', videoData)
-            if(videoData && !videoData.author) {
-                store.nextChosen()
-                $chosen = $store.chosen
-                console.log('nowy bo nie ma autora', $chosen)
-            }
-            author = videoData.author
+            // console.log('vd', videoData)
+            if(videoData && !videoData.author) $chosen = chooseInstance($store.instances)
+            author = videoData.title
+            loading = false
         } catch(err) {
             console.log(err)
-            getNextChosen()
+            $chosen = chooseInstance($store.instances)
+            loading = false
         }
     }
-    const getNextChosen = () => {
-        console.log('jeden', $store)
-        store.nextChosen()
-        console.log('dwa', $store)
-        $chosen = $store.chosen
-    }
+
+    $: if($chosen && videoID) fetchVideoInformation($chosen, videoID)
 </script>
 
-{#if videoId}
-    <Video {videoId} chosen={$chosen} on:error={getNextChosen} />
-    {author}
+{#if loading}
+    fetching... from {$chosen}<br>
+{:else if videoID && $chosen}
+    <Video chosen={$chosen} {videoID} on:error={() => $chosen = chooseInstance($store.instances)} />
+    <h3>{author}</h3>
 {/if}

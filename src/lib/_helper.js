@@ -42,11 +42,16 @@ export const saveLocal = async data => {
     if(rss) localStorage.rss = rss
 }
 
-// export const routes = {
-//     popular: '/api/v1/popular',
-//     trending: '/api/v1/trending',
-//     top: '/api/v1/top',
-//     channels: '/api/v1/channels',
-//     videos: '/api/v1/videos',
+//input: chosen instance, output: version
+export const getVersion = (chosen, instances) => {
+    console.log(chosen)
+    console.log(instances)
+    // $store.instances[$store.instances.findIndex(x => w[0] === $chosen)][1].version
+}
 
-// }
+export const convertCount = count => {
+    if(Math.floor(count/1000) < 1000) return `${(count/1000).toFixed(2)}K`
+    if(Math.floor(count/1000000) < 1000) return `${(count/1000000).toFixed(2)}M`
+    if(Math.floor(count/1000000000) < 1000) return `${(count/1000000000).toFixed(2)}G`
+    else return count
+}

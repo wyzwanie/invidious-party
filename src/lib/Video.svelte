@@ -2,7 +2,8 @@
     import { createEventDispatcher } from 'svelte'
 
     export let chosen
-    export let videoId
+    export let version = ''
+    export let videoID
 
     let player
     let initialized = 0
@@ -73,28 +74,28 @@
 
 <svelte:head>
     {#if chosen}
-        <link rel="stylesheet" href="{chosen}css/video-js.min.css?v=5f2e87f">
-        <link rel="stylesheet" href="{chosen}css/videojs-http-source-selector.css?v=5f2e87f">
-        <link rel="stylesheet" href="{chosen}css/videojs.markers.min.css?v=5f2e87f">
-        <!-- <link rel="stylesheet" href="{chosen}css/videojs-share.css?v=5f2e87f"> -->
-        <link rel="stylesheet" href="{chosen}css/videojs-vtt-thumbnails.css?v=5f2e87f">
-        <link rel="stylesheet" href="{chosen}css/quality-selector.css?v=5f2e87f">
+        <link rel="stylesheet" href="https://{chosen}/css/video-js.min.css?v={version}">
+        <link rel="stylesheet" href="https://{chosen}/css/videojs-http-source-selector.css?v={version}">
+        <link rel="stylesheet" href="https://{chosen}/css/videojs.markers.min.css?v={version}">
+        <!-- <link rel="stylesheet" href="https://{chosen}/css/videojs-share.css?v={version}"> -->
+        <link rel="stylesheet" href="https://{chosen}/css/videojs-vtt-thumbnails.css?v={version}">
+        <link rel="stylesheet" href="https://{chosen}/css/quality-selector.css?v={version}">
 
-        <script src="{chosen}js/video.min.js?v=5f2e87f" on:load={() => initialized++} on:error={() => dispatch('error')} />
-        <script src="{chosen}js/videojs-contrib-quality-levels.min.js?v=5f2e87f" on:load={() => initialized++} on:error={() => dispatch('error')} />
-        <script src="{chosen}js/videojs-http-source-selector.min.js?v=5f2e87f" on:load={() => initialized++} on:error={() => dispatch('error')} />
-        <script src="{chosen}js/videojs-markers.min.js?v=5f2e87f" on:load={() => initialized++} on:error={() => dispatch('error')} />
-        <!-- <script src="{chosen}js/videojs-share.min.js?v=5f2e87f" on:load={() => initialized++} /> -->
-        <script src="{chosen}js/videojs-vtt-thumbnails.min.js?v=5f2e87f" on:load={() => initialized++} on:error={() => dispatch('error')} />
-        <script src="{chosen}js/silvermine-videojs-quality-selector.min.js?v=5f2e87f" on:load={() => initialized++} on:error={() => dispatch('error')} />
+        <script src="https://{chosen}/js/video.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
+        <script src="https://{chosen}/js/videojs-contrib-quality-levels.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
+        <script src="https://{chosen}/js/videojs-http-source-selector.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
+        <script src="https://{chosen}/js/videojs-markers.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
+        <!-- <script src="https://{chosen}/js/videojs-share.min.js?v={version}" on:load={() => initialized++} /> -->
+        <script src="https://{chosen}/js/videojs-vtt-thumbnails.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
+        <script src="https://{chosen}/js/silvermine-videojs-quality-selector.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
     {/if}    
 </svelte:head>
-<button on:click={() => dispatch('error')}>nextChosen</button>
+<!-- <button on:click={() => dispatch('error')}>nextChosen</button>
 {#if initialized > 4}
 YEE
-{/if}
-{#if chosen && videoId}
-<!-- <iframe src="{chosen}embed/{videoId}" title="video" /> -->
+{/if} -->
+{#if chosen && videoID}
+<!-- <iframe src="https://{chosen}/embed/{videoID}" title="video" /> -->
 <!-- &itag=18&local=true -->
 <!-- svelte-ignore a11y-media-has-caption -->
 <div class="video-js-responsive-container vjs-hd">
@@ -103,17 +104,17 @@ YEE
         class="video-js"
         controls
         preload="auto"
-        poster="{chosen}vi/{videoId}/maxres.jpg"
+        poster="https://{chosen}/vi/{videoID}/maxres.jpg"
         data-setup=""
     >
         <source
-            src="{chosen}latest_version?id={videoId}&itag=18"
+            src="https://{chosen}/latest_version?id={videoID}&itag=18"
             type='video/mp4; codecs="avc1.42001E, mp4a.40.2"'
             label="medium"
             selected="false"
         >
         <source 
-            src="{chosen}latest_version?id={videoId}&itag=22"
+            src="https://{chosen}/latest_version?id={videoID}&itag=22"
             type='video/mp4; codecs="avc1.64001F, mp4a.40.2"'
             label="hd720"
             selected="true"

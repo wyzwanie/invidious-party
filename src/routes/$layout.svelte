@@ -3,7 +3,7 @@
     import Header from '$lib/Header.svelte'
 
     import { store, chosen } from '$lib/_store'
-    import { getInstances, chooseInstance, saveLocal } from '$lib/_helper'
+    import { getInstances, getVersion, chooseInstance, saveLocal } from '$lib/_helper'
 
     let currentPage
     let searchTerm
@@ -18,31 +18,35 @@
     }
 
     onMount(async () => {
-        console.log(localStorage)
+        
         if(!localStorage.instances || localStorage.instances === '{}') {
             const instances = await getInstances()
             saveLocal({
                 instances,
-                theme: false
+                theme: false,
+                // version: instances[instances.findIndex(x => x[0] === $chosen)][1].version
             })
             $store = {
                 instances,
                 lastUpdate: localStorage.lastUpdate,
                 theme: false,
+                // version: instances[instances.findIndex(x => x[0] === $chosen)][1].version
             }
         } else {
             $store = {
                 instances: JSON.parse(localStorage.instances),
                 lastUpdate: localStorage.lastUpdate,
                 theme: !localStorage.theme ? false : JSON.parse(localStorage.theme),
-                rss: localStorage.rss || undefined
+                rss: localStorage.rss || undefined,
+                // version: JSON.parse(localStorage.instances)[JSON.parse(localStorage.instances).findIndex(x => x[0] === $chosen)][1].version
             }
         }
         $chosen = chooseInstance($store.instances)
         //if light theme toggle class
         if($store.theme) document.documentElement.classList.toggle('light')
+        console.log(getVersion($chosen, $store.instances))
+        console.log(getVersion($chosen, $store.instances))
     })
-
 
     afterUpdate(() => {
         currentPage = window.location.pathname

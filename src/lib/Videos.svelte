@@ -1,5 +1,7 @@
 <script>
     import { createEventDispatcher } from 'svelte'
+    import { convertCount } from '$lib/_helper'
+    import Lazy from 'svelte-lazy'
 
     export let chosen
     export let videos
@@ -13,29 +15,26 @@
         newSeconds = newSeconds < 10 ? `0${newSeconds}` : newSeconds
         return `${newMinutes}:${newSeconds}`
     }
-
-    const watchCount = viewCount => {
-        if(Math.floor(viewCount/1000) < 1000) return `${Math.floor(viewCount/1000)}K`
-        if(Math.floor(viewCount/1000000) < 1000000) return `${Math.floor(viewCount/1000000)}M`
-        if(Math.floor(viewCount/1000000000) < 1000000000) return `${Math.floor(viewCount/1000000000)}G`
-    }
+    $: if(videos[0].el) console.log(videos[0].el.offsetWidth)
 </script>
 
 {#if videos.length > 0}
 <div class="videos">
     {#each videos as video}
-        <div class="video-outer">
+        <div class="video-outer" bind:this={video.el}>
             <div class="video-inner">
                 <div class="card">
                     <a class="thumbnail" href="/watch?v={video.videoId}">
-                        <img alt="thumbnail" src="https://{chosen}/vi/{video.videoId}/mqdefault.jpg">
+                        <Lazy height={video.el ? video.el.offsetWidth : 0}>
+                            <img alt="thumbnail" src="https://{chosen}/vi/{video.videoId}/mqdefault.jpg">
+                        </Lazy>
                         <div class="duration">{secToMin(video.lengthSeconds)}</div>
                     </a>
                     <h3 class="title"><a href="/watch?v={video.videoId}">{video.title}</a></h3>
-                    <h4 class="author"><a href="https://{chosen}/channel/{video.authorId}">{video.author}</a></h4>
+                    <h4 class="author"><a href="/channel#{video.authorId}">{video.author}</a></h4>
                     <div class="stats">
                         <span>Shared {video.publishedText}</span>
-                        <span>{watchCount(video.viewCount)}</span>
+                        <span>{convertCount(video.viewCount)}</span>
                     </div>
                 </div>
             </div>

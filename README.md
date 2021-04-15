@@ -4,7 +4,10 @@
 # WORKING ROUTES
 - index (popular)
 - watch (only video feed)
-- search
+- search (videos)
+- channel (basic)
+-
+
 
 # PLAN/IDEAS
 - implement "party queue" where you can add songs to temporary list in one tab, while listening on another.
