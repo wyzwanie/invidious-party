@@ -22,7 +22,7 @@
             if(res && Object.keys(res).length > 0) {
                 if(res.error && res.error !== 'This channel does not exist.') retry = true
                 return res
-            }c
+            }
             return res
         } catch(err) {
             retry = true
