@@ -8,7 +8,7 @@
 
     let channelID = ''
     let retry = false
-    let vw
+
     let activeTab = 'videos'
 
     onMount(() => channelID = window.location.href.split('#')[1])
@@ -44,12 +44,8 @@
     $: if(retry) {
         $chosen = chooseInstance($store.instances)
         retry = false
-
     }
-    $: console.log(channelID)
 </script>
-
-<svelte:window bind:innerWidth={vw}/>
 
 {#await fetchChannel($chosen, channelID)}
     ...loading...<br><Loader />
