@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from 'svelte'
+    import { onDestroy } from 'svelte'
     import { joinRoom } from 'trystero'
 
     export let roomID
@@ -18,10 +18,30 @@
     let room
     let peers
 
-    onMount(async () => {
-        const config = { appId: 'invidious.party' }
-        room = joinRoom(config, roomID)
+    const config = { appId: 'invidious.party' }
 
+    const sendMessage = (msg, id) => {
+        const msgObj = {
+            id: id || 'self',
+            text: msg,
+            timestamp: new Date().getTime()
+        }
+        messages = [...messages, msgObj]
+        sendMsg(msgObj)
+        message = ''
+    }
+    const setName = name => {
+        names['self'] = name
+        namesColors['self'] = "#" + ((1<<24)*Math.random() | 0).toString(16)
+        sendName(name)
+    }
+
+    onDestroy(() => room.leave())
+
+    $: if(!room) {
+        room = joinRoom(config, roomID)
+    } else {
+        setTimeout(() => peers = room.getPeers(), 1000)
         sendName = room.makeAction('name')[0]
         getName = room.makeAction('name')[1]
         sendMsg = room.makeAction('msg')[0]
@@ -41,68 +61,56 @@
             messages = [...messages, { id, text, timestamp }]
             if(!namesColors[id]) namesColors[id] = "#" + ((1<<24)*Math.random() | 0).toString(16)
         })
-    })
+    }
     
-    const sendMessage = (msg, id) => {
-        const msgObj = {
-            id: id || 'self',
-            text: msg,
-            timestamp: new Date().getTime()
-        }
-        messages = [...messages, msgObj]
-        sendMsg(msgObj)
-        message = ''
-    }
-    const setName = name => {
-        names['self'] = name
-        namesColors['self'] = "#" + ((1<<24)*Math.random() | 0).toString(16)
-        sendName(name)
-    }
-    $: console.log(peers)
-    $: if(room) peers = room.getPeers()
 </script>
 
 <h2>Welcome to p2p chat</h2>
 <p>There are no servers involved, all communication is uncensorable, unlimited, no logs are stored or sent anywhere.</p>
 <p>Anyone can pick any name they want, colors are based on uniqueIDs and randomized everytime somone joins.</p>
+<p>made possible by brilliant package: <a href="https://github.com/dmotz/trystero">https://github.com/dmotz/trystero</a>
 <hr>
-{#if room}
-{#if !names.self}
-Pick a name:<br>
-<input type="text" bind:value={name} />
-<button on:click={() => setName(name)}>saveName</button>
-<hr>
-{/if}
-<div class="chat">
-    <div class="chatBox">
-        <div class="messagesBox">
-            <div class="messages">
-                {#key messages}
-                    {#each messages as msg}
-                        <div class="message">
-                            <b style="color: {namesColors[msg.id]}">{names[msg.id]}</b>: {msg.text}<br>
-                            <span>{new Date(msg.timestamp).toLocaleTimeString() }<br>{msg.id}</span><br>
-                        </div> 
-                    {/each}
-                {/key}
+<!-- {#if room} -->
+    {#if !names.self}
+        Pick a name:<br>
+        <input type="text" bind:value={name} />
+        <button on:click={() => setName(name)}>saveName</button>
+        <hr>
+    {/if}
+    <div class="chat">
+        <div class="chatBox">
+            <div class="messagesBox">
+                <div class="messages">
+                    {#key messages}
+                        {#each messages as msg}
+                            <div class="message">
+                                <b style="color: {namesColors[msg.id]}">{names[msg.id]}</b>: {msg.text}<br>
+                                <span>{new Date(msg.timestamp).toLocaleTimeString() }<br>{msg.id}</span><br>
+                            </div> 
+                        {/each}
+                    {/key}
+                </div>
+            </div>
+            <div class="inputBox">
+                <input type="text" on:keyup={e => {if(e.key === 'Enter') sendMessage(message)}} bind:value={message}>
+                <button on:click={() => sendMessage(message)}>send</button>
             </div>
         </div>
-        <div class="inputBox">
-            <input type="text" on:keyup={e => {if(e.key === 'Enter') sendMessage(message)}} bind:value={message}>
-            <button on:click={() => sendMessage(message)}>send</button>
+        <div class="peersBox">
+            {#if peers}
+                #of peers: {peers.length}
+            {:else}
+                ...gathering...
+            {/if}
+            {#each Object.keys(names) as ID}
+                <div class="peer">
+                    <span style="color:{namesColors[ID]}"></span>
+                    <span style="font-size:90%;">{ID}</span>
+                </div>
+            {/each}
         </div>
     </div>
-    <!-- <div class="peersBox">
-        List of peers:
-        {#each Object.keys(names) as ID}
-            <div class="peer">
-                <span style="color:{namesColors[ID]}">{names[ID]}</span>
-                <span style="font-size:90%;">{ID}</span>
-            </div>
-        {/each}
-    </div> -->
-</div>
-{/if}
+<!-- {/if} -->
 <style>
 h2,p {
     margin: 0;
@@ -146,6 +154,6 @@ h2,p {
     background: rgb(0,0,0,0.381);
 }
 .peersBox {
-    min-width: 213px;
+    /* min-width: 213px; */
 }
 </style>
