@@ -89,6 +89,7 @@ Pick a name:<br>
         </div>
     </div>
     <div class="peersBox">
+        List of peers:
         {#each Object.keys(names) as ID}
             <div class="peer">
                 <span style="color:{namesColors[ID]}">{names[ID]}</span>
