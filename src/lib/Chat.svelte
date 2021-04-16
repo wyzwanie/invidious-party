@@ -2,6 +2,8 @@
     import { onMount } from 'svelte'
     import { joinRoom } from 'trystero'
 
+    export let roomID
+
     let name
     let names = {}
     let namesColors = {}
@@ -18,19 +20,20 @@
 
     onMount(async () => {
         const config = { appId: 'invidious.party' }
-        room = joinRoom(config, 'ytlink2')
+        room = joinRoom(config, roomID)
 
         sendName = room.makeAction('name')[0]
         getName = room.makeAction('name')[1]
         sendMsg = room.makeAction('msg')[0]
         getMsg = room.makeAction('msg')[1]
 
-        peers = room.getPeers()
         room.onPeerJoin(id => {
             sendName(name, id)
+            peers = room.getPeers()
         })
         room.onPeerLeave(id => {
             delete names.id
+            peers = room.getPeers()
         })
         getName((name, id) => (names[id] = name))
         getMsg((msg, id) => {
@@ -55,6 +58,7 @@
         namesColors['self'] = "#" + ((1<<24)*Math.random() | 0).toString(16)
         sendName(name)
     }
+    $: console.log(peers)
     $: if(room) peers = room.getPeers()
 </script>
 
@@ -62,6 +66,7 @@
 <p>There are no servers involved, all communication is uncensorable, unlimited, no logs are stored or sent anywhere.</p>
 <p>Anyone can pick any name they want, colors are based on uniqueIDs and randomized everytime somone joins.</p>
 <hr>
+{#if room}
 {#if !names.self}
 Pick a name:<br>
 <input type="text" bind:value={name} />
@@ -97,7 +102,7 @@ Pick a name:<br>
         {/each}
     </div>
 </div>
-
+{/if}
 <style>
 h2,p {
     margin: 0;
@@ -137,7 +142,7 @@ h2,p {
     right: 3px;
     font-size: 61.8%;
 }
-.message:nth-child(2) {
+:global(.message:nth-child(2)) {
     background: rgb(0,0,0,0.381);
 }
 .peersBox {

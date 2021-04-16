@@ -2,6 +2,7 @@
     import { onMount } from 'svelte'
     import { chooseInstance } from '$lib/_helper'
     import { store, chosen } from '$lib/_store'
+    import Chat from '$lib/Chat.svelte'
     import Video from '$lib/Video.svelte'
 
     let videoID
@@ -34,6 +35,23 @@
 {#if loading}
     fetching... from {$chosen}<br>
 {:else if videoID && $chosen}
-    <Video chosen={$chosen} {videoID} on:error={() => $chosen = chooseInstance($store.instances)} />
+    <div class="wrapper">
+        <div class="video">
+            <Video chosen={$chosen} {videoID} on:error={() => $chosen = chooseInstance($store.instances)} />
+        </div>
+        <div class="chat">
+            <Chat roomID={videoID} />
+        </div>
+    </div>
     <h3>{author}</h3>
 {/if}
+
+<style>
+.wrapper {
+    display: flex;
+}
+.video {
+    width: 80%;
+    margin-right: 11px;
+}
+</style>
