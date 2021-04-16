@@ -35,11 +35,12 @@ export const chooseInstance = instances => {
 
 //save parameter to localStorage
 export const saveLocal = async data => {
-    const { instances, theme, rss } = data
+    const { instances, theme, rss, subscriptions } = data
     if(instances) localStorage.instances = JSON.stringify(instances)
     if(instances || rss) localStorage.lastUpdate = new Date().toJSON()
     if(theme) localStorage.theme = theme
     if(rss) localStorage.rss = rss
+    if(subscriptions) localStorage.subscriptions = JSON.stringify(subscriptions)
 }
 
 //input: chosen instance, output: version

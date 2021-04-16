@@ -47,7 +47,10 @@
 {:else}
     No results or an error! <button on:click={() => dispatch('empty')}>Try another instance?</button>
 {/if}
-<style>    
+<style>
+:global(.svelte-lazy) {
+    width: 100%;
+}
 .videos {
     display: flex;
     flex-wrap: wrap;

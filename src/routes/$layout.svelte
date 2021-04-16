@@ -2,7 +2,7 @@
     import { onMount, afterUpdate } from 'svelte'
     import Header from '$lib/Header.svelte'
 
-    import { store, chosen } from '$lib/_store'
+    import { store, chosen, ipfs } from '$lib/_store'
     import { getInstances, getVersion, chooseInstance, saveLocal } from '$lib/_helper'
 
     let currentPage
@@ -18,7 +18,6 @@
     }
 
     onMount(async () => {
-        
         if(!localStorage.instances || localStorage.instances === '{}') {
             const instances = await getInstances()
             saveLocal({
@@ -46,18 +45,36 @@
         if($store.theme) document.documentElement.classList.toggle('light')
         console.log(getVersion($chosen, $store.instances))
         console.log(getVersion($chosen, $store.instances))
+        if(Ipfs && !$ipfs) initializeNode()
     })
 
     afterUpdate(() => {
         currentPage = window.location.pathname
         if(currentPage.includes('/search')) searchTerm = window.decodeURI(window.location.search.split('=')[1])
     })
+
+    let ipfsStatus = 'initializing'
+
+    const initializeNode = async () => {
+        ipfsStatus = 'ipfs: assets loaded'
+        const tmp = await Ipfs.create()
+        $ipfs = tmp
+        ipfsStatus = 'ipfs: loaded yay!'
+    }
 </script>
 
-<Header {currentPage} {searchTerm} chosen={$chosen} status={$store.theme}
+<svelte:head>
+    <script
+        src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"
+        on:load={initializeNode}>
+    </script>
+</svelte:head>
+
+<Header {currentPage} {searchTerm} chosen={$chosen} status={$store.theme} {ipfsStatus}
     on:changeInstance={() => $chosen = chooseInstance($store.instances)}
     on:theme={changeTheme}
 />
+
 
 <main>
     <slot></slot>

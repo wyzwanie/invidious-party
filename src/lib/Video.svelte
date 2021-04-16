@@ -129,6 +129,7 @@ YEE
     </video>
 </div>
 {:else}
+... loading ...
     <button on:click={() => dispatch('error')}>nextChosen</button>
 {/if}
 

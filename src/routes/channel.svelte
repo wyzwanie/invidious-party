@@ -1,31 +1,62 @@
 <script>
     import { onMount } from 'svelte'
 	import { chooseInstance, convertCount, saveLocal } from '$lib/_helper'
-	import { store, chosen } from '$lib/_store'
+	import { store, chosen, subStore, ipfs } from '$lib/_store'
 	
 	import Loader from '$lib/Loader.svelte'
+    import Playlists from '$lib/Playlists.svelte'
 	import Videos from '$lib/Videos.svelte'
 
     let channelID = ''
     let retry = false
+    let counter = 0
 
     let activeTab = 'videos'
 
     onMount(() => channelID = window.location.href.split('#')[1])
+let tmp
+    const sub = async channelID => {
+        if(!$subStore.includes(channelID)) $subStore = [...$subStore, channelID]
+        else alert('unsub?')
+        const saveToIpfs = await $ipfs.dag.put({
+            subscriptions: $subStore
+        })
+        saveLocal({ subscriptions: { array: $subStore, cid: saveToIpfs.toString() }})
+        tmp = saveToIpfs.toString()
+    }
 
     const fetchChannel = async (instance, channelID) => {
         if(!channelID) return { error: 'This channel does not exist.'}
+        if(channelID.length > 24) return { error: 'wrong channel ID'}
+        if(counter > 10) return { error: 'is everything OK? too many retries...' }
+
         try {
             const req = await fetch(`https://${instance}/api/v1/channels/${channelID}`)
             const res = await req.json()
 
             if(res && Object.keys(res).length > 0) {
-                if(res.error && res.error !== 'This channel does not exist.') retry = true
+                if(res.error && res.error !== 'This channel does not exist.') {
+                    // retry = true
+                    counter++
+                }
                 return res
             }
             return res
         } catch(err) {
             retry = true
+            counter++
+        }
+    }
+
+    const fetchPlaylists = async (instance, channelID) => {
+        try {
+            const req = await fetch(`https://${instance}/api/v1/channels/${channelID}/playlists`)
+            const res = await req.json()
+            if(res.error) return res.error
+            else return res
+        } catch(err) {
+            retry = true
+            counter++
         }
     }
 
@@ -46,7 +77,7 @@
         retry = false
     }
 </script>
-
+{tmp}
 {#await fetchChannel($chosen, channelID)}
     ...loading...<br><Loader />
     {:then channel}
@@ -60,7 +91,7 @@
                     <img src="{getAuthorThumbnail(channel.authorThumbnails)}" alt="author icon" />
                     <span class="author">{channel.author}</span>
                 </div>
-                <div class="sub">
+                <div class="sub" on:click={sub(channelID)}>
                     <span class="subCount">Subscribe <span>{convertCount(channel.subCount)}</span></span>
                     <!-- <span class="totalViews">Total views: {channel.totalViews}</span> -->
                 </div>
@@ -75,6 +106,15 @@
             </nav>
             {#if activeTab === 'videos'}
                 <Videos chosen={$chosen} videos={channel.latestVideos} />
+            {/if}
+            {#if activeTab === 'playlists'}
+                {#await fetchPlaylists($chosen, channelID)}
+                    ...loading playlists...
+                {:then playlists}
+                    <Playlists chosen={$chosen} playlists={playlists.playlists} />
+                {:catch error}
+                    ...error...
+                {/await}
             {/if}
             {#if activeTab === 'info'}
                 <div class="description">
