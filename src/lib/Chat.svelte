@@ -92,7 +92,7 @@ Pick a name:<br>
             <button on:click={() => sendMessage(message)}>send</button>
         </div>
     </div>
-    <div class="peersBox">
+    <!-- <div class="peersBox">
         List of peers:
         {#each Object.keys(names) as ID}
             <div class="peer">
@@ -100,7 +100,7 @@ Pick a name:<br>
                 <span style="font-size:90%;">{ID}</span>
             </div>
         {/each}
-    </div>
+    </div> -->
 </div>
 {/if}
 <style>
@@ -142,7 +142,7 @@ h2,p {
     right: 3px;
     font-size: 61.8%;
 }
-:global(.message:nth-child(2)) {
+.message:nth-child(2n) {
     background: rgb(0,0,0,0.381);
 }
 .peersBox {

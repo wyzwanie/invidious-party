@@ -34,10 +34,12 @@
 
 {#if loading}
     fetching... from {$chosen}<br>
-{:else if videoID && $chosen}
+{:else if videoID}
     <div class="wrapper">
         <div class="video">
-            <Video chosen={$chosen} {videoID} on:error={() => $chosen = chooseInstance($store.instances)} />
+            {#if $chosen}
+                <Video chosen={$chosen} {videoID} on:error={() => $chosen = chooseInstance($store.instances)} />
+            {/if}
         </div>
         <div class="chat">
             <Chat roomID={videoID} />
