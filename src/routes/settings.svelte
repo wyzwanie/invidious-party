@@ -12,7 +12,7 @@
 
     const save = async data => {
         if(ipfsNode) savedCID = await ipfsNode.dag.put(data)
-        console.log(savedCID)
+        // console.log(savedCID)
         // let a = await ipfsNode.key.gen('myKey', {
         //     type: 'ed25519'
         // })

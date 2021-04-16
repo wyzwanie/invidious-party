@@ -45,8 +45,8 @@ export const saveLocal = async data => {
 
 //input: chosen instance, output: version
 export const getVersion = (chosen, instances) => {
-    console.log(chosen)
-    console.log(instances)
+    // console.log(chosen)
+    // console.log(instances)
     // $store.instances[$store.instances.findIndex(x => w[0] === $chosen)][1].version
 }
 

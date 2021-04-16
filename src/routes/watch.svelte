@@ -22,7 +22,7 @@
             author = videoData.title
             loading = false
         } catch(err) {
-            console.log(err)
+            // console.log(err)
             $chosen = chooseInstance($store.instances)
             loading = false
         }

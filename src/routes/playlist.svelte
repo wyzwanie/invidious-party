@@ -29,7 +29,6 @@
                     counter++
                 }
                 currentVideo = res.videos[0].videoId
-                console.log(currentVideo)
                 return res
             }
             return res

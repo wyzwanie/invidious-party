@@ -43,8 +43,7 @@
         $chosen = chooseInstance($store.instances)
         //if light theme toggle class
         if($store.theme) document.documentElement.classList.toggle('light')
-        console.log(getVersion($chosen, $store.instances))
-        console.log(getVersion($chosen, $store.instances))
+        console.log('$layout:getVersion', getVersion($chosen, $store.instances))
         if(Ipfs && !$ipfs) initializeNode()
     })
 

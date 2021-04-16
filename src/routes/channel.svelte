@@ -67,7 +67,6 @@ let tmp
     }
     const getAuthorThumbnail = authorThumbnails => {
         const link = authorThumbnails[authorThumbnails.findIndex(x => x.width == 100)].url
-        console.log(link)
         const extracted = link.split('/')[4]
         return `https://${$chosen}/ggpht/ytc/${extracted}`
     }

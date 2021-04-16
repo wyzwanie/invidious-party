@@ -25,7 +25,7 @@
             searchResult = await fetchResponse.json()
             loading = false
         } catch(err) {
-            console.log(err)
+            // console.log(err)
             $chosen = chooseInstance($store.instances)
             await fetchResult(searchQuery)
             loading = false
