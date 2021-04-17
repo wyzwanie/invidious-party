@@ -1,6 +1,5 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-import { select_multiple_value } from 'svelte/internal';
 
     import Toggle from './Toggle.svelte'
 

@@ -2,42 +2,38 @@
 	import { chooseInstance } from '$lib/_helper'
 	import { store, chosen } from '$lib/_store'
 	
+	import Chat from '$lib/Chat.svelte'
 	import Loader from '$lib/Loader.svelte'
-	import Videos from '$lib/Videos.svelte'
+	import Video from '$lib/Video.svelte'
 
-	let error
-	let loading
-	let popular
-
-	const fetchPopular = async instance => {
-		if(!instance) return false
-		loading = true
-		try {
-			///api/v1/videos/aqz-KE-bpKQ?fields=videoId,title,description
-			const popularRequest = await fetch(`https://${instance}/api/v1/popular`)
-			popular = await popularRequest.json()
-			loading = false
-			if(popular.length > 0) return popular
-			else $chosen = chooseInstance($store.instances)
-		} catch(err) {
-			$chosen = chooseInstance($store.instances)
-			error = 'No results or an error!'
-			await fetchPopular($chosen)
-			loading = false
-		}
-	}
-
-	$: fetchPopular($chosen)
+	let videoID
 </script>
 
-<div class="container">
-	{#if loading}
-		<Loader />
-	{/if}
-	{#if popular && popular.length > 0}
-		<Videos videos={popular} chosen={$chosen} />
-	{/if}
-	{#if error}
-		{error} <button on:click={() => $chosen = chooseInstance($store.instances)}>Try another instance?</button>
-	{/if}
+<div class="party">
+	<div class="video">
+		{#if videoID}
+			<Video chosen={$chosen} {videoID} />
+		{:else}
+			<img src="sadge.png" alt="sadge">
+			<h3>Party Empty</h3>
+			<button>ADD VIDEO TO PARTY</button>
+		{/if}
+	</div>
+	<div class="chat">
+		<Chat roomID="invidious.party" />
+	</div>
 </div>
+
+<style>
+.party {
+    display: flex;
+}
+.video {
+    width: 100%;
+	justify-self: center;
+	align-items: center;
+}
+.chat {
+    width: 50%;
+}
+</style>

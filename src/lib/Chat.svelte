@@ -83,7 +83,7 @@
 
 <div class="chat">
     <div class="info">
-        <h2>Welcome to p2p chat</h2>
+        <span style="font-size: 1.382em;font-weight: bold;">Welcome to p2p chat</span>
         <span class="help" on:click={() => chatHelp = !chatHelp}>?</span>
         {#if chatHelp}
             <p>There are no servers involved, all communication is uncensorable, unlimited, no logs are stored or sent anywhere.</p>
@@ -151,6 +151,7 @@
     background: var(--bg-menus);
     padding: 7px;
     border-top-right-radius: 5px;
+    height: 42px;
 }
 .help {
     position: absolute;
@@ -175,9 +176,6 @@
     display: flex;
     padding: 7px;
 }
-h2 {
-    margin: 0;
-}
 .chat {
     display: flex;
     flex-direction: column;
@@ -185,6 +183,7 @@ h2 {
     height: 100%;
     background: var(--bg-dark-second);
     border: 1px solid var(--bg-dark-second);
+    border-left: none;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }

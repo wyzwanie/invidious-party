@@ -33,7 +33,12 @@
             hls: {
                 overrideNative: true
             }
-        }
+        },
+        // plugins: {
+        //     httpSourceSelector: {
+        //         default: 'hd720'
+        //     }
+        // }
     }
     const initializeVideo = () => {
         console.log('loaded')
@@ -69,31 +74,14 @@
             }
         });
     }
-    $: if(initialized > 5) initializeVideo()
+    $: if(initialized) initializeVideo()
 </script>
 
 <svelte:head>
-    {#if chosen}
-        <link rel="stylesheet" href="https://{chosen}/css/video-js.min.css?v={version}">
-        <link rel="stylesheet" href="https://{chosen}/css/videojs-http-source-selector.css?v={version}">
-        <link rel="stylesheet" href="https://{chosen}/css/videojs.markers.min.css?v={version}">
-        <!-- <link rel="stylesheet" href="https://{chosen}/css/videojs-share.css?v={version}"> -->
-        <link rel="stylesheet" href="https://{chosen}/css/videojs-vtt-thumbnails.css?v={version}">
-        <link rel="stylesheet" href="https://{chosen}/css/quality-selector.css?v={version}">
-
-        <script src="https://{chosen}/js/video.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
-        <script src="https://{chosen}/js/videojs-contrib-quality-levels.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
-        <script src="https://{chosen}/js/videojs-http-source-selector.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
-        <script src="https://{chosen}/js/videojs-markers.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
-        <!-- <script src="https://{chosen}/js/videojs-share.min.js?v={version}" on:load={() => initialized++} /> -->
-        <script src="https://{chosen}/js/videojs-vtt-thumbnails.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
-        <script src="https://{chosen}/js/silvermine-videojs-quality-selector.min.js?v={version}" on:load={() => initialized++} on:error={() => dispatch('error')} />
-    {/if}    
+    <link rel="stylesheet" href="https://unpkg.com/video.js/dist/video-js.min.css">
+    <script src="https://unpkg.com/video.js/dist/video.min.js" on:load={() => initialized = true} on:error={() => dispatch('error')} />
 </svelte:head>
-<!-- <button on:click={() => dispatch('error')}>nextChosen</button>
-{#if initialized > 4}
-YEE
-{/if} -->
+
 {#if chosen && videoID}
 <!-- <iframe src="https://{chosen}/embed/{videoID}" title="video" /> -->
 <!-- &itag=18&local=true -->
@@ -101,7 +89,7 @@ YEE
 <div class="video-js-responsive-container vjs-hd">
     <video
         id="my-player"
-        class="video-js"
+        class="video-js vjs-big-play-centered"
         controls
         preload="auto"
         poster="https://{chosen}/vi/{videoID}/maxres.jpg"
