@@ -31,29 +31,27 @@
         }
     } else {
         peers = room.getPeers()
-        setTimeout(() => peers = room.getPeers(), 1000)
-
-        room.onPeerJoin(id => {
-            console.log('joined', id)
-            messages = [...messages, { id: 'app', text: `${id} has just joined...`, timestamp: new Date().getTime() }]
-            if(name) sendName(name, id)
-        })
-        room.onPeerLeave(id => {
-            delete names.id
-        })
-
-room.onPeerLeave(id => console.log(`${id} left`))
-room.onPeerJoin(id => console.log(`${id} joined`))
 
         sendName = room.makeAction('name')[0]
         getName = room.makeAction('name')[1]
         sendMsg = room.makeAction('msg')[0]
         getMsg = room.makeAction('msg')[1]
-        getName((n, id) => {
-            console.log('getting name', n)
-            names[id] = n
-            messages = [...messages, { id: 'app', text: `${n} has just joined...`, timestamp: new Date().getTime() }]
+
+        if(names.self) sendName(names.self)
+        room.onPeerJoin(id => {
+            if(names.self) sendName(names.self, id)
+            if(!names[id]) sendMessage(`someone joined as viewer`, 'app')
+            else sendMessage(`${names[id]} joined the party!`, 'app')
         })
+        room.onPeerLeave(id => {
+            if(names[id]) {
+                sendMessage(`${names[id]} just left...`, 'app')
+                delete names.id
+            } else sendMessage(`viewer left`, 'app') 
+            delete names.id
+        })
+
+        getName((n, id) => names[id] = n)
         getMsg((msg, id) => {
             console.log('msg', msg)
             const { text, timestamp } = msg
@@ -68,6 +66,7 @@ room.onPeerJoin(id => console.log(`${id} joined`))
     const sendMessage = (msg, id) => {
         const msgObj = {
             id: id || 'self',
+            name: '',
             text: msg,
             timestamp: new Date().getTime()
         }
@@ -79,11 +78,8 @@ room.onPeerJoin(id => console.log(`${id} joined`))
         name = n
         names['self'] = n
         namesColors['self'] = "#" + ((1<<24)*Math.random() | 0).toString(16)
-        // sendName(nameContainer.value)
     }
 </script>
-{JSON.stringify(names)}
-{JSON.stringify(messages)}
 
 <div class="chat">
     <div class="info">
@@ -119,8 +115,8 @@ room.onPeerJoin(id => console.log(`${id} joined`))
                                 <span>{new Date(msg.timestamp).toLocaleTimeString() }<br>{msg.id}</span><br>
                             </div>
                         {:else}
-                            <div class="joined">
-                                {msg.name} just joined... say hi :)
+                            <div class="notifications">
+                                {msg.text}
                             </div>
                         {/if}
                     {/each}
@@ -135,8 +131,8 @@ room.onPeerJoin(id => console.log(`${id} joined`))
         {/if}
     </div>
     <div class="peersBox">
-        {#if peers}
-            #of peers: {peers.length}
+        {#if Object.keys(names).length > 0}
+            #of peers: {Object.keys(names).length}
         {:else}
             status: searching for peers...
         {/if}
@@ -179,7 +175,6 @@ room.onPeerJoin(id => console.log(`${id} joined`))
     display: flex;
     padding: 7px;
 }
-    /*  */
 h2 {
     margin: 0;
 }
@@ -224,6 +219,7 @@ button {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
     flex: 1 1 11%;
+    cursor: pointer;
 }
 .messagesBox {
     height: 100%;
@@ -243,8 +239,10 @@ button {
 .message:nth-child(2n) {
     background: rgb(0,0,0,0.381);
 }
-.joined {
-    background: var(--accent)
+.notifications {
+    background: #515151;
+    padding: 7px;
+    color: white;
 }
 .peersBox {
     padding: 7px;
