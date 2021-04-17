@@ -84,14 +84,14 @@
     on:theme={changeTheme}
 />
 
-
 <main>
     <slot></slot>
 </main>
 
-<footer>
-
-</footer>
+<!-- <footer>
+donate to invidious<br>
+thanks...<br>
+</footer> -->
 
 <style>
 :global(body) {

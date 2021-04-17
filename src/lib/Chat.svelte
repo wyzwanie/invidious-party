@@ -4,6 +4,7 @@
 
     export let roomID
 
+    let name
     let names = {}
     let namesColors = {}
     let message
@@ -20,6 +21,50 @@
 
     const config = { appId: 'invidious.party' }
 
+    onDestroy(() => {if(room) room.leave()})
+
+    $: if(!room || !Object.keys(room).length) {
+        try {
+            room = joinRoom(config, roomID)
+        } catch(err) {
+            console.log(err.message)
+        }
+    } else {
+        peers = room.getPeers()
+        setTimeout(() => peers = room.getPeers(), 1000)
+
+        room.onPeerJoin(id => {
+            console.log('joined', id)
+            messages = [...messages, { id: 'app', text: `${id} has just joined...`, timestamp: new Date().getTime() }]
+            if(name) sendName(name, id)
+        })
+        room.onPeerLeave(id => {
+            delete names.id
+        })
+
+room.onPeerLeave(id => console.log(`${id} left`))
+room.onPeerJoin(id => console.log(`${id} joined`))
+
+        sendName = room.makeAction('name')[0]
+        getName = room.makeAction('name')[1]
+        sendMsg = room.makeAction('msg')[0]
+        getMsg = room.makeAction('msg')[1]
+        getName((n, id) => {
+            console.log('getting name', n)
+            names[id] = n
+            messages = [...messages, { id: 'app', text: `${n} has just joined...`, timestamp: new Date().getTime() }]
+        })
+        getMsg((msg, id) => {
+            console.log('msg', msg)
+            const { text, timestamp } = msg
+            messages = [...messages, { id, text, timestamp }]
+            if(!namesColors[id]) namesColors[id] = "#" + ((1<<24)*Math.random() | 0).toString(16)
+        })
+    }
+
+    $: console.log(names)
+    let chatHelp = false
+
     const sendMessage = (msg, id) => {
         const msgObj = {
             id: id || 'self',
@@ -31,45 +76,14 @@
         message = ''
     }
     const setName = n => {
+        name = n
         names['self'] = n
         namesColors['self'] = "#" + ((1<<24)*Math.random() | 0).toString(16)
-        sendName(n)
+        // sendName(nameContainer.value)
     }
-
-    onDestroy(() => {if(room) room.leave()})
-
-    $: if(!room) {
-        try {
-            room = joinRoom(config, roomID)
-        } catch(err) {
-            console.log(err.message)
-        }
-    } else {  
-        setTimeout(() => peers = room.getPeers(), 1000)
-        sendName = room.makeAction('name')[0]
-        getName = room.makeAction('name')[1]
-        sendMsg = room.makeAction('msg')[0]
-        getMsg = room.makeAction('msg')[1]
-
-        room.onPeerJoin(id => {
-            if(name) sendName(name, id)
-            peers = room.getPeers()
-        })
-        room.onPeerLeave(id => {
-            delete names.id
-            peers = room.getPeers()
-        })
-        getName((name, id) => (names[id] = name))
-        getMsg((msg, id) => {
-            const { text, timestamp } = msg
-            messages = [...messages, { id, text, timestamp }]
-            if(!namesColors[id]) namesColors[id] = "#" + ((1<<24)*Math.random() | 0).toString(16)
-        })
-    }
-    $: console.log(names)
-    let chatHelp = false
 </script>
-
+{JSON.stringify(names)}
+{JSON.stringify(messages)}
 
 <div class="chat">
     <div class="info">
@@ -85,7 +99,7 @@
     {#if !names.self}
         <div class="namePicker">
             <input placeholder="Pick a name" type="text" bind:this={nameContainer} />
-            <button on:click={() => setName(nameContainer.value)}>pick</button>
+            <button on:click={() => {setName(nameContainer.value)}}>pick</button>
         </div>
         <div style="padding: 7px;">
             <p>There are no servers involved, all communication is uncensorable, unlimited, no logs are stored or sent anywhere.</p>
@@ -99,10 +113,16 @@
             <div class="messages">
                 {#key messages}
                     {#each messages as msg}
-                        <div class="message">
-                            <b style="color: {namesColors[msg.id]}">{names[msg.id]}</b>: {msg.text}<br>
-                            <span>{new Date(msg.timestamp).toLocaleTimeString() }<br>{msg.id}</span><br>
-                        </div> 
+                        {#if msg.id !== 'app'}
+                            <div class="message">
+                                <b style="color: {namesColors[msg.id]}">{names[msg.id]}</b>: {msg.text}<br>
+                                <span>{new Date(msg.timestamp).toLocaleTimeString() }<br>{msg.id}</span><br>
+                            </div>
+                        {:else}
+                            <div class="joined">
+                                {msg.name} just joined... say hi :)
+                            </div>
+                        {/if}
                     {/each}
                 {/key}
             </div>
@@ -222,6 +242,9 @@ button {
 }
 .message:nth-child(2n) {
     background: rgb(0,0,0,0.381);
+}
+.joined {
+    background: var(--accent)
 }
 .peersBox {
     padding: 7px;
