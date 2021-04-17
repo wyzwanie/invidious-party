@@ -53,7 +53,9 @@
     display: flex;
 }
 .video {
-    width: 80%;
-    margin-right: 11px;
+    width: 100%;
+}
+.chat {
+    width: 31.8%;
 }
 </style>

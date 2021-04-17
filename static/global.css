@@ -1,6 +1,7 @@
 :root {
     --bg-dark: rgba(35, 35, 35, 1);
     --bg-dark-second: rgba(0, 0, 0, 0.12345);
+    --bg-menus: rgb(0 0 0 / 35%);
     --txt-dark: #FFF;
     --lightgrey: #f0f0f0;
     --grey: #a8a8a8;

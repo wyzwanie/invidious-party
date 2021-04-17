@@ -4,7 +4,6 @@
 
     export let roomID
 
-    let name
     let names = {}
     let namesColors = {}
     let message
@@ -17,6 +16,7 @@
 
     let room
     let peers
+    let nameContainer
 
     const config = { appId: 'invidious.party' }
 
@@ -30,17 +30,21 @@
         sendMsg(msgObj)
         message = ''
     }
-    const setName = name => {
-        names['self'] = name
+    const setName = n => {
+        names['self'] = n
         namesColors['self'] = "#" + ((1<<24)*Math.random() | 0).toString(16)
-        sendName(name)
+        sendName(n)
     }
 
-    onDestroy(() => room.leave())
+    onDestroy(() => {if(room) room.leave()})
 
     $: if(!room) {
-        room = joinRoom(config, roomID)
-    } else {
+        try {
+            room = joinRoom(config, roomID)
+        } catch(err) {
+            console.log(err.message)
+        }
+    } else {  
         setTimeout(() => peers = room.getPeers(), 1000)
         sendName = room.makeAction('name')[0]
         getName = room.makeAction('name')[1]
@@ -48,7 +52,7 @@
         getMsg = room.makeAction('msg')[1]
 
         room.onPeerJoin(id => {
-            sendName(name, id)
+            if(name) sendName(name, id)
             peers = room.getPeers()
         })
         room.onPeerLeave(id => {
@@ -62,82 +66,148 @@
             if(!namesColors[id]) namesColors[id] = "#" + ((1<<24)*Math.random() | 0).toString(16)
         })
     }
-    
+    $: console.log(names)
+    let chatHelp = false
 </script>
 
-<h2>Welcome to p2p chat</h2>
-<p>There are no servers involved, all communication is uncensorable, unlimited, no logs are stored or sent anywhere.</p>
-<p>Anyone can pick any name they want, colors are based on uniqueIDs and randomized everytime somone joins.</p>
-<p>made possible by brilliant package: <a href="https://github.com/dmotz/trystero">https://github.com/dmotz/trystero</a>
-<hr>
-<!-- {#if room} -->
+
+<div class="chat">
+    <div class="info">
+        <h2>Welcome to p2p chat</h2>
+        <span class="help" on:click={() => chatHelp = !chatHelp}>?</span>
+        {#if chatHelp}
+            <p>There are no servers involved, all communication is uncensorable, unlimited, no logs are stored or sent anywhere.</p>
+            <p>Anyone can pick any name they want, colors are based on uniqueIDs and randomized everytime somone joins.</p>
+            <p>made possible by brilliant package: <a href="https://github.com/dmotz/trystero">https://github.com/dmotz/trystero</a>
+            <p><b>use it at your own risk, you've been warned.</b></p>
+        {/if}
+    </div>
     {#if !names.self}
-        Pick a name:<br>
-        <input type="text" bind:value={name} />
-        <button on:click={() => setName(name)}>saveName</button>
-        <hr>
+        <div class="namePicker">
+            <input placeholder="Pick a name" type="text" bind:this={nameContainer} />
+            <button on:click={() => setName(nameContainer.value)}>pick</button>
+        </div>
+        <div style="padding: 7px;">
+            <p>There are no servers involved, all communication is uncensorable, unlimited, no logs are stored or sent anywhere.</p>
+            <p>Anyone can pick any name they want, colors are based on uniqueIDs and randomized everytime somone joins.</p>
+            <p>made possible by brilliant package: <a href="https://github.com/dmotz/trystero">https://github.com/dmotz/trystero</a>
+            <p><b>use it at your own risk, you've been warned.</b></p>
+        </div>
     {/if}
-    <div class="chat">
-        <div class="chatBox">
-            <div class="messagesBox">
-                <div class="messages">
-                    {#key messages}
-                        {#each messages as msg}
-                            <div class="message">
-                                <b style="color: {namesColors[msg.id]}">{names[msg.id]}</b>: {msg.text}<br>
-                                <span>{new Date(msg.timestamp).toLocaleTimeString() }<br>{msg.id}</span><br>
-                            </div> 
-                        {/each}
-                    {/key}
-                </div>
+    <div class="chatBox">
+        <div class="messagesBox">
+            <div class="messages">
+                {#key messages}
+                    {#each messages as msg}
+                        <div class="message">
+                            <b style="color: {namesColors[msg.id]}">{names[msg.id]}</b>: {msg.text}<br>
+                            <span>{new Date(msg.timestamp).toLocaleTimeString() }<br>{msg.id}</span><br>
+                        </div> 
+                    {/each}
+                {/key}
             </div>
+        </div>
+        {#if names.self}
             <div class="inputBox">
                 <input type="text" on:keyup={e => {if(e.key === 'Enter') sendMessage(message)}} bind:value={message}>
                 <button on:click={() => sendMessage(message)}>send</button>
             </div>
-        </div>
-        <div class="peersBox">
-            {#if peers}
-                #of peers: {peers.length}
-            {:else}
-                ...gathering...
-            {/if}
-            {#each Object.keys(names) as ID}
-                <div class="peer">
-                    <span style="color:{namesColors[ID]}"></span>
-                    <span style="font-size:90%;">{ID}</span>
-                </div>
-            {/each}
-        </div>
+        {/if}
     </div>
+    <div class="peersBox">
+        {#if peers}
+            #of peers: {peers.length}
+        {:else}
+            status: searching for peers...
+        {/if}
+        <!-- {#each Object.keys(names) as ID}
+            <div class="peer">
+                <span style="color:{namesColors[ID]}"></span>
+                <span style="font-size:90%;">{ID}</span>
+            </div>
+        {/each} -->
+    </div>
+</div>
 <!-- {/if} -->
 <style>
-h2,p {
+.info {
+    position: relative;
+    background: var(--bg-menus);
+    padding: 7px;
+    border-top-right-radius: 5px;
+}
+.help {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+    width: 1.3em;
+    height: 1.3em;
+    display: flex;
+    font-size: 1.1em;
+    font-weight: bold;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.help:hover {
+    filter: grayscale(0.618)
+}
+.namePicker {
+    display: flex;
+    padding: 7px;
+}
+    /*  */
+h2 {
     margin: 0;
 }
 .chat {
     display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-dark-second);
+    border: 1px solid var(--bg-dark-second);
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 .chatBox {
-    flex: 1 1 61.8%;
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 31px);
 }
 .inputBox {
     display: flex;
+    padding: 3px;
 }
-.inputBox input {
-    display: flex;
-    width: 100%;
+input {
+    font-size: 1em;
     padding: 7px;
     background: rgb(59 59 59);
     color: white;
-    border: none;
     border: 1px solid #3b3b3b;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+    flex: 1 1 89%;
 }
-.inputBox input:focus {
+input:focus {
     outline: none;
 }
+button {
+    font-size: 1em;
+    font-weight: bold;
+    padding: 7px;
+    background: var(--accent);
+    border: none;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    flex: 1 1 11%;
+}
 .messagesBox {
-    min-height: 420px;
+    height: 100%;
+    background: var(--bg-dark);
 }
 .message {
     position: relative;
@@ -154,6 +224,7 @@ h2,p {
     background: rgb(0,0,0,0.381);
 }
 .peersBox {
-    /* min-width: 213px; */
+    padding: 7px;
+    border-top:1px solid var(--bg-dark-second);
 }
 </style>
