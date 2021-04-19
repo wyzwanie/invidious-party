@@ -12,7 +12,7 @@ let counter = 0
             const cid = $store.subscriptions.cid
             const result = await $ipfs.dag.get(cid)
             return result.value.SUBs
-        } else {}
+        } else return []
     }
     const fetchSubscriptions = async (instance, channelID) => {
         try {
