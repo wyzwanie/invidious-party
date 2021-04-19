@@ -86,11 +86,12 @@
     height: 69px;
     display: flex;
     justify-content: space-between;
-    margin-top: 1px;
+    margin-top: 2px;
 }
 .authorInfo {
     display: flex;
     align-items: center;
+    
 }
 .wrapper {
     width: 69px;
