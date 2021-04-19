@@ -50,6 +50,7 @@ let counter = 0
 {#await getSubscriptions()}
     ...fetching from IPFS...
 {:then subscriptions}
+{JSON.stringify(subscriptions)}
     {#each subscriptions as channelID, i}
     {channelID}
     <hr>
