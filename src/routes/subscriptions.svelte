@@ -17,11 +17,12 @@ let counter = 0
             return $SUBs
         }
     }
-    const fetchSubscriptions = async (instance, channelID) => {
+    const fetchChannel = async (instance, channelID) => {
         try {
             // instance = 'tube.connect.cafe'
             const req = await fetch(`https://${instance}/feed/channel/${channelID}`)
             const res = await req.text()
+            console.log(res)
 
             const parser = new DOMParser()
             const xml = parser.parseFromString(text, 'text/xml')
@@ -43,6 +44,7 @@ let counter = 0
             // retry = true
         }
     }
+
     $: if($ipfs) getSubscriptions()
     $: if(retry) {
         $chosen = chooseInstance($store.instances)
@@ -50,25 +52,25 @@ let counter = 0
     }
 </script>
 
-{#await getSubscriptions()}
+<!-- {#await getSubscriptions()}
     ...fetching from IPFS...
-{:then subscriptions}
-{JSON.stringify(subscriptions)}
-    {#each subscriptions as channelID, i}
+{:then subscriptions} -->
+<!-- {JSON.stringify(subscriptions)} -->
+    {#each $SUBs as channelID, i}
     {channelID}
     <hr>
-        {#await fetchSubscriptions($chosen, channelID, i)}
-            ...fetching {i+1}/{subscriptions.length}...
+        {#await fetchChannel($chosen, channelID, i)}
+            ...fetching {i+1}/{$SUBs.length}...
         {:then rss} 
-            {rss}
+            {JSON.stringify(rss)}
         {:catch error}
             {error}
         {/await}
     <hr>
     {/each}
-{:catch error}
+<!-- {:catch error}
     {error}
-{/await}
+{/await} -->
 
 
 
