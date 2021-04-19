@@ -1,6 +1,8 @@
 <script>
-    import Lazy from 'svelte-lazy'
     import { convertCount, getAuthorThumbnail, secToMin } from '$lib/_helper'
+    
+    import Lazy from 'svelte-lazy'
+    import Loader from '$lib/Loader.svelte'
 
     export let chosen
     export let video
@@ -49,7 +51,7 @@
                     <div class="video-inner">
                         <div class="card">
                             <a class="thumbnail" href="/watch?v={r.videoId}">
-                                <Lazy height={Math.floor(vw*0.11)} placeholder=...loading...>
+                                <Lazy height={Math.floor(vw*0.11)} placeholder={Loader}>
                                     <img alt="thumbnail" src="https://{chosen}/vi/{r.videoId}/mqdefault.jpg">
                                 </Lazy>
                                 <div class="duration">{secToMin(r.lengthSeconds)}</div>

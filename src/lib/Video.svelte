@@ -138,5 +138,12 @@
     position: absolute;
     top: 0;
     left: 0;
+    border-radius: 5px;
+}
+:global(.video-js .vjs-tech) {
+    border-radius: 5px;
+}
+:global(.vjs-poster) {
+    border-radius: 5px;
 }
 </style>

@@ -60,7 +60,6 @@
         })
     }
 
-    $: console.log(names)
     let chatHelp = false
 
     const sendMessage = (msg, id) => {
@@ -146,17 +145,27 @@
 </div>
 <!-- {/if} -->
 <style>
+.chat {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-dark-second);
+    border: 1px solid var(--light-border);
+    border-radius: 5px;
+}
 .info {
     position: relative;
-    background: var(--bg-menus);
+    background: var(--bg-dark-second);
     padding: 7px;
-    border-top-right-radius: 5px;
     height: 42px;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
 }
 .help {
     position: absolute;
-    right: 0;
-    top: 0;
+    right: 7px;
+    top: 7px;
     color: var(--accent);
     border: 2px solid var(--accent);
     border-radius: 50%;
@@ -175,17 +184,6 @@
 .namePicker {
     display: flex;
     padding: 7px;
-}
-.chat {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    background: var(--bg-dark-second);
-    border: 1px solid var(--bg-dark-second);
-    border-left: none;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
 }
 .chatBox {
     display: flex;
