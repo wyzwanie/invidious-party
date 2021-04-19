@@ -6,14 +6,16 @@
 
 let retry = false
 let counter = 0
-let tmp
 
-    const getSubscriptions = async SUBs => {
-        if(SUBs && SUBs.length > 0) {
+    const getSubscriptions = async () => {
+        // if($store && store.subscriptions && $store.subscriptions.cid) {
+        try {
             const cid = $store.subscriptions.cid
             const result = await $ipfs.dag.get(cid)
             return result.value.SUBs
-        } else return []
+        } catch(err) {
+            return $SUBs
+        }
     }
     const fetchSubscriptions = async (instance, channelID) => {
         try {
@@ -48,7 +50,7 @@ let tmp
     }
 </script>
 
-{#await getSubscriptions($SUBs)}
+{#await getSubscriptions()}
     ...fetching from IPFS...
 {:then subscriptions}
 {JSON.stringify(subscriptions)}
