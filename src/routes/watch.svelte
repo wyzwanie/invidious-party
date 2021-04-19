@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte'
     import { chooseInstance } from '$lib/_helper'
-    import { store, chosen, subStore, ipfs } from '$lib/_store'
+    import { store, chosen, SUBs, ipfs } from '$lib/_store'
 
     import AsyncError from '$lib/AsyncError.svelte'
     import AsyncLoading from '$lib/AsyncLoading.svelte'
