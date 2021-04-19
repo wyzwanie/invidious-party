@@ -17,7 +17,7 @@
         dispatch('rotate')
     }
 </script>
-
+{#if video}
 <div class="info">
     <div class="titleBar">
         <div class="left">
@@ -62,7 +62,9 @@
         <div class="subcount">{video.subCountText}</div>
     </div>
 </div>
-
+{:else}
+...loading...
+{/if}
 
 
 <style>

@@ -1,7 +1,7 @@
 <script>
     import { onMount } from 'svelte'
 	import { chooseInstance, convertCount, saveLocal, getAuthorThumbnail, sleep } from '$lib/_helper'
-	import { store, chosen, subStore, ipfs } from '$lib/_store'
+	import { store, chosen, SUBs, ipfs } from '$lib/_store'
     import AsyncError from '$lib/AsyncError.svelte'
 	import AsyncLoading from '$lib/AsyncLoading.svelte'
     import Playlists from '$lib/Playlists.svelte'
@@ -12,18 +12,25 @@
     let channelID = ''
     let retry = false
     let counter = 0
+    let subbed
 
     let activeTab = 'videos'
 
-    onMount(() => channelID = window.location.href.split('#')[1])
+    onMount(() => {
+        channelID = window.location.href.split('#')[1]
+        subbed = $SUBs.includes(channelID)
+    })
 let tmp
     const sub = async channelID => {
-        if(!$subStore.includes(channelID)) $subStore = [...$subStore, channelID]
-        else alert('unsub?')
-        const saveToIpfs = await $ipfs.dag.put({
-            subscriptions: $subStore
-        })
-        saveLocal({ subscriptions: { array: $subStore, cid: saveToIpfs.toString() }})
+        if(!$SUBs.includes(channelID)) $SUBs = [...$SUBs, channelID]
+        else $SUBs = $SUBs.filter(x => x !== channelID)
+        subbed = !subbed
+        
+        const saveToIpfs = await $ipfs.dag.put({ SUBs: $SUBs })
+        
+        $store = {...$store, subscriptions: { SUBs: $SUBs, cid: saveToIpfs.toString() }}
+        saveLocal({ subscriptions: { SUBs: $SUBs, cid: saveToIpfs.toString() }})
+
         tmp = saveToIpfs.toString()
     }
 
@@ -71,8 +78,10 @@ let tmp
         $chosen = chooseInstance($store.instances)
         retry = false
     }
+    $: subbed = (x => x.includes(channelID))($SUBs)
 </script>
-{tmp}
+
+{tmp}|subbed: {subbed}
 {#await fetchChannel($chosen, channelID)}
     <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($store.instances)} />
 {:then channel}
@@ -89,7 +98,7 @@ let tmp
                 <img src="{getAuthorThumbnail($chosen, channel.authorThumbnails)}" alt="author icon" />
                 <span class="author">{channel.author}</span>
             </div>
-            <div class="sub" on:click={sub(channelID)}>
+            <div class="sub" class:subbed on:click={sub(channelID)}>
                 <span class="subCount">Subscribe <span>{convertCount(channel.subCount)}</span></span>
                 <!-- <span class="totalViews">Total views: {channel.totalViews}</span> -->
             </div>
@@ -103,7 +112,7 @@ let tmp
             </ul>
         </nav>
         {#if activeTab === 'videos'}
-            <Videos chosen={$chosen} videos={channel.latestVideos} on:empty={() => $chosen = chosenInstance($store.instances)} />
+            <Videos chosen={$chosen} videos={channel.latestVideos} on:empty={() => $chosen = chooseInstance($store.instances)} />
         {/if}
         {#if activeTab === 'playlists'}
             {#await fetchPlaylists($chosen, channelID)}

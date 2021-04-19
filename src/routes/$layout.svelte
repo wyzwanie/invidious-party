@@ -2,7 +2,7 @@
     import { onMount, afterUpdate } from 'svelte'
     import Header from '$lib/Header.svelte'
 
-    import { store, chosen, ipfs } from '$lib/_store'
+    import { store, chosen, ipfs, SUBs } from '$lib/_store'
     import { getInstances, getVersion, chooseInstance, saveLocal } from '$lib/_helper'
 
     let currentPage
@@ -20,25 +20,31 @@
     onMount(async () => {
         if(!localStorage.instances || localStorage.instances === '{}') {
             const instances = await getInstances()
-            saveLocal({
+            const initStorage = {
                 instances,
                 theme: false,
+                subscriptions: {
+                    cid: false,
+                    SUBs: []
+                },
                 // version: instances[instances.findIndex(x => x[0] === $chosen)][1].version
-            })
-            $store = {
-                instances,
-                lastUpdate: localStorage.lastUpdate,
-                theme: false,
-                // version: instances[instances.findIndex(x => x[0] === $chosen)][1].version
+                lastUpdate: new Date().toJSON()
             }
+            saveLocal(initStorage)
+            $store = initStorage
         } else {
+            console.log('asdasd', localStorage)
             $store = {
                 instances: JSON.parse(localStorage.instances),
-                lastUpdate: localStorage.lastUpdate,
                 theme: !localStorage.theme ? false : JSON.parse(localStorage.theme),
-                rss: localStorage.rss || undefined,
+                subscriptions: {
+                    cid: JSON.parse(localStorage.subscriptions).cid,
+                    SUBs: JSON.parse(localStorage.subscriptions).SUBs
+                },
+                lastUpdate: localStorage.lastUpdate
                 // version: JSON.parse(localStorage.instances)[JSON.parse(localStorage.instances).findIndex(x => x[0] === $chosen)][1].version
             }
+            $SUBs = JSON.parse(localStorage.subscriptions).SUBs
         }
         $chosen = chooseInstance($store.instances)
         //if light theme toggle class

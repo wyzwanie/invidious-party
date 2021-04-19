@@ -1,25 +1,70 @@
 <script>
     import { onMount } from 'svelte'
-    import { store, chosen, subStore, ipfs } from '$lib/_store'
+    import { store, chosen, ipfs, SUBs } from '$lib/_store'
     import { chooseInstance } from '$lib/_helper'
     import Videos from '$lib/Videos.svelte'
 
-    let cid = 'loading'
-    let subscriptions
+let retry = false
+let counter = 0
 
     const getSubscriptions = async () => {
-        if(localStorage && localStorage.subscriptions) cid = JSON.parse(localStorage.subscriptions).cid
-        else cid = false
-        if(!cid) cid = $store.subscriptions
-        const result = await $ipfs.dag.get(cid)
-        subscriptions = result.value.subscriptions
+        if($SUBs && $SUBs.length > 0) {
+            const cid = $store.subscriptions.cid
+            const result = await $ipfs.dag.get(cid)
+            return result.value.SUBs
+        } else {}
     }
-    $: if($ipfs) getSubscriptions()    
+    const fetchSubscriptions = async (instance, channelID) => {
+        try {
+            // instance = 'tube.connect.cafe'
+            const req = await fetch(`https://${instance}/feed/channel/${channelID}`)
+            const res = await req.text()
+
+            const parser = new DOMParser()
+            const xml = parser.parseFromString(text, 'text/xml')
+            const feed = xml.getElementsByTagName('entry')[0]
+            const suubFeed = []
+            
+            for(let entry in feed) {
+                const videoId = feed.getElementsByTagName('yt:videoId')[0].innerHTML
+                const title = feed.getElementsByTagName('title')[0].innerHTML
+                const link = feed.getElementsByTagName('link')[0]
+                const published = feed.getElementsByTagName('published')[0].innerHTML
+                const parsedEntry = { videoId, title, link, published }
+                suubFeed = [...suubFeed, parsedEntry]
+            }
+            console.log(feed)
+            return suubFeed
+        } catch(err) {
+            // counter++
+            // retry = true
+        }
+    }
+    $: if($ipfs) getSubscriptions()
+    $: if(retry) {
+        $chosen = chooseInstance($store.instances)
+        retry = false
+    }
 </script>
-<!-- <button on:click={fetchSubscriptions}>click</button> -->
-{cid}
-<hr>
-{JSON.stringify(subscriptions)}
+
+{#await getSubscriptions()}
+    ...fetching from IPFS...
+{:then subscriptions}
+    {#each subscriptions as channelID, i}
+    {channelID}
+    <hr>
+        {#await fetchSubscriptions($chosen, channelID, i)}
+            ...fetching {i+1}/{subscriptions.length}...
+        {:then rss} 
+            {rss}
+        {:catch error}
+            {error}
+        {/await}
+    <hr>
+    {/each}
+{:catch error}
+    {error}
+{/await}
 
 
 
