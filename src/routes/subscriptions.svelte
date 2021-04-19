@@ -19,7 +19,7 @@ let counter = 0
     }
     const fetchChannel = async (instance, channelID) => {
         try {
-            // instance = 'tube.connect.cafe'
+            instance = 'yewtu.be'
             const req = await fetch(`https://${instance}/feed/channel/${channelID}`)
             const res = await req.text()
             console.log(res)
