@@ -1,78 +1,96 @@
 <script>
     import { onMount } from 'svelte'
-    import { store, chosen, ipfs, SUBs } from '$lib/_store'
+    import { store, chosen, SUBs } from '$lib/_store'
     import { chooseInstance } from '$lib/_helper'
     import Videos from '$lib/Videos.svelte'
 
-let retry = false
-let counter = 0
+    let instances
 
-    const getSubscriptions = async () => {
-        // if($store && store.subscriptions && $store.subscriptions.cid) {
-        try {
-            const cid = $store.subscriptions.cid
-            const result = await $ipfs.dag.get(cid)
-            return result.value.SUBs
-        } catch(err) {
-            return $SUBs
+    const prepareInstancesTable = instanceStore => {
+        if(instanceStore) {
+            instances = instanceStore.map((curr, index) => {
+                if(typeof curr[0] === 'string' && curr[0].length > 0) {
+                    return {
+                        instance: curr[0],
+                        counter: 0
+                    }
+                }
+            })
         }
     }
-    const fetchChannel = async (instance, channelID) => {
-        try {
-            instance = 'yewtu.be'
-            const req = await fetch(`https://${instance}/feed/channel/${channelID}`)
-            const res = await req.text()
-            console.log(res)
 
-            const parser = new DOMParser()
-            const xml = parser.parseFromString(text, 'text/xml')
-            const feed = xml.getElementsByTagName('entry')[0]
-            const suubFeed = []
+    // const getSubscriptions = async instances => {
+    //     // if($store && store.subscriptions && $store.subscriptions.cid) {
+    //     try {
+    //         const cid = $store.subscriptions.cid
+    //         const result = await $ipfs.dag.get(cid)
+    //         return result.value.SUBs
+    //     } catch(err) {
+    //         return $SUBs
+    //     }
+    // }
+
+    // const rotateInstances = instances => {
+    //     while(go) {
+    //         if(i.counter < 3) return i.instance
+    //         return false
+    //     }
+    //     for(let i of instances) {
             
-            for(let entry in feed) {
-                const videoId = feed.getElementsByTagName('yt:videoId')[0].innerHTML
-                const title = feed.getElementsByTagName('title')[0].innerHTML
-                const link = feed.getElementsByTagName('link')[0]
-                const published = feed.getElementsByTagName('published')[0].innerHTML
-                const parsedEntry = { videoId, title, link, published }
-                suubFeed = [...suubFeed, parsedEntry]
+    //     }
+    // }
+
+    const fetchSubscriptions = async (ynstancez, SUBs) => {
+        if(!SUBs) return { error: 'Missing SUBs list' }
+        if(!SUBs.length) return { error: 'No subscriptions' }
+
+        let go = true
+        let index = 0
+
+        while(go) {
+            // console.log(ynstancez[index].instance, ynstancez[index].counter)
+            if(instances[index].counter < 3) {
+                try {
+                    const req = await fetch(`https://${instances[index].instance}/api/v1/channels/${channelID}`)
+                    const res = await req.json()
+
+                    if(res && Object.keys(res).length > 0) {
+                        if(res.error && res.error !== 'This channel does not exist.') {
+                            instances[index].counter++
+                            instances = instances
+                        }
+                    }
+                    return res
+                } catch(error) {
+                    instances[index].counter++
+                    instances = instances
+                }
+            } else {
+                if(index < ynstancez.length - 1) index++
+                else {
+                    go = false
+                    return { error: 'no more instances'}
+                }
             }
-            console.log(feed)
-            return suubFeed
-        } catch(err) {
-            // counter++
-            // retry = true
         }
     }
-
-    $: if($ipfs) getSubscriptions()
-    $: if(retry) {
-        $chosen = chooseInstance($store.instances)
-        retry = false
-    }
+    $: if(Object.keys($store).length > 0 && $store.instances) prepareInstancesTable($store.instances)
 </script>
 
-<!-- {#await getSubscriptions()}
-    ...fetching from IPFS...
-{:then subscriptions} -->
-<!-- {JSON.stringify(subscriptions)} -->
+{#if instances && instances.length}
     {#each $SUBs as channelID, i}
-    {channelID}
-    <hr>
-        {#await fetchChannel($chosen, channelID, i)}
-            ...fetching {i+1}/{$SUBs.length}...
-        {:then rss} 
-            {JSON.stringify(rss)}
-        {:catch error}
-            {error}
-        {/await}
-    <hr>
+        {channelID}
+        <hr>
+            {#await fetchChannel(instances, channelID)}
+                ...fetching {i+1}/{$SUBs.length}...
+            {:then rss} 
+                {JSON.stringify(rss)}
+            {:catch error}
+                {error}
+            {/await}
+        <hr>
     {/each}
-<!-- {:catch error}
-    {error}
-{/await} -->
-
-
+{/if}
 
 
 <!-- import { chooseInstance } from '$lib/_helper'
