@@ -1,16 +1,20 @@
 <script>
     import { onMount } from 'svelte'
     import { store, chosen, subStore, ipfs } from '$lib/_store'
-    import { chooseInstance,  } from '$lib/_helper'
+    import { chooseInstance, sleep } from '$lib/_helper'
+    
+    import AsyncError from '$lib/AsyncError.svelte'
+    import AsyncLoading from '$lib/AsyncLoading.svelte'
     import ListOfVideos from '$lib/ListOfVideos.svelte'
+    import Rotate from '$lib/Rotate.svelte'
     import Video from '$lib/Video.svelte'
 
-    let playlistID
+    let active = 0
     let counter = 0
     let currentVideo = false
-    let retry = false
     let left
-    let active = 0
+    let playlistID
+    let retry = false
 
     onMount(async () => playlistID = window.location.search.split('=')[1])
 
@@ -58,36 +62,45 @@
 </script>
 
 {#await fetchPlaylist($chosen, playlistID)}
-    ... loading ...
-    {:then playlist}
-        {#if playlist.error}
-            {playlist.error}<br>
-            <button on:click={() => {$chosen = chooseInstance($store.instances)}}>Try another instance?</button>
-        {:else}
-            <div class="playlist">
-                <div class="top">
-                    <h3>{playlist.title}</h3>
-                    <h4><span>by:</span> {playlist.author}</h4>
+    <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($store.instances)} />
+{:then playlist}
+    {#if playlist.error}
+        <div class="df">
+            <p>{playlist.error}</p>
+            <Rotate on:rotate={() => $chosen = chooseInstance($store.instances)} />
+            <p style="font-size: 90%">click Rotate button to try on next invidious instance</p>
+        </div>
+    {:else}
+        <div class="playlist">
+            <div class="top">
+                <h3>{playlist.title}</h3>
+                <h4><span>by:</span> {playlist.author}</h4>
+            </div>
+            <div class="wrapper">
+                <div class="left" bind:this={left}>
+                    {#if currentVideo}
+                        <Video chosen={$chosen} videoID={currentVideo} />
+                    {/if}
                 </div>
-                <div class="wrapper">
-                    <div class="left" bind:this={left}>
-                        {#if currentVideo}
-                            <Video chosen={$chosen} videoID={currentVideo} />
-                        {/if}
-                    </div>
-                    <div class="right" style="height:{left ? left.offsetHeight : 0}px;overflow:auto;">
-                        <ListOfVideos {active} chosen={$chosen} videos={playlist.videos}
-                            on:play={e => currentVideo = e.detail}
-                        />
-                    </div>
+                <div class="right" style="height:{left ? left.offsetHeight : 0}px;overflow:auto;">
+                    <ListOfVideos {active} chosen={$chosen} videos={playlist.videos}
+                        on:play={e => currentVideo = e.detail}
+                    />
                 </div>
             </div>
-        {/if}
-    {:catch error}
-    > {error.message}
+        </div>
+    {/if}
+{:catch error}
+    <AsyncError {error} on:rotate={() => $chosen = chooseInstance($store.instances)} />
 {/await}
 
 <style>
+.df {
+    align-items: center;
+}
+.df p {
+    padding: 7px;
+}
 h3, h4 {
     margin: 0;
 }

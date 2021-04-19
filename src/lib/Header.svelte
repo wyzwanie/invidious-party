@@ -31,7 +31,7 @@
 
 <header>
     <div class="logo">
-        invidious.party<span style="font-size: 69%; color: unset;">&nbsp;v0.4.1</span><br>
+        invidious.party<span style="font-size: 69%; color: unset;">&nbsp;v0.4.2</span><br>
         <span>instance: {#if chosen}<a style="color: white;" href="{chosen}">{chosen}</a>{:else}...initializing...{/if}</span>
         <br><span>{ipfsStatus}</span>
     </div>

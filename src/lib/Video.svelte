@@ -2,7 +2,7 @@
     import { createEventDispatcher } from 'svelte'
 
     export let chosen
-    export let version = ''
+    // export let version = ''
     export let videoID
 
     let player

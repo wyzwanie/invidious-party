@@ -14,7 +14,9 @@
 - (WIP) implement IPFS storage with option to pin your settings if you provide API to ex. pinata.cloud
 - (WORKING) implement p2p chat under videos
 - (WIP) implement p2p chat main site.
-- Information which videos have peers in chat.
+- Information which videos have peers in chat
+- Party mode: (initial idea is to have chat like now, video on left
+and when you play video its broadcasted to others in the room and you get some kind of a display what is wathced and you can swithc.)
 
 # TODO
 - trending

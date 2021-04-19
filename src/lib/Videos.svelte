@@ -1,53 +1,56 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-    import { convertCount } from '$lib/_helper'
+    import { convertCount, secToMin } from '$lib/_helper'
+
     import Lazy from 'svelte-lazy'
+    import Loader from '$lib/Loader.svelte'
+    import Rotate from '$lib/Rotate.svelte'
 
     export let chosen
     export let videos
 
     let vw
-
     const dispatch = createEventDispatcher()
-
-    const secToMin = seconds => {
-        let minutes = seconds / 60
-        let newMinutes = Math.floor(minutes)
-        let newSeconds = Math.round((minutes - newMinutes) * 60)
-        newSeconds = newSeconds < 10 ? `0${newSeconds}` : newSeconds
-        return `${newMinutes}:${newSeconds}`
-    }
 </script>
 
 <svelte:window bind:innerWidth={vw} />
 
-{#if vw && videos.length > 0}
-<div class="videos">
-    {#each videos as video}
-        <div class="video-outer" bind:this={video.el}>
-            <div class="video-inner">
-                <div class="card">
-                    <a class="thumbnail" href="/watch?v={video.videoId}">
-                        <Lazy height={Math.floor(vw*0.11)} placeholder=...loading...>
-                            <img alt="thumbnail" src="https://{chosen}/vi/{video.videoId}/mqdefault.jpg">
-                        </Lazy>
-                        <div class="duration">{secToMin(video.lengthSeconds)}</div>
-                    </a>
-                    <h3 class="title"><a href="/watch?v={video.videoId}">{video.title}</a></h3>
-                    <h4 class="author"><a href="/channel#{video.authorId}">{video.author}</a></h4>
-                    <div class="stats">
-                        <span>Shared {video.publishedText}</span>
-                        <span>{convertCount(video.viewCount)}</span>
+{#if vw && videos && videos.length > 0}
+    <div class="videos">
+        {#each videos as video}
+            <div class="video-outer" bind:this={video.el}>
+                <div class="video-inner">
+                    <div class="card">
+                        <a class="thumbnail" href="/watch?v={video.videoId}">
+                            <Lazy height={Math.floor(vw*0.11)} placeholder={Loader}>
+                                <img alt="thumbnail" src="https://{chosen}/vi/{video.videoId}/mqdefault.jpg">
+                            </Lazy>
+                            <div class="duration">{secToMin(video.lengthSeconds)}</div>
+                        </a>
+                        <h3 class="title"><a href="/watch?v={video.videoId}">{video.title}</a></h3>
+                        <h4 class="author"><a href="/channel#{video.authorId}">{video.author}</a></h4>
+                        <div class="stats">
+                            <span>Shared {video.publishedText}</span>
+                            <span>{convertCount(video.viewCount)}</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    {/each}
-</div>
+        {/each}
+    </div>
 {:else}
-    No results or an error! <button on:click={() => dispatch('empty')}>Try another instance?</button>
+    <div class="df">
+        <p>No results or an error!</p>
+        <Rotate on:rotate={() => dispatch('empty')} />
+    </div>
 {/if}
 <style>
+.df {
+    align-items: center;
+}
+.df p {
+    padding: 7px;
+}
 :global(.svelte-lazy) {
     width: 100%;
 }

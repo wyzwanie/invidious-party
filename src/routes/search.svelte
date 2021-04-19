@@ -1,39 +1,38 @@
 <script>
     import { onMount } from 'svelte'
-    import Loader from '$lib/Loader.svelte'
-    import Videos from '$lib/Videos.svelte'
-    import { chooseInstance, saveLocal } from '$lib/_helper'
+    import { chooseInstance, saveLocal, sleep } from '$lib/_helper'
     import { store, chosen } from '$lib/_store'
 
+    import AsyncError from '$lib/AsyncError.svelte'
+    import AsyncLoading from '$lib/AsyncLoading.svelte'
+    import Videos from '$lib/Videos.svelte'
+
+    let counter = 0
+    let retry = false
     let searchTerm
-    let searchResult
-    let loading
 
-    let start
-    let end
+    onMount(async () => searchTerm = window.location.search.split('=')[1])
 
-    onMount(async () => {
-        searchTerm = window.location.search.split('=')[1]
-    })
-
-    const fetchResult = async searchQuery => {
-        start = new Date().getTime()
-
-        loading = true
+    const fetchResult = async (instance, searchQuery) => {
+        if(!searchQuery) return { error: 'missing search query' }
+        if(counter > 10) {
+            counter = 0
+            return { error: 'is everything OK? too many retries...' }
+        }
         try {
-            const fetchResponse = await fetch(`https://${$chosen}/api/v1/search?q=${searchQuery}`)
-            searchResult = await fetchResponse.json()
-            loading = false
+            const req = await fetch(`https://${instance}/api/v1/search?q=${searchQuery}`)
+            const res = await req.json()
+            counter++
+            return res
         } catch(err) {
-            // console.log(err)
-            $chosen = chooseInstance($store.instances)
-            await fetchResult(searchQuery)
-            loading = false
+            retry = true
+            counter++
         }
     }
-
-    $: if(searchTerm && $chosen) fetchResult(searchTerm)
-    $: end = new Date().getTime()
+    $: if(retry) {
+        $chosen = chooseInstance($store.instances)
+        retry = false
+    }
 
     const disableInstance = () => {
         let index = $store.instances.findIndex(x => x[1].uri === $chosen)
@@ -42,16 +41,13 @@
         $chosen = chooseInstance($store.instances)
         saveLocal()
     }
+    const delay = () => setTimeout(() => true, 681)
 </script>
 
-{#if loading}
-    fetching... from {$chosen}<br>
-    {#key end}
-        {#if start-end > 1000}
-            Instance too slow? <button on:click={disableInstance}>Disable instance</button>
-        {/if}
-    {/key}
-    <Loader />
-{:else if searchResult && $chosen}
-    <Videos videos={searchResult} chosen={$chosen} on:empty={() => $chosen = chooseInstance($store.instances)} />
-{/if}
+{#await fetchResult($chosen, searchTerm)}
+    <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($store.instances)} />
+{:then videos}
+    <Videos {videos} chosen={$chosen} on:empty={() => $chosen = chooseInstance($store.instances)} />
+{:catch error}
+    <AsyncError {error} on:rotate={() => $chosen = chooseInstance($store.instances)} />
+{/await}

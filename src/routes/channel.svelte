@@ -1,11 +1,13 @@
 <script>
     import { onMount } from 'svelte'
-	import { chooseInstance, convertCount, saveLocal } from '$lib/_helper'
+	import { chooseInstance, convertCount, saveLocal, getAuthorThumbnail, sleep } from '$lib/_helper'
 	import { store, chosen, subStore, ipfs } from '$lib/_store'
-	
-	import Loader from '$lib/Loader.svelte'
+    import AsyncError from '$lib/AsyncError.svelte'
+	import AsyncLoading from '$lib/AsyncLoading.svelte'
     import Playlists from '$lib/Playlists.svelte'
+    import Rotate from '$lib/Rotate.svelte'
 	import Videos from '$lib/Videos.svelte'
+	
 
     let channelID = ''
     let retry = false
@@ -65,12 +67,6 @@ let tmp
         const extracted = link.split('/')[3]
         return `https://${$chosen}/ggpht/${extracted}`
     }
-    const getAuthorThumbnail = authorThumbnails => {
-        const link = authorThumbnails[authorThumbnails.findIndex(x => x.width == 100)].url
-        const extracted = link.split('/')[4]
-        return `https://${$chosen}/ggpht/ytc/${extracted}`
-    }
-
     $: if(retry) {
         $chosen = chooseInstance($store.instances)
         retry = false
@@ -78,57 +74,65 @@ let tmp
 </script>
 {tmp}
 {#await fetchChannel($chosen, channelID)}
-    ...loading...<br><Loader />
-    {:then channel}
-        {#if channel.error}
-            {channel.error}<br>
-            <button on:click={() => {$chosen = chooseInstance($store.instances)}}>Try another instance?</button>
-        {:else}
-            <div class="banner">
-                <img src="{getAuthorBanner(channel.authorBanners)}" alt="author banner" />
-                <div class="info">
-                    <img src="{getAuthorThumbnail(channel.authorThumbnails)}" alt="author icon" />
-                    <span class="author">{channel.author}</span>
-                </div>
-                <div class="sub" on:click={sub(channelID)}>
-                    <span class="subCount">Subscribe <span>{convertCount(channel.subCount)}</span></span>
-                    <!-- <span class="totalViews">Total views: {channel.totalViews}</span> -->
-                </div>
+    <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($store.instances)} />
+{:then channel}
+    {#if channel.error}
+        <div class="df">
+            <p>{channel.error}</p>
+            <Rotate on:rotate={() => $chosen = chooseInstance($store.instances)} />
+            <p style="font-size: 90%">click Rotate button to try on next invidious instance</p>
+        </div>
+    {:else}
+        <div class="banner">
+            <img src="{getAuthorBanner(channel.authorBanners)}" alt="author banner" />
+            <div class="info">
+                <img src="{getAuthorThumbnail($chosen, channel.authorThumbnails)}" alt="author icon" />
+                <span class="author">{channel.author}</span>
             </div>
-            <nav>
-                <ul>
-                    <li on:click={() => activeTab = 'videos'} class="videos {activeTab === 'videos' ? 'active' : ''}">Videos</li>
-                    <li on:click={() => activeTab = 'playlists'} class="{activeTab === 'playlists' ? 'active' : ''}">Playlists</li>
-                    <li on:click={() => activeTab = 'community'} class="{activeTab === 'community' ? 'active' : ''}">Community</li>
-                    <li on:click={() => activeTab = 'info'} class="{activeTab === 'info' ? 'active' : ''}">Info</li>
-                </ul>
-            </nav>
-            {#if activeTab === 'videos'}
-                <Videos chosen={$chosen} videos={channel.latestVideos} />
-            {/if}
-            {#if activeTab === 'playlists'}
-                {#await fetchPlaylists($chosen, channelID)}
-                    ...loading playlists...
-                {:then playlists}
-                    <Playlists chosen={$chosen} playlists={playlists.playlists} />
-                {:catch error}
-                    ...error...
-                {/await}
-            {/if}
-            {#if activeTab === 'info'}
-                <div class="description">
-                    <h3>Channel description:</h3>
-                    {channel.description}
-                    <h3 style="margin-top: 0.618em;">Total view count: <span style="font-weight: normal">{convertCount(channel.totalViews)}</span></h3>
-                    
-                </div>
-            {/if}
+            <div class="sub" on:click={sub(channelID)}>
+                <span class="subCount">Subscribe <span>{convertCount(channel.subCount)}</span></span>
+                <!-- <span class="totalViews">Total views: {channel.totalViews}</span> -->
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li on:click={() => activeTab = 'videos'} class="videos {activeTab === 'videos' ? 'active' : ''}">Videos</li>
+                <li on:click={() => activeTab = 'playlists'} class="{activeTab === 'playlists' ? 'active' : ''}">Playlists</li>
+                <li on:click={() => activeTab = 'community'} class="{activeTab === 'community' ? 'active' : ''}">Community</li>
+                <li on:click={() => activeTab = 'info'} class="{activeTab === 'info' ? 'active' : ''}">Info</li>
+            </ul>
+        </nav>
+        {#if activeTab === 'videos'}
+            <Videos chosen={$chosen} videos={channel.latestVideos} on:empty={() => $chosen = chosenInstance($store.instances)} />
         {/if}
-    {:catch error}
-    > {error.message}
+        {#if activeTab === 'playlists'}
+            {#await fetchPlaylists($chosen, channelID)}
+                <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($store.instances)} />
+            {:then playlists}
+                <Playlists chosen={$chosen} playlists={playlists.playlists} />
+            {:catch error}
+                <AsyncError {error} on:rotate={() => $chosen = chooseInstance($store.instances)} />
+            {/await}
+        {/if}
+        {#if activeTab === 'info'}
+            <div class="description">
+                <h3>Channel description:</h3>
+                {channel.description}
+                <h3 style="margin-top: 0.618em;">Total view count: <span style="font-weight: normal">{convertCount(channel.totalViews)}</span></h3>
+            </div>
+        {/if}
+    {/if}
+{:catch error}
+    <AsyncError {error} on:rotate={() => $chosen = chooseInstance($store.instances)} />
 {/await}
 
 <style>
+.df {
+    align-items: center;
+}
+.df p {
+    padding: 7px;
+}
 /* banner */
 .banner {
     position: relative;

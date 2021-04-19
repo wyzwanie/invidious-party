@@ -56,3 +56,19 @@ export const convertCount = count => {
     if(Math.floor(count/1000000000) < 1000) return `${(count/1000000000).toFixed(2)}G`
     else return count
 }
+
+export const secToMin = seconds => {
+    let minutes = seconds / 60
+    let newMinutes = Math.floor(minutes)
+    let newSeconds = Math.round((minutes - newMinutes) * 60)
+    newSeconds = newSeconds < 10 ? `0${newSeconds}` : newSeconds
+    return `${newMinutes}:${newSeconds}`
+}
+export const getAuthorThumbnail = (chosen, authorThumbnails) => {
+    const link = authorThumbnails[authorThumbnails.findIndex(x => x.width == 100)].url
+    console.log(link)
+    const extracted = link.split('/')[4]
+    return `https://${chosen}/ggpht/ytc/${extracted}`
+}
+
+export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))

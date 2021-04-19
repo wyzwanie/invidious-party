@@ -1,43 +1,42 @@
 <script>
-	import { chooseInstance } from '$lib/_helper'
+	import { chooseInstance, sleep } from '$lib/_helper'
 	import { store, chosen } from '$lib/_store'
 	
-	import Loader from '$lib/Loader.svelte'
+	import AsyncError from '$lib/AsyncError.svelte'
+	import AsyncLoading from '$lib/AsyncLoading.svelte'
 	import Videos from '$lib/Videos.svelte'
 
-	let error
-	let loading
-	let popular
+	let counter = 0
+	let retry = false
 
 	const fetchPopular = async instance => {
-		if(!instance) return false
-		loading = true
+		if(counter > 10) {
+            counter = 0
+            return { error: 'is everything OK? too many retries...' }
+        }
 		try {
 			///api/v1/videos/aqz-KE-bpKQ?fields=videoId,title,description
-			const popularRequest = await fetch(`https://${instance}/api/v1/popular`)
-			popular = await popularRequest.json()
-			loading = false
-			if(popular.length > 0) return popular
-			else $chosen = chooseInstance($store.instances)
+			const req = await fetch(`https://${instance}/api/v1/popular`)
+			const res = await req.json()
+			counter++
+			return res
 		} catch(err) {
-			$chosen = chooseInstance($store.instances)
-			error = 'No results or an error!'
-			await fetchPopular($chosen)
-			loading = false
+            retry = true
+            counter++
 		}
 	}
 
-	$: fetchPopular($chosen)
+	$: if(retry) {
+        $chosen = chooseInstance($store.instances)
+        retry = false
+    }
 </script>
 
-<div class="container">
-	{#if loading}
-		<Loader />
-	{/if}
-	{#if popular && popular.length > 0}
-		<Videos videos={popular} chosen={$chosen} />
-	{/if}
-	{#if error}
-		{error} <button on:click={() => $chosen = chooseInstance($store.instances)}>Try another instance?</button>
-	{/if}
-</div>
+
+{#await fetchPopular($chosen)}
+	<AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($store.instances)} />
+{:then videos}
+	<Videos {videos} chosen={$chosen} on:empty={() => {console.log('asd');$chosen = chooseInstance($store.instances)}} />
+{:catch error}
+	<AsyncError {error} on:rotate={() => $chosen = chooseInstance($store.instances)} />
+{/await}
