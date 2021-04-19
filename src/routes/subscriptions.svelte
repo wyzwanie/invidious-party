@@ -1,4 +1,5 @@
 <script>
+    // import { createQueue } from 'best-queue'
     import { onMount } from 'svelte'
     import { store, chosen, SUBs } from '$lib/_store'
     import { chooseInstance } from '$lib/_helper'
@@ -40,6 +41,43 @@
     //     }
     // }
 
+
+
+    const fetcher = SUBs => {
+        let taskQueue = []
+        for(let channelID of SUBs) {
+            taskQueue.push(fetchChannel(instances[Math.floor(Math.random()*instances.length)], channelID))
+        }
+        // const queue = createQueue(taskQueue, {
+        //     max: 10,
+        //     interval: 1 * 1000,
+        //     recordError: true
+            
+        // })
+        // queue.then(result => console.log('result', result))
+        // queue.subscribe((status, data, index) => console.log('asd', status, data, index))
+    }
+
+    const fetchChannel = async channelID => {
+        if(instances[index].counter <= 3) {
+            try {
+                const req = await fetch(`https://${instance}/api/v1/channels/${channelID}`)
+                const res = await req.json()
+
+                if(res && Object.keys(res).length > 0) {
+                    if(res.error && res.error !== 'This channel does not exist.') {
+                        instances[index].counter++
+                        instances = instances
+                    }
+                }
+                return res
+            } catch(error) {
+                instances[index].counter++
+                instances = instances
+            }
+        } else return { error: 'max retries' }
+    }
+
     const fetchSubscriptions = async (ynstancez, SUBs) => {
         if(!SUBs) return { error: 'Missing SUBs list' }
         if(!SUBs.length) return { error: 'No subscriptions' }
@@ -50,21 +88,7 @@
         while(go) {
             // console.log(ynstancez[index].instance, ynstancez[index].counter)
             if(instances[index].counter < 3) {
-                try {
-                    const req = await fetch(`https://${instances[index].instance}/api/v1/channels/${channelID}`)
-                    const res = await req.json()
 
-                    if(res && Object.keys(res).length > 0) {
-                        if(res.error && res.error !== 'This channel does not exist.') {
-                            instances[index].counter++
-                            instances = instances
-                        }
-                    }
-                    return res
-                } catch(error) {
-                    instances[index].counter++
-                    instances = instances
-                }
             } else {
                 if(index < ynstancez.length - 1) index++
                 else {
@@ -74,6 +98,7 @@
             }
         }
     }
+    $: if($SUBs) fetcher($SUBs)
     $: if(Object.keys($store).length > 0 && $store.instances) prepareInstancesTable($store.instances)
 </script>
 
