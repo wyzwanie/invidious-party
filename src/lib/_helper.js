@@ -9,7 +9,7 @@ export const getInstances = async () => {
             const name = instance[0]
             const { flag, uri, openRegistrations, lastChannelRefreshedAt, stats } = instance[1]
 
-            parsedInstances = [...parsedInstances, [ name, {
+            if(name) parsedInstances = [...parsedInstances, [ name, {
                 flag,
                 uri: uri[uri.length-1] !== '/' ? `${uri}/` : uri,
                 openRegistrations,

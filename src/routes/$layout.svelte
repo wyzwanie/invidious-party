@@ -62,7 +62,7 @@
 
     const initializeNode = async () => {
         ipfsStatus = 'ipfs: assets loaded'
-        const tmp = await Ipfs.create({
+        $ipfs = await Ipfs.create({
             config: {
                 Addresses: {
                     Swarm: [
@@ -73,9 +73,9 @@
                 }
             }
         })
-        $ipfs = tmp
         ipfsStatus = 'ipfs: loaded yay!'
     }
+    $: console.log('y', $ipfs)
 </script>
 
 <svelte:head>
