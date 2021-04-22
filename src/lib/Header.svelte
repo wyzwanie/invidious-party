@@ -1,5 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte'
+    import { sleep } from '$lib/_helper'
 
     import Toggle from './Toggle.svelte'
 
@@ -16,9 +17,6 @@
     const handleSearch = e => {
         if(e.keyCode === 13) window.location.href = `/search?q=${searchTerm}`
     }
-    const sleep = ms => {
-      return new Promise(resolve => setTimeout(resolve, ms));
-   }
     const changeInstance = async () => {
         dispatch('changeInstance')
         rotate = true
@@ -85,7 +83,7 @@
         font-weight: bold;
         cursor: pointer;
     } */
-.sidebar {
+/* .sidebar {
     position: absolute;
     left: 0;
     top: 64px;
@@ -119,7 +117,7 @@ header {
     font-weight: 100;
     font-size: 90%;
     color: white;
-}
+} */
 a {
     color: white;
 }
@@ -127,7 +125,7 @@ a {
     font-weight: bold;
     color: var(--accent);
 }
-.logo {
+/* .logo {
     font-weight: bold;
 }
 .search {
@@ -144,7 +142,7 @@ input {
 input:focus {
     outline: none;
     border-bottom: 2px solid var(--accent)
-}
+} */
 .refresh svg {
     fill: var(--grey);
     width: 32px;

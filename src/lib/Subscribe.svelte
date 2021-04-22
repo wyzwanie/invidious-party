@@ -1,17 +1,17 @@
 <script>
-    import { store, chosen, subStore, ipfs } from '$lib/_store'
+    import { store, chosen, SUBs, ipfs } from '$lib/_store'
     import { chooseInstance, convertCount, saveLocal } from '$lib/_helper'
 
     export let channelID
     export let subCount
     let tmp
     const sub = async channelID => {
-        if(!$subStore.includes(channelID)) $subStore = [...$subStore, channelID]
+        if(!$SUBs.includes(channelID)) $SUBs = [...$SUBs, channelID]
         else alert('unsub?')
         const saveToIpfs = await $ipfs.dag.put({
-            subscriptions: $subStore
+            subscriptions: $SUBs
         })
-        saveLocal({ subscriptions: { array: $subStore, cid: saveToIpfs.toString() }})
+        saveLocal({ subscriptions: { array: $SUBs, cid: saveToIpfs.toString() }})
         tmp = saveToIpfs.toString()
     }
 </script>

@@ -18,6 +18,7 @@
     }
 </script>
 {#if video}
+<pre>{JSON.stringify(video, null, 4)}</pre>
 <div class="info">
     <div class="titleBar">
         <div class="left">

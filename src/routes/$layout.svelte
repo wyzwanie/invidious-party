@@ -1,9 +1,9 @@
 <script>
     import { onMount, afterUpdate } from 'svelte'
-    import Header from '$lib/Header.svelte'
-
     import { store, chosen, ipfs, SUBs } from '$lib/_store'
-    import { getInstances, getVersion, chooseInstance, saveLocal } from '$lib/_helper'
+    import { getInstances, getVersion, chooseInstance, saveLocal, sleep } from '$lib/_helper'
+
+    import Header from '$lib/Header.svelte'
 
     let currentPage
     let searchTerm
@@ -22,26 +22,27 @@
             const instances = await getInstances()
             const initStorage = {
                 instances,
-                theme: false,
                 subscriptions: {
                     cid: false,
-                    SUBs: []
+                    SUBs: [],
+                    lastFetch: false
                 },
+                theme: false,
+                lastStoreUpdate: false,
+                lastInstancesUpdate: false,
                 // version: instances[instances.findIndex(x => x[0] === $chosen)][1].version
-                lastUpdate: new Date().toJSON()
             }
             saveLocal(initStorage)
             $store = initStorage
         } else {
-            console.log('asdasd', localStorage)
+            //refresh instance list every 24h
+            if((new Date().getTime() - localStorage.lastStoreUpdate)/1000  > 24 * 60 * 60) localStorage.instances = JSON.stringify(await getInstances())
             $store = {
                 instances: JSON.parse(localStorage.instances),
+                subscriptions: JSON.parse(localStorage.subscriptions),
                 theme: !localStorage.theme ? false : JSON.parse(localStorage.theme),
-                subscriptions: {
-                    cid: JSON.parse(localStorage.subscriptions).cid,
-                    SUBs: JSON.parse(localStorage.subscriptions).SUBs
-                },
-                lastUpdate: localStorage.lastUpdate
+                lastStoreUpdate: JSON.parse(localStorage.lastStoreUpdate),
+                lastInstancesUpdate: JSON.parse(localStorage.lastInstancesUpdate),
                 // version: JSON.parse(localStorage.instances)[JSON.parse(localStorage.instances).findIndex(x => x[0] === $chosen)][1].version
             }
             $SUBs = JSON.parse(localStorage.subscriptions).SUBs
@@ -49,7 +50,6 @@
         $chosen = chooseInstance($store.instances)
         //if light theme toggle class
         if($store.theme) document.documentElement.classList.toggle('light')
-        console.log('$layout:getVersion', getVersion($chosen, $store.instances))
         if(Ipfs && !$ipfs) initializeNode()
     })
 
@@ -62,20 +62,23 @@
 
     const initializeNode = async () => {
         ipfsStatus = 'ipfs: assets loaded'
-        $ipfs = await Ipfs.create({
-            config: {
-                Addresses: {
-                    Swarm: [
-                        '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star/',
-                        '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star/',
-                        '/dns4/webrtc-star.discovery.libp2p.io/tcp/443/wss/p2p-webrtc-star/'
-                    ]
-                }
-            }
-        })
+        await sleep(681)
+        ipfsStatus = 'ipfs: swarming...'
+        $ipfs = await Ipfs.create()
+        //     {
+        //     config: {
+        //         Addresses: {
+        //             Swarm: [
+        //                 '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star/',
+        //                 '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star/',
+        //                 '/dns4/webrtc-star.discovery.libp2p.io/tcp/443/wss/p2p-webrtc-star/'
+        //             ]
+        //         }
+        //     }
+        // }
         ipfsStatus = 'ipfs: loaded yay!'
     }
-    $: console.log('y', $ipfs)
+    $: console.log('$layout:store', $store)
 </script>
 
 <svelte:head>

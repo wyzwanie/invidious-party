@@ -1,7 +1,9 @@
 <script>
     import { onMount } from 'svelte'
+
 	import { chooseInstance, convertCount, saveLocal, getAuthorThumbnail, sleep } from '$lib/_helper'
 	import { store, chosen, SUBs, ipfs } from '$lib/_store'
+
     import AsyncError from '$lib/AsyncError.svelte'
 	import AsyncLoading from '$lib/AsyncLoading.svelte'
     import Playlists from '$lib/Playlists.svelte'
@@ -20,7 +22,9 @@
         channelID = window.location.href.split('#')[1]
         subbed = $SUBs.includes(channelID)
     })
+
 let tmp
+
     const sub = async channelID => {
         if(!$SUBs.includes(channelID)) $SUBs = [...$SUBs, channelID]
         else $SUBs = $SUBs.filter(x => x !== channelID)
