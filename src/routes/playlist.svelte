@@ -1,7 +1,8 @@
 <script>
     import { onMount } from 'svelte'
-    import { store, chosen, subStore, ipfs } from '$lib/_store'
-    import { chooseInstance, sleep } from '$lib/_helper'
+    import { chosen } from '$lib/_store'
+    import { instances } from '$lib/_localStore'
+    import { chooseInstance } from '$lib/_helper'
     
     import AsyncError from '$lib/AsyncError.svelte'
     import AsyncLoading from '$lib/AsyncLoading.svelte'
@@ -10,7 +11,6 @@
     import Video from '$lib/Video.svelte'
 
     let active = 0
-    let counter = 0
     let currentVideo = false
     let left
     let playlistID
@@ -21,24 +21,18 @@
     const fetchPlaylist = (async (instance, playlistID) => {
         if(!playlistID) return { error: 'This playlist does not exist.'}
         if(playlistID.length > 34) return { error: 'Wrong channel ID'}
-        if(counter > 10) return { error: 'is everything OK? too many retries...' }
 
         try {
             const req = await fetch(`https://${instance}/api/v1/playlists/${playlistID}/`)
             const res = await req.json()
 
-            if(res && Object.keys(res).length > 0) {
-                if(res.error && res.error !== 'This playlist does not exist.') {
-                    // retry = true
-                    counter++
-                }
+            if(Object.keys(res).length < 1) throw new Error(res.error)
+            else {
                 currentVideo = res.videos[0].videoId
                 return res
             }
-            return res
         } catch(err) {
             retry = true
-            counter++
         }
     })
 
@@ -55,52 +49,46 @@
         return `${daysLeft} ${hoursLeft} ${minutesLeft} ago`
     }
 
+	const disableInstance = chosen => {
+		console.log('disable started')
+		new AbortController().abort()
+		const index = $instances.findIndex(x => x[0] === chosen)
+		$instances[index][1].enabled = false
+		$instances = $instances
+	}
+
     $: if(retry) {
-        $chosen = chooseInstance($store.instances)
+        $chosen = chooseInstance($instances)
         retry = false
     }
 </script>
 
 {#await fetchPlaylist($chosen, playlistID)}
-    <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($store.instances)} />
+    <AsyncLoading chosen={$chosen} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
 {:then playlist}
-    {#if playlist.error}
-        <div class="df">
-            <p>{playlist.error}</p>
-            <Rotate on:rotate={() => $chosen = chooseInstance($store.instances)} />
-            <p style="font-size: 90%">click Rotate button to try on next invidious instance</p>
+    <div class="playlist">
+        <div class="top">
+            <h3>{playlist.title}</h3>
+            <h4><span>by:</span> {playlist.author}</h4>
         </div>
-    {:else}
-        <div class="playlist">
-            <div class="top">
-                <h3>{playlist.title}</h3>
-                <h4><span>by:</span> {playlist.author}</h4>
+        <div class="wrapper">
+            <div class="left" bind:this={left}>
+                {#if currentVideo}
+                    <Video chosen={$chosen} videoID={currentVideo} />
+                {/if}
             </div>
-            <div class="wrapper">
-                <div class="left" bind:this={left}>
-                    {#if currentVideo}
-                        <Video chosen={$chosen} videoID={currentVideo} />
-                    {/if}
-                </div>
-                <div class="right" style="height:{left ? left.offsetHeight : 0}px;overflow:auto;">
-                    <ListOfVideos {active} chosen={$chosen} videos={playlist.videos}
-                        on:play={e => currentVideo = e.detail}
-                    />
-                </div>
+            <div class="right" style="height:{left ? left.offsetHeight : 0}px;overflow:auto;">
+                <ListOfVideos {active} chosen={$chosen} videos={playlist.videos} aktiv={playlist.videos.findIndex(x => x.videoId === currentVideo)}
+                    on:play={e => currentVideo = e.detail}
+                />
             </div>
         </div>
-    {/if}
+    </div>
 {:catch error}
-    <AsyncError {error} on:rotate={() => $chosen = chooseInstance($store.instances)} />
+    <AsyncError {error} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
 {/await}
 
 <style>
-.df {
-    align-items: center;
-}
-.df p {
-    padding: 7px;
-}
 h3, h4 {
     margin: 0;
 }

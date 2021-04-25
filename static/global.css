@@ -98,3 +98,15 @@ header {
     outline: none;
     border-bottom: 2px solid var(--accent)
 }
+
+/*  */
+button {
+    padding: 7px;
+    border: none;
+    color: var(--bg-dark);
+    background: var(--accent);
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+}
+/*  */

@@ -1,55 +1,40 @@
 <script>
     import { onMount, afterUpdate } from 'svelte'
-    import { store, chosen, ipfs, SUBs } from '$lib/_store'
-    import { getInstances, getVersion, chooseInstance, saveLocal, sleep } from '$lib/_helper'
+    import { chosen, ipfs } from '$lib/_store'
+    import { settings, instances, instancesUpdatedAt } from '$lib/_localStore'
+    import { chooseInstance, getInstances, sleep } from '$lib/_helper'
 
     import Header from '$lib/Header.svelte'
 
     let currentPage
+    let ipfsStatus = 'initializing'
     let searchTerm
 
     const changeTheme = e => {
-        $store = {
-            ...$store,
+        $settings = {
+            ...$settings,
             theme: e.detail
         }
-        saveLocal({ theme: e.detail })
-        document.documentElement.classList.toggle('light')
+        if(e.detail === 'light') document.documentElement.classList.toggle('light')
     }
 
     onMount(async () => {
-        if(!localStorage.instances || localStorage.instances === '{}') {
-            const instances = await getInstances()
-            const initStorage = {
-                instances,
-                subscriptions: {
-                    cid: false,
-                    SUBs: [],
-                    lastFetch: false
-                },
-                theme: false,
-                lastStoreUpdate: false,
-                lastInstancesUpdate: false,
-                // version: instances[instances.findIndex(x => x[0] === $chosen)][1].version
-            }
-            saveLocal(initStorage)
-            $store = initStorage
-        } else {
-            //refresh instance list every 24h
-            if((new Date().getTime() - localStorage.lastStoreUpdate)/1000  > 24 * 60 * 60) localStorage.instances = JSON.stringify(await getInstances())
-            $store = {
-                instances: JSON.parse(localStorage.instances),
-                subscriptions: JSON.parse(localStorage.subscriptions),
-                theme: !localStorage.theme ? false : JSON.parse(localStorage.theme),
-                lastStoreUpdate: JSON.parse(localStorage.lastStoreUpdate),
-                lastInstancesUpdate: JSON.parse(localStorage.lastInstancesUpdate),
-                // version: JSON.parse(localStorage.instances)[JSON.parse(localStorage.instances).findIndex(x => x[0] === $chosen)][1].version
-            }
-            $SUBs = JSON.parse(localStorage.subscriptions).SUBs
+        //never fetched before
+        if(!$instancesUpdatedAt) {
+            console.log('--- fetching instances ---')
+            $instances = await getInstances()
+            $instancesUpdatedAt = new Date().getTime()
         }
-        $chosen = chooseInstance($store.instances)
-        //if light theme toggle class
-        if($store.theme) document.documentElement.classList.toggle('light')
+        //instances lastUpdated more than 24h ago
+        if ($instancesUpdatedAt && ((new Date().getTime() - $instancesUpdatedAt) > 24 * 60 * 60 * 1000)) {
+            console.log('--- refreshing instances ---')
+            $instances = await getInstances()
+            $instancesUpdatedAt = new Date().getTime()
+        }
+
+        $chosen = chooseInstance($instances)
+
+        if($settings && $settings.theme === 'light') document.documentElement.classList.toggle('light')
         if(Ipfs && !$ipfs) initializeNode()
     })
 
@@ -58,13 +43,16 @@
         if(currentPage.includes('/search')) searchTerm = window.decodeURI(window.location.search.split('=')[1])
     })
 
-    let ipfsStatus = 'initializing'
-
     const initializeNode = async () => {
         ipfsStatus = 'ipfs: assets loaded'
         await sleep(681)
-        ipfsStatus = 'ipfs: swarming...'
-        $ipfs = await Ipfs.create()
+        try {
+            ipfsStatus = 'ipfs: swarming...'
+            $ipfs = await Ipfs.create()
+            ipfsStatus = 'ipfs: loaded yay!'
+        } catch(err) {
+            'ipfs: error! RELOAD PAGE'
+        }
         //     {
         //     config: {
         //         Addresses: {
@@ -76,20 +64,22 @@
         //         }
         //     }
         // }
-        ipfsStatus = 'ipfs: loaded yay!'
+        
     }
-    $: console.log('$layout:store', $store)
+    $: console.log('$layout:$instances', $instances)
+    $: console.log('$layout:$settings', $settings)
 </script>
 
 <svelte:head>
     <script
         src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"
-        on:load={initializeNode}>
-    </script>
+        on:load={initializeNode}
+        on:error={() => ipfsStatus = 'ipfs: error! RELOAD PAGE'}
+    />
 </svelte:head>
 
-<Header {currentPage} {searchTerm} chosen={$chosen} status={$store.theme} {ipfsStatus}
-    on:changeInstance={() => $chosen = chooseInstance($store.instances)}
+<Header {currentPage} {searchTerm} chosen={$chosen} status={false} {ipfsStatus}
+    on:changeInstance={() => $chosen = chooseInstance($instances)}
     on:theme={changeTheme}
 />
 

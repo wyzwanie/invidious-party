@@ -86,6 +86,7 @@
 <!-- <iframe src="https://{chosen}/embed/{videoID}" title="video" /> -->
 <!-- &itag=18&local=true -->
 <!-- svelte-ignore a11y-media-has-caption -->
+{#key videoID}
 <div class="video-js-responsive-container vjs-hd">
     <video
         id="my-player"
@@ -116,6 +117,7 @@
     </p>
     </video>
 </div>
+{/key}
 {:else}
 ... loading ...
     <button on:click={() => dispatch('error')}>nextChosen</button>

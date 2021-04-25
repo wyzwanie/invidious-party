@@ -1,44 +1,46 @@
 <script>
-	import { chooseInstance, sleep } from '$lib/_helper'
-	import { store, chosen } from '$lib/_store'
+	import { chooseInstance } from '$lib/_helper'
+	import { chosen } from '$lib/_store'
+	import { instances } from '$lib/_localStore'
 	
     import AsyncError from '$lib/AsyncError.svelte'
 	import AsyncLoading from '$lib/AsyncLoading.svelte'
-	import Loader from '$lib/Loader.svelte'
-	import Rotate from '$lib/Rotate.svelte'
 	import Videos from '$lib/Videos.svelte'
 
-	let counter = 0
 	let retry = false
 
 	const fetchTrending = async instance => {
-		if(counter > 10) {
-            counter = 0
-            return { error: 'is everything OK? too many retries...' }
-        }
 		try {
 			///api/v1/videos/aqz-KE-bpKQ?fields=videoId,title,description
 			const req = await fetch(`https://${instance}/api/v1/trending`)
 			const res = await req.json()
-			counter++
+
 			return res
 		} catch(err) {
             retry = true
-            counter++
 		}
 	}
 
+	const disableInstance = chosen => {
+		console.log('disable started')
+		new AbortController().abort()
+		const index = $instances.findIndex(x => x[0] === chosen)
+		$instances[index][1].enabled = false
+		$instances = $instances
+	}
+
 	$: if(retry) {
-        $chosen = chooseInstance($store.instances)
+        $chosen = chooseInstance($instances)
         retry = false
     }
 </script>
 
-
-{#await fetchTrending($chosen)}
-	<AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($store.instances)} />
-{:then videos}
-	<Videos {videos} chosen={$chosen} on:empty={() => $chosen = chooseInstance($store.instances)} />
-{:catch error}
-    <AsyncError {error} on:rotate={() => $chosen = chooseInstance($store.instances)} />
-{/await}
+{#if chosen}
+	{#await fetchTrending($chosen)}
+		<AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+	{:then videos}
+		<Videos {videos} chosen={$chosen} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+	{:catch error}
+		<AsyncError {error} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+	{/await}
+{/if}

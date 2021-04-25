@@ -1,31 +1,29 @@
 
 <script>
-    import { lzw_encode, encodeData, saveLocal } from '$lib/_helper'
-    import { store, chosen } from '$lib/_store'
+    // import { lzw_encode, encodeData, saveLocal } from '$lib/_helper'
+    import { chosen, ipfs } from '$lib/_store'
+    import { instances, settings } from '$lib/_localStore'
 
-    let ipfsNode
     let savedCID
     let result
     let cid
 
-    const initializeNode = async () => ipfsNode = await Ipfs.create()
-
     const save = async data => {
-        if(ipfsNode) savedCID = await ipfsNode.dag.put(data)
+        if($ipfs) savedCID = await $ipfs.dag.put(data)
         // console.log(savedCID)
-        // let a = await ipfsNode.key.gen('myKey', {
+        // let a = await $ipfs.key.gen('myKey', {
         //     type: 'ed25519'
         // })
         // console.log(a)
 
     }
     const get = async cid => {
-        if(ipfsNode && cid) result = await ipfsNode.dag.get(cid)
+        if($ipfs && cid) result = await $ipfs.dag.get(cid)
         else return 'not ready yet'
         return result.value
     }
 </script>
-{!!ipfsNode} {savedCID}<hr>
+{!!$ipfs} {savedCID}<hr>
 {#await get(savedCID)}
     ...loading...
 {:then result}
@@ -36,16 +34,16 @@
 
 
 <input bind:value={cid}><button on:click={() => savedCID = cid}>getCID</button>
-<button on:click={() => save($store)}>as</button>
+<!-- <button on:click={() => save($store)}>as</button> -->
 <h1>Settings</h1>
 <div class="wrapper">
     <div class="left">
         <h3>Chose instances rotation:</h3>
-        {#if $store && $store.instances && $store.instances.length > 0}
+        {#if $instances && $instances.length > 0}
             <ul style="list-style: none;">
-                {#each $store.instances as instance, index}
+                {#each $instances as instance, index}
                     <li>
-                        <input type="checkbox" bind:checked={$store.instances[index][1].enabled}>
+                        <input type="checkbox" bind:checked={$instances[index][1].enabled}>
                         <span style="margin-right:7px"></span>
                         {instance[0]}
                         <span style="margin-right:7px"></span>
@@ -54,8 +52,7 @@
                 {/each}
             </ul>
         {/if}
-        <h3>Input RSS for subscription:</h3>
-        <input type="text" bind:value={$store.rss}>
+
     </div>
     <div class="right">
         <h3>Here you own your data</h3>
@@ -72,14 +69,7 @@
     </div>    
 </div>
 
-<svelte:head>
-    <script
-        src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"
-        on:load={initializeNode}>
-    </script>
-</svelte:head>
-
-<button on:click={() => saveLocal({ instances: $store.instances, rss: $store.rss })}>Save</button>
+<!-- <button on:click={() => saveLocal({ instances: $store.instances, rss: $store.rss })}>Save</button> -->
 <button on:click={() => window.location = chosen}>Back To Invidious</button>
 
 

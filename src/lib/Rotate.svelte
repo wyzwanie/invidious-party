@@ -8,6 +8,7 @@
 
     const dispatch = createEventDispatcher()
     const sendRotate = async () => {
+        new AbortController().abort()
         dispatch('rotate')
         rotate = true
         await sleep(1000)

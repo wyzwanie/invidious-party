@@ -40,13 +40,15 @@
     </div>
 {:else}
     <div class="df">
-        <p>No results or an error!</p>
-        <Rotate on:rotate={() => dispatch('empty')} />
+        <p>Instance returned empty result.</p>
+        <button on:click={() => dispatch('disable')}>Disable it in your rotation list</button>
+        <p style="font-size: 90%">OR click Rotate icon next to search, to try on next invidious instance</p>
     </div>
 {/if}
 <style>
 .df {
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
 }
 .df p {
     padding: 7px;

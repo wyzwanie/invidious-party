@@ -35,7 +35,7 @@ export const chooseInstance = instances => {
 
 //save parameter to localStorage
 export const saveLocal = async storeObject => {
-    const { instances, theme, subscriptions } = storeObject
+    const { instances, theme, subscriptions, SUBcache } = storeObject
 
     if(instances) {
         localStorage.instances = JSON.stringify(instances)
@@ -43,7 +43,7 @@ export const saveLocal = async storeObject => {
     }
     if(subscriptions) localStorage.subscriptions = JSON.stringify(subscriptions)
     if(theme) localStorage.theme = theme
-    
+    if(SUBcache) localStorage.SUBcache = JSON.stringify(SUBcache)
     localStorage.lastStoreUpdate = new Date().getTime()
 }
 
