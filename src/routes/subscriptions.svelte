@@ -75,19 +75,22 @@
     const job = async (task, next) => {
         if(retryCounter[task.instance]) retryCounter[task.instance].totalRequests++
         else retryCounter[task.instance] = { ...retryCounter[task.instance], totalRequests: 1 }
-
         const { instance, channelID, interval } = task
-        let error = null
-        if(SUBfeed.findIndex(x => x.authorId === channelID) === -1) {
-            let fetchChannel = await feCh(instance, channelID, task.signal)
-            if(fetchChannel.success) SUBfeed = [...SUBfeed, fetchChannel.res]
-            // else if(empty_response) SUBfeed = [...SUBfeed, { authorId: task.channelID, latestVideos: [ { published: 0 }] }]
-            //latestVideox[max=10]: author, authorId,  isUpcoming, lengthSeconds, liveNow, published, title, videoId, viewCount
-            else error = fetchChannel
-        } else error = null
-        
 
-        setTimeout(next, interval, error, task)
+        try {
+            let error = null
+            if(SUBfeed.findIndex(x => x.authorId === channelID) === -1) {
+                let fetchChannel = await feCh(instance, channelID, task.signal)
+                if(fetchChannel.success) SUBfeed = [...SUBfeed, fetchChannel.res]
+                // else if(empty_response) SUBfeed = [...SUBfeed, { authorId: task.channelID, latestVideos: [ { published: 0 }] }]
+                //latestVideox[max=10]: author, authorId,  isUpcoming, lengthSeconds, liveNow, published, title, videoId, viewCount
+                else error = fetchChannel
+            } else error = null
+            setTimeout(next, interval, error, task)
+        } catch {
+            error = { failed: 'dang' }
+            setTimeout(next, interval, error, task)
+        }
     }
     const SUBqueue = Queue.channels(concurrency)
         .timeout(3000)
