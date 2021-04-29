@@ -201,7 +201,7 @@ console.log('rr', (refreshedAt + 15 * 1000) < new Date().getTime())
     // done?
 
 </script>
-
+<h2>Subscriptions</h2>
 <nav>
     <ul>
         <li on:click={() => activeTab = 'feed'} class="feed {activeTab === 'feed' ? 'active' : ''}">Feed</li>
@@ -209,6 +209,10 @@ console.log('rr', (refreshedAt + 15 * 1000) < new Date().getTime())
         <li on:click={() => activeTab = 'import'} class="{activeTab === 'import' ? 'active' : ''}">Import</li>
     </ul>
 </nav>
+<div class="filter">
+
+</div>
+
 <button on:click={() => alert(SUBqueue.count)}>count</button><br>
 <button on:click={() => requestsMade = 200}>off</button><br>
 refreshRunning: {refreshRunning}
