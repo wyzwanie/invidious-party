@@ -1,6 +1,6 @@
 [invidious.PARTY](https://invidious.party)
 ===============
-(WIP) Pure client side, privacy focused app, that fetches instances from api.invidious.io and managesrotates instance on every request. Instances automatically rotate on failed request, upon empty search result you can request fresh one from new instance. Settings are currently stored in localStorage.
+(WIP) Pure client side, privacy focused app, that fetches instances from api.invidious.io. Instances automatically rotate on failed request, upon empty search result you can request fresh one from new instance. Settings are currently stored in localStorage.
 
 # inspiration
 showing invidious to non-technical friend, had to try multiple domains before one worked.
@@ -17,7 +17,7 @@ only modern, no mobile version yet
 - search (partially done)
 - channel (partially done)
 - playlist (partially done)
-- subscriptions (figuring best way to fetch information, ipfs storage is working)
+- subscriptions (prototype working, ipfs storage is working)
 
 
 ### PLAN/IDEAS
