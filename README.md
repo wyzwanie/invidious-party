@@ -1,4 +1,4 @@
-inivdious.PARTY
+invidious.PARTY
 ===============
 (WIP) Pure client side, privacy focused app, that fetches instances from api.invidious.io and managesrotates instance on every request. Instances automatically rotate on failed request, upon empty search result you can request fresh one from new instance. Settings are currently stored in localStorage.
 
