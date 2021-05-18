@@ -136,22 +136,22 @@ let counter = 0
     failed Tasks     : {failedTasks.length}<br>
     done?            : {done}
     <hr>
-    DO POBRANIA:
+    DO POBRANIA: {Youtube.length}
     <hr>
-    {#each Youtube.sort(sortThings) as x}
+    <!-- {#each Youtube.sort(sortThings) as x}
         {x},&nbsp;
     {/each}
+    <hr> -->
+    POBRANE: {result.length}
     <hr>
-    POBRANE:
-    <hr>
-    {#each result as x}
+    <!-- {#each result as x}
         {x.authorId},&nbsp;
     {/each}
-    {result.length}
+    {result.length} -->
     <hr>
-    FAILED:
-    <hr>
+    FAILED: {failedTasks.length}
+    <!-- <hr>
     {#each failedTasks.sort(sortThings) as x}
         {x},&nbsp;
-    {/each}
+    {/each} -->
 </div>

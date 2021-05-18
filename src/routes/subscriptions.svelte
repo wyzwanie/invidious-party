@@ -9,8 +9,6 @@
     import ProgressBar from '$lib/ProgressBar.svelte'
     import { sleep } from '$lib/_helper';
 
-    import * as d3 from 'd3-queue'
-    console.log(d3)
     let SUBfeed = []
     let tasks = []
     let tasksLeft = []
