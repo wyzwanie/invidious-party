@@ -1,6 +1,6 @@
-inivdious.PARTY
+[invidious.PARTY](https://invidious.party)
 ===============
-(WIP) Pure client side, privacy focused app, that fetches instances from api.invidious.io and managesrotates instance on every request. Instances automatically rotate on failed request, upon empty search result you can request fresh one from new instance. Settings are currently stored in localStorage.
+(WIP) Pure client side, privacy focused app, that fetches instances from api.invidious.io. Instances automatically rotate on failed request, upon empty search result you can request fresh one from new instance. Settings are currently stored in localStorage.
 
 # inspiration
 showing invidious to non-technical friend, had to try multiple domains before one worked.
@@ -17,7 +17,7 @@ only modern, no mobile version yet
 - search (partially done)
 - channel (partially done)
 - playlist (partially done)
-- subscriptions (figuring best way to fetch information, ipfs storage is working)
+- subscriptions (prototype working, ipfs storage is working)
 
 
 ### PLAN/IDEAS
@@ -37,7 +37,7 @@ alot :D
 The WeThePeople License (WTP)
 Pasteleft WeThePeople 2021
 
-As long as you are a human (for sure not a corporation) you can do what the heck you want with it, unless its made for profit and/or incorporated in any way shape or form, then you are not allowed to benefit and/or profit from this software in any way shape or form.
+As long as you are a human (for sure not a corporation) you can do what the heck you want with it, unless its made for profit and/or incorporated in any way shape or form, then you are not allowed to intercact, use, benefit, and/or profit from this software in any way shape or form.
 
 The above pasteleft notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
