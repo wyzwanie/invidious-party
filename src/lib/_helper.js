@@ -5,18 +5,22 @@ export const getInstances = async () => {
     let allInstances = await instancesRequest.json()
 
     allInstances.forEach(instance => {
-        if(instance[1].type === 'https' && instance[1].monitor && instance[1].monitor.statusClass === 'success') {
+        try {
+            const version = instance[1].stats.software.version.split('-')[0]
+            const newEnough = new Date(version) > new Date('2021-04-30')
+            const metadata = instance[1].stats.metadata
             const name = instance[0]
-            const { flag, uri, openRegistrations, lastChannelRefreshedAt, stats } = instance[1]
+            const { flag, uri } = instance[1]
 
-            if(name) parsedInstances = [...parsedInstances, [ name, {
+            parsedInstances = [...parsedInstances, [ name, {
                 flag,
                 uri: uri[uri.length-1] !== '/' ? `${uri}/` : uri,
-                openRegistrations,
-                lastChannelRefreshedAt,
-                version: (stats && stats.software) ? stats.software.version.split('-')[1] : '',
+                metadata,
+                version,
                 enabled: true
             }]]
+        } catch(e) {
+            console.log(instance[0], e)
         }
     })
     return parsedInstances

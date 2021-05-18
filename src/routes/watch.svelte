@@ -13,6 +13,8 @@
     let retry = false
     let videoID
 
+    // let videoTMP = JSON.parse()
+
     onMount(async () => videoID = window.location.search.split('=')[1])
     
     const fetchVideo = async(instance, videoID) => {

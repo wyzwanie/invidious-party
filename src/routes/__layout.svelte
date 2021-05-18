@@ -20,7 +20,7 @@
 
     onMount(async () => {
         //never fetched before
-        if(!$instancesUpdatedAt) {
+        if(!$instancesUpdatedAt || !$instances.length) {
             console.log('--- fetching instances ---')
             $instances = await getInstances()
             $instancesUpdatedAt = new Date().getTime()
@@ -31,7 +31,7 @@
             $instances = await getInstances()
             $instancesUpdatedAt = new Date().getTime()
         }
-
+        console.log($instances)
         $chosen = chooseInstance($instances)
 
         if($settings && $settings.theme === 'light') document.documentElement.classList.toggle('light')
@@ -71,8 +71,14 @@
 </script>
 
 <svelte:head>
-    <script
+    <!-- <script
         src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"
+        on:load={initializeNode}
+        on:error={() => ipfsStatus = 'ipfs: error! RELOAD PAGE'}
+    /> -->
+
+    <script
+        src="lib/ipfs.js"
         on:load={initializeNode}
         on:error={() => ipfsStatus = 'ipfs: error! RELOAD PAGE'}
     />

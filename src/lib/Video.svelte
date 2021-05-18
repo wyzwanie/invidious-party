@@ -78,8 +78,11 @@
 </script>
 
 <svelte:head>
-    <link rel="stylesheet" href="https://unpkg.com/video.js/dist/video-js.min.css">
-    <script src="https://unpkg.com/video.js/dist/video.min.js" on:load={() => initialized = true} on:error={() => dispatch('error')} />
+    <!-- <link rel="stylesheet" href="https://unpkg.com/video.js/dist/video-js.min.css"> -->
+    <!-- <script src="https://unpkg.com/video.js/dist/video.min.js" on:load={() => initialized = true} on:error={() => dispatch('error')} /> -->
+
+    <link rel="stylesheet" href="lib/videojs.min.css">
+    <script src="lib/videojs.min.js" on:load={() => initialized = true} on:error={() => dispatch('error')} />
 </svelte:head>
 
 {#if chosen && videoID}

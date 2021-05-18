@@ -7,19 +7,19 @@
 		"start": "svelte-kit start"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-static": "next",
-		"@sveltejs/kit": "next",
+		"@sveltejs/adapter-static": "^1.0.0-next.9",
+		"@sveltejs/kit": "^1.0.0-next.107",
 		"@vime-js/standard": "^1.6.6",
-		"@vime/svelte": "^5.0.27",
-		"svelte": "^3.29.0",
+		"@vime/svelte": "^5.0.28",
+		"svelte": "^3.38.2",
 		"svelte-lazy": "^1.0.8",
-		"vite": "^2.1.0"
+		"vite": "^2.3.3"
 	},
 	"type": "module",
 	"engines": {
 		"node": ">= 12.17.0"
 	},
 	"dependencies": {
-		"trystero": "^0.7.10"
+		"trystero": "^0.7.11"
 	}
 }

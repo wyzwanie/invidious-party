@@ -128,8 +128,6 @@
                 console.log('failure:task', task)
             }
         })
-        // .done((err, task) => console.log(SUBfeed))
-        // .drain(() => // console.log('Queue drain'));
 
         const feCh = async (instance, channelID, signal) => {
             if(instance === null) return { init: 'success' }
