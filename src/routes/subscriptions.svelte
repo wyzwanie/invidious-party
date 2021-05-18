@@ -7,7 +7,10 @@
     import Videos from '$lib/Videos.svelte'
 
     import ProgressBar from '$lib/ProgressBar.svelte'
-    
+    import { sleep } from '$lib/_helper';
+
+    import * as d3 from 'd3-queue'
+    console.log(d3)
     let SUBfeed = []
     let tasks = []
     let tasksLeft = []
@@ -88,8 +91,7 @@
             } else error = null
             setTimeout(next, interval, error, task)
         } catch {
-            error = { failed: 'dang' }
-            setTimeout(next, interval, error, task)
+            setTimeout(next, interval, { failed: 'dang' }, task)
         }
     }
     const SUBqueue = Queue.channels(concurrency)
@@ -100,9 +102,10 @@
             finished++
             tasksLeft = tasks.filter(x => x.channelID !== task.channelID)
             // console.log(tasksLeft)
-            if(toDo === 0) onComplete()
+            // if(toDo === 0) onComplete()
         })
         .failure((err, task) => {
+            
             const empty_response = typeof err.reason === 'object' && Object.keys(err.reason).length === 0
             if(err.init || empty_response || err.reason === 'Failed to fetch' || err.reason === 'Read timed out' || err.message === 'Process timed out') {
                 if(!err.init) failedCount++
@@ -115,12 +118,13 @@
                 for(let key of Object.keys(retryCounter)) {
                     const failed = retryCounter[key].failed
                     const totalRequests = retryCounter[key].totalRequests
-
-                    if(!failed || failed <= 5) filteredInstances.push(key)
+                    if(failed/totalRequests <= 1) filteredInstances.push(key)
                 }
-
+                // console.log(retryCounter)
+                
                 if(filteredInstances.length) {
                     const newInstance = filteredInstances[Math.floor(Math.random() * filteredInstances.length)]
+                    console.log(task.instance, newInstance)
                     SUBqueue.add({ ...task, instance:  newInstance })
                 }
             } else {
@@ -136,11 +140,16 @@
             requestsMade++
 
             try {
-                const req = await fetch(`https://${instance}/api/v1/channels/${channelID}?fields=authorId,author,latestVideos`, { signal })
-                const res = await req.json()
+                // const req = await fetch(`https://${instance}/api/v1/channels/${channelID}?fields=authorId,author,latestVideos`, { signal })
+                // const res = await req.json()
                 inProgress--
-                if(res && res.authorId) return { success: channelID, from: instance, res }
-                else return { failed: channelID, from: instance, reason: res }
+                await sleep(Math.random()*300)
+
+                    if(Math.random() > 0.5) return { success: channelID, from: instance, res: {} }
+                    else return { failed: channelID, from: instance, reason: {} }
+
+                // if(res && res.authorId) return { success: channelID, from: instance, res }
+                // else return { failed: channelID, from: instance, reason: res }
             } catch(error) {
                 inProgress--
                 return { failed: channelID, from: instance, reason: error.message }
@@ -187,7 +196,10 @@ console.log('rr', (refreshedAt + 15 * 1000) < new Date().getTime())
         }
     }
     
-    const startYmport = () => {}
+    const startYmport = () => {
+        // console.log(JSON.parse(ymport.subscriptions))
+        $SUBs = JSON.parse(ymport).subscriptions
+    }
 
     // $: console.log('instanceRetryCounter', instanceRetryCounter)
     // $: // console.log('$instances', $instances)
@@ -200,7 +212,7 @@ console.log('rr', (refreshedAt + 15 * 1000) < new Date().getTime())
         setInterval(() => refresh($SUBsRefreshedAt, $instances, $SUBs), 15 * 60 * 1000)
     }
     // done?
-
+$: console.log($SUBs)
 </script>
 <h2>Subscriptions</h2>
 <nav>
@@ -215,7 +227,7 @@ console.log('rr', (refreshedAt + 15 * 1000) < new Date().getTime())
 </div>
 
 <button on:click={() => alert(SUBqueue.count)}>count</button><br>
-<button on:click={() => requestsMade = 200}>off</button><br>
+<button on:click={() => refresh(1, $instances, $SUBs)}>off</button><br>
 refreshRunning: {refreshRunning}
 
 {#if activeTab === 'feed'}
