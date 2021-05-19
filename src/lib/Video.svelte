@@ -34,11 +34,11 @@
                 overrideNative: true
             }
         },
-        plugins: {
-            httpSourceSelector: {
-                    default: 'auto'
-            }
-        }
+        // plugins: {
+        //     httpSourceSelector: {
+        //             default: 'auto'
+        //     }
+        // }
     }
     $: console.log(videoAPI)
 
