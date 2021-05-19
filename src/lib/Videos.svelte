@@ -3,7 +3,7 @@
     import { createEventDispatcher, afterUpdate } from 'svelte'
     import { convertCount, secToMin } from '$lib/_helper'
 
-    import Lazy from 'svelte-lazy'
+    import ImageLoader from '$lib/Image/ImageLoader.svelte'
     import Loader from '$lib/Loader.svelte'
     import Rotate from '$lib/Rotate.svelte'
 
@@ -24,9 +24,7 @@
                 <div class="video-inner">
                     <div class="card">
                         <a class="thumbnail" href="/watch?v={video.videoId}">
-                            <Lazy height={Math.floor(vw*0.11)} placeholder={Loader}>
-                                <img alt="thumbnail" src="https://{chosen}/vi/{video.videoId}/mqdefault.jpg">
-                            </Lazy>
+                            <ImageLoader src={`https://${chosen}/vi/${video.videoId}/mqdefault.jpg`} alt={video.title} />
                             <div class="duration">{secToMin(video.lengthSeconds)}</div>
                         </a>
                         <h3 class="title"><a href="/watch?v={video.videoId}">{video.title}</a></h3>
@@ -84,7 +82,7 @@
     justify-content: center;
     align-content: center;
 }
-.thumbnail img {
+:global(.thumbnail img) {
     width: 100%;
     /* height: 215px; */
     flex-grow: 1;
@@ -123,6 +121,4 @@
     flex-grow: 1;
     color: var(--accent-hover);
 }
-/*  */
-
 </style>
