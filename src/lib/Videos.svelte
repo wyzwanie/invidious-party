@@ -53,9 +53,6 @@
 .df p {
     padding: 7px;
 }
-:global(.svelte-lazy) {
-    width: 100%;
-}
 .videos {
     display: flex;
     flex-wrap: wrap;
@@ -65,6 +62,7 @@
     width: calc(25% - 1em);
     margin-bottom: 1em;
 }
+
 .video-inner {
     display: flex;
     flex-direction: row;

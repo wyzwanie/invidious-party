@@ -1,7 +1,8 @@
 <script>
     import { createEventDispatcher } from 'svelte'
     import { convertCount } from '$lib/_helper'
-    import Lazy from 'svelte-lazy'
+
+    import ImageLoader from '$lib/Image/ImageLoader.svelte'
 
     export let chosen
     export let playlists
@@ -20,9 +21,7 @@
                 <div class="playlist-inner">
                     <div class="card">
                         <a class="thumbnail" href="/playlist?list={playlist.playlistId}">
-                            <Lazy height={Math.floor(vw*0.11)} placeholder=...loading...>
-                                <img alt="thumbnail" src="https://{chosen}/vi/{playlist.playlistThumbnail.split('/vi/')[1]}">
-                            </Lazy>
+                            <ImageLoader src={`https://${chosen}/vi/${playlist.playlistThumbnail.split('/vi/')[1]}`} alt={playlist.title} />
                             <div class="count">{playlist.videoCount} video{playlist.videoCount > 1 ? 's' : ''}</div>
                         </a>
                         <h3 class="title"><a href="/playlist?list={playlist.playlistId}">{playlist.title}</a></h3>
@@ -65,7 +64,7 @@
     justify-content: center;
     align-content: center;
 }
-.thumbnail img {
+:global(.thumbnail img) {
     width: 100%;
     /* height: 215px; */
     flex-grow: 1;
@@ -78,15 +77,6 @@
     margin: 0;
     padding: 7px;
     height: 38px;
-}
-.author {
-    margin: 0;
-    padding: 7px;
-    flex-grow: 1;
-    color: white;
-}
-.author a {
-    color: white;
 }
 .count {
     position: absolute;

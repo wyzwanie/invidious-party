@@ -2,7 +2,7 @@
     import { createEventDispatcher } from 'svelte'
     import { getAuthorThumbnail } from '$lib/_helper'
 
-    import Lazy from 'svelte-lazy'
+    import ImageLoader from '$lib/Image/ImageLoader.svelte'
     import Loader from '$lib/Loader.svelte'
     import Rotate from '$lib/Rotate.svelte'
 
@@ -47,16 +47,11 @@
     <div class="authorBar">
         <div class="authorInfo">
             <div class="wrapper">
-                <Lazy placeholder={Loader} >
-                    {#if !error}
-                        <img
-                            src="{getAuthorThumbnail(chosen, video.authorThumbnails)}" alt="{video.author} thumbnail"
-                            on:error={() => error = true}
-                        >
-                    {:else}
-                        <Loader />
-                    {/if}                
-                </Lazy>
+                {#if !error}
+                    <ImageLoader src={getAuthorThumbnail(chosen, video.authorThumbnails)} alt={video.author} />
+                {:else}
+                    <Loader />
+                {/if}
             </div>
             <a href="/channel#{video.authorId}">{video.author}</a>
         </div>
