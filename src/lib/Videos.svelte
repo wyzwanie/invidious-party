@@ -62,7 +62,27 @@
     width: calc(25% - 1em);
     margin-bottom: 1em;
 }
-
+@media screen and (max-width: 1366px) {
+    .video-outer {
+        width: calc(33% - 1em);
+        margin-bottom: 1em;
+    }
+}
+@media screen and (max-width: 1000px) {
+    .video-outer {
+        width: calc(50% - 1em);
+        margin-bottom: 1em;
+    }
+}
+@media screen and (max-width: 768px) {
+    .videos {
+        justify-content: center;
+    }
+    .video-outer {
+        width: calc(100% - 1em);
+        margin-bottom: 1em;
+    }
+}
 .video-inner {
     display: flex;
     flex-direction: row;
