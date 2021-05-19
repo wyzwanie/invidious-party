@@ -84,7 +84,7 @@
     <script src="lib/videojs.min.js" on:load={() => initialized = true} on:error={() => dispatch('error')} />
 </svelte:head>
 
-<!-- {#if chosen && videoAPI} -->
+{#if chosen && videoAPI}
 <!-- <iframe src="https://{chosen}/embed/{videoID}" title="video" /> -->
 <!-- &itag=18&local=true -->
 <!-- svelte-ignore a11y-media-has-caption -->
@@ -117,10 +117,10 @@
     </video>
 </div>
 {/key}
-<!-- {:else}
+{:else}
 ... loading ...
     <button on:click={() => dispatch('error')}>nextChosen</button>
-{/if} -->
+{/if}
 
 <style>
 .video-js-responsive-container.vjs-hd {
