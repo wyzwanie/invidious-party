@@ -2,13 +2,14 @@
     import { createEventDispatcher } from 'svelte'
 
     export let chosen
-    export let videoID
-
-    let player
+    export let videoAPI
+    
     let initialized = 0
+    let player
+    let sources = []
 
     const dispatch = createEventDispatcher()
-    const options = {
+    var options = {
         preload: 'auto',
         liveui: true,
         playbackRates: [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0],
@@ -32,14 +33,13 @@
             hls: {
                 overrideNative: true
             }
-        },
-        // plugins: {
-        //     httpSourceSelector: {
-        //         default: 'hd720'
-        //     }
-        // }
+        }
     }
+    $: console.log(videoAPI)
+
     const initializeVideo = () => {
+        console.log('uuu', videoAPI)
+        if(videoAPI) sources = videoAPI.formatStreams
         console.log('loaded')
         player = videojs('my-player', options)
         console.log(player)
@@ -84,32 +84,29 @@
     <script src="lib/videojs.min.js" on:load={() => initialized = true} on:error={() => dispatch('error')} />
 </svelte:head>
 
-{#if chosen && videoID}
+<!-- {#if chosen && videoAPI} -->
 <!-- <iframe src="https://{chosen}/embed/{videoID}" title="video" /> -->
 <!-- &itag=18&local=true -->
 <!-- svelte-ignore a11y-media-has-caption -->
-{#key videoID}
+
+{#key player}
 <div class="video-js-responsive-container vjs-hd">
     <video
         id="my-player"
         class="video-js vjs-big-play-centered"
         controls
         preload="auto"
-        poster="https://{chosen}/vi/{videoID}/maxres.jpg"
+        poster="https://{chosen}/vi/{videoAPI.videoId}/maxres.jpg"
         data-setup=""
     >
+    {#each sources as source}
         <source
-            src="https://{chosen}/latest_version?id={videoID}&itag=18"
-            type='video/mp4; codecs="avc1.42001E, mp4a.40.2"'
-            label="medium"
-            selected="false"
+            src="https://{chosen}/latest_version?id={videoAPI.videoId}&itag={source.itag}"
+            type={source.type}
+            label={source.qualityLabel}
+            selected={source.qualityLabel === '720p' && source.encoding === 'h264' ? 'true' : 'false'}
         >
-        <source 
-            src="https://{chosen}/latest_version?id={videoID}&itag=22"
-            type='video/mp4; codecs="avc1.64001F, mp4a.40.2"'
-            label="hd720"
-            selected="true"
-        >
+    {/each}
     <p class="vjs-no-js">
         To view this video please enable JavaScript, and consider upgrading to a
         web browser that
@@ -120,10 +117,10 @@
     </video>
 </div>
 {/key}
-{:else}
+<!-- {:else}
 ... loading ...
     <button on:click={() => dispatch('error')}>nextChosen</button>
-{/if}
+{/if} -->
 
 <style>
 .video-js-responsive-container.vjs-hd {
