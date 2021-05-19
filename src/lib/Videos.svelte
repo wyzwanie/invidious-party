@@ -4,8 +4,6 @@
     import { convertCount, secToMin } from '$lib/_helper'
 
     import ImageLoader from '$lib/Image/ImageLoader.svelte'
-    import Loader from '$lib/Loader.svelte'
-    import Rotate from '$lib/Rotate.svelte'
 
     export let chosen
     export let videos
