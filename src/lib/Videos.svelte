@@ -1,5 +1,6 @@
 <script>
-    import { createEventDispatcher } from 'svelte'
+
+    import { createEventDispatcher, afterUpdate } from 'svelte'
     import { convertCount, secToMin } from '$lib/_helper'
 
     import Lazy from 'svelte-lazy'
@@ -11,6 +12,7 @@
 
     let vw
     const dispatch = createEventDispatcher()
+    afterUpdate(() => console.log('update Videos'))
 </script>
 
 <svelte:window bind:innerWidth={vw} />

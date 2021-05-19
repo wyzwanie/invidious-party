@@ -200,9 +200,10 @@ let counter = 0
     {/each} -->
 
 </div>
+<ProgressBar total={Youtube.length} progress={(result.length/Youtube.length)*100} />
 <!-- {#if count % 10 === 0} -->
     <Videos chosen={$chosen} videos={wynikk} />
 <!-- {/if} -->
-{JSON.stringify(wynikk, null, 4)}
+<!-- {JSON.stringify(wynikk, null, 4)} -->
 <!-- {#each result as x, i} -->
 <!-- {/each} -->
