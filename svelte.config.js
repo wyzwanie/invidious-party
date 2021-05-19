@@ -8,6 +8,10 @@ export default {
 			assets: 'build',
 			fallback: null
 		}),
-		
+		vite: {
+			build: {
+				sourcemap: true
+			}
+		}
 	}
 }
