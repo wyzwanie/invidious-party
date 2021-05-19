@@ -47,7 +47,7 @@
         if(videoAPI) sources = videoAPI.formatStreams
         console.log('loaded')
         player = videojs('my-player', options)
-        player.httpSourceSelector()
+        // player.httpSourceSelector()
         console.log(player)
 
         player.on('error', function (event) {
