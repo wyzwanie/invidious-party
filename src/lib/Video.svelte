@@ -33,6 +33,11 @@
             hls: {
                 overrideNative: true
             }
+        },
+        plugins: {
+            httpSourceSelector: {
+                    default: 'auto'
+            }
         }
     }
     $: console.log(videoAPI)
@@ -42,6 +47,7 @@
         if(videoAPI) sources = videoAPI.formatStreams
         console.log('loaded')
         player = videojs('my-player', options)
+        player.httpSourceSelector()
         console.log(player)
 
         player.on('error', function (event) {
@@ -73,15 +79,18 @@
             }
         });
     }
-    $: if(initialized) initializeVideo()
+    $: if(initialized === 3) initializeVideo()
 </script>
 
 <svelte:head>
     <!-- <link rel="stylesheet" href="https://unpkg.com/video.js/dist/video-js.min.css"> -->
     <!-- <script src="https://unpkg.com/video.js/dist/video.min.js" on:load={() => initialized = true} on:error={() => dispatch('error')} /> -->
 
-    <link rel="stylesheet" href="lib/videojs.min.css">
-    <script src="lib/videojs.min.js" on:load={() => initialized = true} on:error={() => dispatch('error')} />
+    <link rel="stylesheet" href="https://unpkg.com/video.js/dist/video-js.min.css">
+    <script src="https://unpkg.com/video.js/dist/video.min.js" on:load={() => initialized++} on:error={() => dispatch('error')} />
+    <script src="https://unpkg.com/videojs-contrib-quality-levels/dist/videojs-contrib-quality-levels.min.js" on:load={() => initialized++} on:error={() => dispatch('error')} />
+    <script src="https://unpkg.com/videojs-http-source-selector/dist/videojs-http-source-selector.min.js" on:load={() => initialized++} on:error={() => dispatch('error')} />
+    
 </svelte:head>
 
 {#if chosen && videoAPI}
