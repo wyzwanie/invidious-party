@@ -1,5 +1,5 @@
 # Greetings Explorer🎉
-🎉You have reached invidious.party project, where [invidious](https://github.com/iv-org/invidious "invidious") instances have a party 🎉
+🎉You have reached invidious.party project, where [invidious](https://github.com/iv-org/invidious "invidious") instances have a party 🎉<br>
 invidious.party is a fully static site build using ![svelte hoolingans reprezent](https://cdn.discordapp.com/icons/457912077277855764/ea3d74c9d4e51d12cd2daa3ea1b44bb6.png?size=32 "svelte hoolingans reprezent") [SvelteKit](https://kit.svelte.dev) 
 
 ## installation
@@ -14,23 +14,23 @@ npm run build
 ```
 
 ## inspiration
-showing invidious to non-technical friend, had to try multiple domains before one worked.
+showing invidious to non-technical friend, had to try multiple domains before one worked.<br>
 using invidious daily as full replacement for yt, had to copy instance addresses to find one that had particular channel or video.
 
 ## solo mode
-in solo mode your browser communicates only with invidious instances to serve you content.
-by default your subscriptions and settings are stored only in browser' localStorage
-if you want to share your data with a friend or another device you can do so using bookmarks and QRcodes (WIP)
-this solution apart from obvious drawback that everytime you add a subscription you need to bookmark new address [maybe some snippet?]
+in solo mode your browser communicates only with invidious instances to serve you content.<br>
+by default your subscriptions and settings are stored only in browser' localStorage<br>
+if you want to share your data with a friend or another device you can do so using bookmarks and QRcodes (WIP)<br>
+this solution apart from obvious drawback that everytime you add a subscription you need to bookmark new address [maybe some snippet?]<br>
 has a limitations on maximum number of subscriptions (150) or videos in playlist (500) per link
 
 ## party mode
-in order to have a party there needs to be a way for browsers to communicate directly between each other.
+in order to have a party there needs to be a way for browsers to communicate directly between each other.<br>
 made possible thanks to brilliant package [trystero](https://github.com/dmotz/trystero)
 
-in party mode we use torrent trackers for signaling, so browsers can find direct communication tunnel.
-in party mode you notify party members what you are watching by broadcasting videoID you watch,(WIP)
-so other peers having a party, can dynamically see what is being watched right now, have fun in (to be encrypted)
+in party mode we use torrent trackers for signaling, so browsers can find direct communication tunnel.<br>
+in party mode you notify party members what you are watching by broadcasting videoID you watch,(WIP)<br>
+so other peers having a party, can dynamically see what is being watched right now, have fun in (to be encrypted)<br>
 global public p2p chat
 
 ## browser support
@@ -50,7 +50,7 @@ only modern, no mobile version yet
 alot :D
 
 # license
-The WeThePeople License (WTP)
+The WeThePeople License (WTP)<br>
 Pasteleft WeThePeople 2021
 
 As long as you are a human (for sure not a corporation) you can do what the heck you want with it, unless its made for profit and/or incorporated in any way shape or form, then you are not allowed to intercact, use, benefit, and/or profit from this software in any way shape or form.
