@@ -3,7 +3,7 @@
 
     import { onDestroy, onMount, afterUpdate } from 'svelte'
     import { chosen } from '$lib/_store'
-    import { party, peers, sendName, getName,  } from '$lib/_partyStore'
+    // import { party, peers, sendName, getName,  } from '$lib/_partyStore'
     import { consent, settings, instances, instancesUpdatedAt, SUBsUpdatedAt } from '$lib/_localStore'
     import { chooseInstance, getInstances, log } from '$lib/_helper'
 
@@ -40,8 +40,8 @@
             log('layout:joinRoom-Error', err.message, 'dev')
         }
     }
-    $: $party = party
-    $: $peers = peers
+    // $: $party = party
+    // $: $peers = peers
     // $: if(party) setInterval(() => (peers = party.getPeers()), 500)
 
     onMount(async () => {
