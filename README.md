@@ -1,34 +1,50 @@
-[invidious.PARTY](https://invidious.party)
-===============
-(WIP) Pure client side, privacy focused app, that fetches instances from api.invidious.io. Instances automatically rotate on failed request, upon empty search result you can request fresh one from new instance. Settings are currently stored in localStorage.
+# Greetings Explorer🎉
+🎉You have reached invidious.party project, where [invidious](https://github.com/iv-org/invidious "invidious") instances have a party 🎉
+invidious.party is a fully static site build using ![svelte hoolingans reprezent](https://cdn.discordapp.com/icons/457912077277855764/ea3d74c9d4e51d12cd2daa3ea1b44bb6.png?size=32 "svelte hoolingans reprezent") [SvelteKit](https://kit.svelte.dev) 
 
-# inspiration
+## installation
+```
+git clone https://github.com/wyzwanie/invidious-party.git project-folder
+cd project-folder
+npm i
+
+npm run start
+npm run dev
+npm run build
+```
+
+## inspiration
 showing invidious to non-technical friend, had to try multiple domains before one worked.
-using invidious daily as full replacement for yt, had to copy instance addresses to find one that has particular channel or video.
+using invidious daily as full replacement for yt, had to copy instance addresses to find one that had particular channel or video.
+
+## solo mode
+in solo mode your browser communicates only with invidious instances to serve you content.
+by default your subscriptions and settings are stored only in browser' localStorage
+if you want to share your data with a friend or another device you can do so using bookmarks and QRcodes (WIP)
+this solution apart from obvious drawback that everytime you add a subscription you need to bookmark new address [maybe some snippet?]
+has a limitations on maximum number of subscriptions (150) or videos in playlist (500) per link
+
+## party mode
+in order to have a party there needs to be a way for browsers to communicate directly between each other.
+made possible thanks to brilliant package [trystero](https://github.com/dmotz/trystero)
+
+in party mode we use torrent trackers for signaling, so browsers can find direct communication tunnel.
+in party mode you notify party members what you are watching by broadcasting videoID you watch,(WIP)
+so other peers having a party, can dynamically see what is being watched right now, have fun in (to be encrypted)
+global public p2p chat
 
 ## browser support
 only modern, no mobile version yet
 
 ## routes status
-- index (only chat - will be some party room with p2p interaction sharing videos currently being watched)
+- index (will be some party room with p2p interaction sharing videos currently being watched)
 - popular (done)
 - trending (done)
 - watch (partially done)
 - search (partially done)
 - channel (partially done)
 - playlist (partially done)
-- subscriptions (prototype working, ipfs storage is working)
-
-
-### PLAN/IDEAS
-- implement "party queue" where you can add songs to temporary list in one tab, while listening on another.
-- implement p2p Key Value database solution, where you could store data using your private key. to "login" you would request `dbKey == yourPubKey`, given correct privKey data stored entry could be decrypted and used in the app. each running instance (tab in browser) would seed the database in the background, so other peers can discover via DHT
-- (WIP) implement IPFS storage with option to pin your settings if you provide API to ex. pinata.cloud
-- (WORKING) implement p2p chat under videos
-- (WIP) implement p2p chat main site.
-- Information which videos have peers in chat
-- Party mode: (initial idea is to have chat like now, video on left
-and when you play video its broadcasted to others in the room and you get some kind of a display what is wathced and you can swithc.)
+- subscriptions (prototype working with localStorage)
 
 # TODO
 alot :D
