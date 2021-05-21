@@ -16,6 +16,9 @@
     let idsToNames = {}
     let sendName
     let getName
+    let party
+    let peers
+
 
     const changeTheme = e => {
         $settings = {
