@@ -20,7 +20,7 @@
 		{/if}
 	</div>
 	<div class="chat">
-		<Chat roomID="invidious.party" />
+		<!-- <Chat roomID="invidious.party" /> -->
 	</div>
 </div>
 

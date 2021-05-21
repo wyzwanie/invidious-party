@@ -1,159 +1,123 @@
 <script>
-    import { createEventDispatcher } from 'svelte'
+    import { createEventDispatcher, onMount } from 'svelte'
+    import Plyr from 'plyr'
+    import 'plyr/dist/plyr.css'
 
     export let chosen
     export let videoAPI
     
-    let initialized = 0
-    let player
-    let sources = []
+    let player = {}
 
-    const dispatch = createEventDispatcher()
-    var options = {
-        preload: 'auto',
-        liveui: true,
-        playbackRates: [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0],
-        controlBar: {
-            children: [
-                'playToggle',
-                'volumePanel',
-                'currentTimeDisplay',
-                'timeDivider',
-                'durationDisplay',
-                'progressControl',
-                'remainingTimeDisplay',
-                'captionsButton',
-                'qualitySelector',
-                'playbackRateMenuButton',
-                'fullscreenToggle'
+    let mediaMeta = {
+
+    }
+
+    onMount(() => {
+        player = new Plyr('#player', {
+            debug: true
+        })
+        videoAPI.allowedRegions = []
+        videoAPI.videoThumbnails = []
+        videoAPI.authorThumbnails = []
+        videoAPI.storyboards = []
+        videoAPI.recommendedVideos = []
+    })
+
+    // <source src="/latest_version?id=DTvS9lvRxZ8&amp;itag=140" type="audio/mp4; codecs=&quot;mp4a.40.2&quot;" label="131392k" selected="true">
+            
+    //         <source src="/latest_version?id=DTvS9lvRxZ8&amp;itag=249" type="audio/webm; codecs=&quot;opus&quot;" label="63674k" selected="false">
+        
+    //         <source src="/latest_version?id=DTvS9lvRxZ8&amp;itag=250" type="audio/webm; codecs=&quot;opus&quot;" label="81133k" selected="false">
+        
+    //         <source src="/latest_version?id=DTvS9lvRxZ8&amp;itag=251" type="audio/webm; codecs=&quot;opus&quot;" label="154016k" selected="false">
+
+    const asd = p => {
+console.log(mediaMeta.audio)
+        player.source = {
+            type: 'audio',
+            title: 'Example title',
+            sources: [
+                {
+                    src: `https://${chosen}/latest_version?id=${videoAPI.videoId}&itag=140`,
+                    type: 'audio/mp4'
+                },
+                {
+                    src: `https://${chosen}/latest_version?id=${videoAPI.videoId}&itag=249`,
+                    type: 'audio/webm'
+                },
+                {
+                    src: `https://${chosen}/latest_version?id=${videoAPI.videoId}&itag=250`,
+                    type: 'audio/webm'
+                },
+                {
+                    src: `https://${chosen}/latest_version?id=${videoAPI.videoId}&itag=251`,
+                    type: 'audio/webm'
+                },
             ]
-        },
-        html5: {
-            preloadTextTracks: false,
-            hls: {
-                overrideNative: true
-            }
-        },
-        // plugins: {
-        //     httpSourceSelector: {
-        //             default: 'auto'
-        //     }
-        // }
+        }
+        audioOnly = true
     }
-    $: console.log(videoAPI)
-
-    const initializeVideo = () => {
-        console.log('uuu', videoAPI)
-        if(videoAPI) sources = videoAPI.formatStreams
-        console.log('loaded')
-        player = videojs('my-player', options)
-        // player.httpSourceSelector()
-        console.log(player)
-
-        player.on('error', function (event) {
-            console.log('aaaaaaa', event)
-            if (player.error().code === 2 || player.error().code === 4) {
-                setTimeout(function (event) {
-                    // store.nextChosen()
-                    // console.log($store.chosen)
-                    // console.log($store)
-                    dispatch('error')
-
-                    var currentTime = player.currentTime();
-                    var playbackRate = player.playbackRate();
-                    var paused = player.paused();
-
-                    player.load();
-
-                    if (currentTime > 0.5) {
-                        currentTime -= 0.5;
-                    }
-
-                    player.currentTime(currentTime);
-                    player.playbackRate(playbackRate);
-
-                    if (!paused) {
-                        player.play();
-                    }
-                }, 5000);
-            }
-        });
-    }
-    $: if(initialized === 3) initializeVideo()
+    let audioOnly = false
 </script>
 
-<svelte:head>
-    <!-- <link rel="stylesheet" href="https://unpkg.com/video.js/dist/video-js.min.css"> -->
-    <!-- <script src="https://unpkg.com/video.js/dist/video.min.js" on:load={() => initialized = true} on:error={() => dispatch('error')} /> -->
 
-    <link rel="stylesheet" href="https://unpkg.com/video.js/dist/video-js.min.css">
-    <script src="https://unpkg.com/video.js/dist/video.min.js" on:load={() => initialized++} on:error={() => dispatch('error')} />
-    <script src="https://unpkg.com/videojs-contrib-quality-levels/dist/videojs-contrib-quality-levels.min.js" on:load={() => initialized++} on:error={() => dispatch('error')} />
-    <script src="https://unpkg.com/videojs-http-source-selector/dist/videojs-http-source-selector.min.js" on:load={() => initialized++} on:error={() => dispatch('error')} />
-    
-</svelte:head>
+<button on:click={asd}>ASD</button>
 
-{#if chosen && videoAPI}
-<!-- <iframe src="https://{chosen}/embed/{videoID}" title="video" /> -->
-<!-- &itag=18&local=true -->
-<!-- svelte-ignore a11y-media-has-caption -->
+{#if videoAPI && videoAPI.formatStreams}
+<!-- <pre>
+    {JSON.stringify(videoAPI, null, 4)}
+</pre> -->
+<div class="video-wrapper">
+<!-- {#if audioOnly}
+    <div class="poster">
+        <img src="{`https://${chosen}/vi/${videoAPI.videoId}/maxres.jpg`}" alt="poster" />
+    </div>
+{/if} -->
+ <video controls playsinline data-poster={`https://${chosen}/vi/${videoAPI.videoId}/maxres.jpg`} id="player">
+        <!-- Video files -->
+        {#each videoAPI.formatStreams as stream}
+            {#if stream.resolution}
+                <source
+                    src={`https://${chosen}/latest_version?id=${videoAPI.videoId}&itag=${stream.itag}`}
+                    type={stream.type.split(';')[0]}
+                    size={stream.size.split('x')[1]}
+                >
+            {/if}
+        {/each}
+        <!-- <source src="{}" type="video/mp4" size="720">
+        <source src="@" type="video/mp4" size="1080">
+        <source src="@" type="video/mp4" size="1440"> -->
 
-{#key player}
-<div class="video-js-responsive-container vjs-hd">
-    <video
-        id="my-player"
-        class="video-js vjs-big-play-centered"
-        controls
-        preload="auto"
-        poster="https://{chosen}/vi/{videoAPI.videoId}/maxres.jpg"
-        data-setup=""
-    >
-    {#each sources as source}
-        <source
-            src="https://{chosen}/latest_version?id={videoAPI.videoId}&itag={source.itag}"
-            type={source.type}
-            label={source.qualityLabel}
-            selected={source.qualityLabel === '720p' && source.encoding === 'h264' ? 'true' : 'false'}
-        >
-    {/each}
-    <p class="vjs-no-js">
-        To view this video please enable JavaScript, and consider upgrading to a
-        web browser that
-        <a href="https://videojs.com/html5-video-support/" target="_blank">
-        supports HTML5 video
-        </a>
-    </p>
+        <!-- Caption files -->
+        <track kind="captions" label="English" srclang="en" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt"
+            default>
+        <track kind="captions" label="Français" srclang="fr" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt">
+
+        <!-- Fallback for browsers that don't support the <video> element -->
+        <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" download>Download</a>
     </video>
 </div>
-{/key}
 {:else}
-... loading ...
-    <button on:click={() => dispatch('error')}>nextChosen</button>
+    ...DUPA...
 {/if}
-
 <style>
-.video-js-responsive-container.vjs-hd {
-    padding-top: 56.25%;
+:global(.plyr--video) {
+    border-radius: 5px;
 }
-:global(.video-js-responsive-container.vjs-sd) {
-    padding-top: 75%;
+:global(:root) {
+    --plyr-color-main: var(--accent);
+    --plyr-menu-background: var(--bg-dark)
 }
-.video-js-responsive-container {
-    width: 100%;
+.video-wrapper {
     position: relative;
+    padding-bottom: 56.25%;  /* acpect ratio 16/9*/
+    height: 0;
 }
-.video-js-responsive-container .video-js {
-    height: 100% !important; 
-    width: 100% !important;
+:global(.plyr) {
     position: absolute;
     top: 0;
     left: 0;
-    border-radius: 5px;
-}
-:global(.video-js .vjs-tech) {
-    border-radius: 5px;
-}
-:global(.vjs-poster) {
-    border-radius: 5px;
+    width: 100%;
+    height: 100%;
 }
 </style>

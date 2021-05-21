@@ -1,14 +1,21 @@
 <script>
-    import { onMount, afterUpdate } from 'svelte'
-    import { chosen, ipfs } from '$lib/_store'
-    import { settings, instances, instancesUpdatedAt } from '$lib/_localStore'
-    import { chooseInstance, getInstances, sleep } from '$lib/_helper'
+    
 
+    import { onDestroy, onMount, afterUpdate } from 'svelte'
+    import { chosen } from '$lib/_store'
+    import { party, peers, sendName, getName,  } from '$lib/_partyStore'
+    import { consent, settings, instances, instancesUpdatedAt, SUBsUpdatedAt } from '$lib/_localStore'
+    import { chooseInstance, getInstances, log } from '$lib/_helper'
+
+    import Consent from '$lib/Consent.svelte'
     import Header from '$lib/Header.svelte'
 
     let currentPage
-    let ipfsStatus = 'initializing'
     let searchTerm
+
+    let idsToNames = {}
+    let sendName
+    let getName
 
     const changeTheme = e => {
         $settings = {
@@ -17,81 +24,89 @@
         }
         if(e.detail === 'light') document.documentElement.classList.toggle('light')
     }
+    const route = () => {
+        currentPage = window.location.pathname
+        if(currentPage.includes('/search')) searchTerm = window.decodeURI(window.location.search.split('=')[1])
+    }
+
+
+    const initP2P = () => {
+        const config = { appId: 'invidious.party' }
+        const roomID = 'party'
+        try {
+            if(!party) party = joinRoom(config, roomID)
+            peers = party.getPeers()
+        } catch(err) {
+            log('layout:joinRoom-Error', err.message, 'dev')
+        }
+    }
+    $: $party = party
+    $: $peers = peers
+    // $: if(party) setInterval(() => (peers = party.getPeers()), 500)
 
     onMount(async () => {
+        if($consent !== 'party') return
+        initP2P()
+
+        if(!party) return
+        peers = party.getPeers()
+        sendName = party.makeAction('name')[0]
+        getName = party.makeAction('name')[1]
+
+        sendName(`testowy-${Math.random()}`)
+
+        party.onPeerJoin(id => {
+            if(!peers.includes(id)) peers = [...peers, id]
+            sendName(`testowy-${Math.random()}`, id)
+        })
+        getName((name, id) => (idsToNames[id] = name))
+        party.onPeerLeave(id => peers = peers.filter(x => x != id))
+
+    })
+
+    afterUpdate(async () => {
+        log('$layout:afterUpdate', 'init', 'dev')
+        if(!$consent) return
         //never fetched before
         if(!$instancesUpdatedAt || !$instances.length) {
-            console.log('--- fetching instances ---')
+            log('$layout:updateInstances', '--- fetching instances ---', 'dev')
             $instances = await getInstances()
             $instancesUpdatedAt = new Date().getTime()
         }
         //instances lastUpdated more than 24h ago
         if ($instancesUpdatedAt && ((new Date().getTime() - $instancesUpdatedAt) > 24 * 60 * 60 * 1000)) {
-            console.log('--- refreshing instances ---')
+            log('$layout:updateInstances', '--- refreshing instances ---', 'dev')
             $instances = await getInstances()
             $instancesUpdatedAt = new Date().getTime()
         }
-        console.log($instances)
         $chosen = chooseInstance($instances)
-
         if($settings && $settings.theme === 'light') document.documentElement.classList.toggle('light')
-        if(Ipfs && !$ipfs) initializeNode()
+        route()
     })
 
-    afterUpdate(() => {
-        currentPage = window.location.pathname
-        if(currentPage.includes('/search')) searchTerm = window.decodeURI(window.location.search.split('=')[1])
-    })
+    onDestroy(() => {if(party) party.leave()})
 
-    const initializeNode = async () => {
-        ipfsStatus = 'ipfs: assets loaded'
-        await sleep(681)
-        try {
-            ipfsStatus = 'ipfs: swarming...'
-            $ipfs = await Ipfs.create()
-            ipfsStatus = 'ipfs: loaded yay!'
-        } catch(err) {
-            'ipfs: error! RELOAD PAGE'
-        }
-        //     {
-        //     config: {
-        //         Addresses: {
-        //             Swarm: [
-        //                 '/dns4/wrtc-star1.par.dwebops.pub/tcp/443/wss/p2p-webrtc-star/',
-        //                 '/dns4/wrtc-star2.sjc.dwebops.pub/tcp/443/wss/p2p-webrtc-star/',
-        //                 '/dns4/webrtc-star.discovery.libp2p.io/tcp/443/wss/p2p-webrtc-star/'
-        //             ]
-        //         }
-        //     }
-        // }
-        
-    }
-    $: console.log('$layout:$instances', $instances)
-    $: console.log('$layout:$settings', $settings)
+    $: log('$layout:$instances', $instances, 'dev')
+    $: log('$layout:$settings', $settings, 'dev')
+    $: log('p2p:party', party, 'dev')
+    $: log('p2p:peers', peers, 'dev')
+
+    // $: setInterval(initP2P, 500)
 </script>
 
-<svelte:head>
-    <!-- <script
-        src="https://cdn.jsdelivr.net/npm/ipfs/dist/index.min.js"
-        on:load={initializeNode}
-        on:error={() => ipfsStatus = 'ipfs: error! RELOAD PAGE'}
-    /> -->
-
-    <script
-        src="lib/ipfs.js"
-        on:load={initializeNode}
-        on:error={() => ipfsStatus = 'ipfs: error! RELOAD PAGE'}
-    />
-</svelte:head>
-
-<Header {currentPage} {searchTerm} chosen={$chosen} status={false} {ipfsStatus}
+<Header {currentPage} {searchTerm} chosen={$chosen} status={false} consent={$consent}
     on:changeInstance={() => $chosen = chooseInstance($instances)}
     on:theme={changeTheme}
 />
 
 <main>
-    <slot></slot>
+    {#if !$consent}
+        <Consent on:consent={e => $consent = e.detail} />
+    {:else}
+        <slot />
+    {/if}
 </main>
+
 
 <!-- <footer>
 donate to invidious<br>

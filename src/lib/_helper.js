@@ -39,8 +39,8 @@ export const chooseInstance = instances => {
 
 //save parameter to localStorage
 export const saveLocal = async storeObject => {
-    const { instances, theme, subscriptions, SUBcache } = storeObject
-
+    const { instances, theme, subscriptions, SUBcache, consent } = storeObject
+    if(consent) localStorage.consent = consent
     if(instances) {
         localStorage.instances = JSON.stringify(instances)
         localStorage.lastInstancesUpdate = new Date().getTime()
@@ -80,3 +80,12 @@ export const getAuthorThumbnail = (chosen, authorThumbnails) => {
 }
 
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+export const getQueryString = (field, url) => {
+    const href = url ? url : window.location.href;
+    const reg = new RegExp( '[?&]' + field + '=([^]*)', 'i' );
+    const string = reg.exec(href);
+    return string ? string[1] : null;
+}
+
+export const log = (fromQ, msg, env) => env === 'dev' ? console.log(fromQ, msg) : ''

@@ -1,6 +1,5 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-    import Rotate from '$lib/Rotate.svelte'
 
     export let error
     const dispatch = createEventDispatcher()

@@ -29,6 +29,8 @@ function writable(key, initialValue) {
     subscribe
   }
 }
+
+export const consent = writable('consent', false)
 export const instances = writable('instances', [])
 export const instancesUpdatedAt = writable('instancesUpdatedAt', null)
 

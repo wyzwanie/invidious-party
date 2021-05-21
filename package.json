@@ -9,8 +9,6 @@
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^1.0.0-next.9",
 		"@sveltejs/kit": "^1.0.0-next.107",
-		"@vime-js/standard": "^1.6.6",
-		"@vime/svelte": "^5.0.28",
 		"svelte": "^3.38.2",
 		"vite": "^2.3.3"
 	},
@@ -19,7 +17,12 @@
 		"node": ">= 12.17.0"
 	},
 	"dependencies": {
+		"@silvermine/videojs-quality-selector": "^1.2.5",
 		"async-await-queue": "^1.1.1",
-		"trystero": "^0.7.11"
+		"plyr": "^3.6.8",
+		"trystero": "^0.7.11",
+		"video.js": "^7.12.2",
+		"videojs-contrib-quality-levels": "^2.1.0",
+		"videojs-http-source-selector": "^1.1.6"
 	}
 }

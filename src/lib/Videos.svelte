@@ -1,6 +1,6 @@
 <script>
 
-    import { createEventDispatcher, afterUpdate } from 'svelte'
+    import { createEventDispatcher } from 'svelte'
     import { convertCount, secToMin } from '$lib/_helper'
 
     import ImageLoader from '$lib/Image/ImageLoader.svelte'
@@ -8,14 +8,10 @@
     export let chosen
     export let videos
 
-    let vw
     const dispatch = createEventDispatcher()
-    afterUpdate(() => console.log('update Videos'))
 </script>
 
-<svelte:window bind:innerWidth={vw} />
-
-{#if vw && videos && videos.length > 0}
+{#if videos && videos.length > 0}
     <div class="videos">
         {#each videos as video}
             <div class="video-outer" bind:this={video.el}>
@@ -35,6 +31,9 @@
                 </div>
             </div>
         {/each}
+        {#if videos.length % 4 > 0}
+            <div style="width: calc({25 * (videos.length % 4)}% - 1em)"></div>
+        {/if} 
     </div>
 {:else}
     <div class="df">
@@ -43,6 +42,8 @@
         <p style="font-size: 90%">OR click Rotate icon next to search, to try on next invidious instance</p>
     </div>
 {/if}
+
+
 <style>
 .df {
     flex-direction: column;
@@ -55,6 +56,10 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+}
+.videos::after {
+    content: '';
+    width: calc(25% - 1em);
 }
 .video-outer {
     width: calc(25% - 1em);
