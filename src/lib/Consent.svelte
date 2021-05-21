@@ -7,7 +7,7 @@
 <h1>Greetings Explorer!</h1>
 <div class="row">
     <div class="left">
-        <p>You have reached <span>invidious.party</span> a site where <a href="[github/invidious]">invidious</a> instances have a party 🎉<br>
+        <p>You have reached <span>invidious.party</span> a site where <a href="https://github.com/iv-org/invidious">invidious</a> instances have a party 🎉<br>
         [DONATE->list of all instances and their donation addresses + project donation links]<br>
         <!-- This party would not be possible if not for brilliant invidious, which allows you to watch youtube videos, without them ever knowing who requested that video.<br> -->
         <span>invidious.party</span> is a fully static site build using <a href="SvelteKit[#]">SvelteKit</a> and hosted on <a href="IPFS[#]">IPFS</a><br>
