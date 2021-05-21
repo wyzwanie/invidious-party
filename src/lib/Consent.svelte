@@ -10,7 +10,7 @@
         <p>You have reached <span>invidious.party</span> a site where <a href="https://github.com/iv-org/invidious">invidious</a> instances have a party 🎉<br>
         [DONATE->list of all instances and their donation addresses + project donation links]<br>
         <!-- This party would not be possible if not for brilliant invidious, which allows you to watch youtube videos, without them ever knowing who requested that video.<br> -->
-        <span>invidious.party</span> is a fully static site build using <a href="SvelteKit[#]">SvelteKit</a> and hosted on <a href="IPFS[#]">IPFS</a><br>
+        <span>invidious.party</span> is a fully static site build using <a href="https://svelte.dev">SvelteKit</a> and hosted on <a href="https://ipfs.io">IPFS</a><br>
         as there are no central servers to store any of your data (by design and principle)<br>
         here you own your data. with freedom comes responsibility.</p>
         [...]
@@ -42,7 +42,7 @@
         <p>in order to have a party there needs to be a way for browsers to communicate between each other.<br>
         unfortunately due to limitations in <a href="https://medium.com/quick-code/webrtc-advantages-technical-hurdles-and-a-case-study-4737d6ccd1a0">webRTC [2]</a> there needs to be some remote machine,<br>
         that will help browsers (peers) to discover themselfs</p>
-        <p>made possible thanks to brilliant package <a href="trystero">trystero</a><br>
+        <p>made possible thanks to brilliant package <a href="https://github.com/dmotz/trystero">trystero</a><br>
         in partyMODE we use torrent trackers to find tunnels in order for party to happen, after a tunnel is established between peers communication is direct peer2peer.<br>
         when you are in partyMODE ?? <span>invidious.party</span> broadcasts videoId you watch,<br>
         so other peers having a party at the same time,<br>
