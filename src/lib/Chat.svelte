@@ -1,10 +1,12 @@
 <script>
-    import { onDestroy } from 'svelte'
-    import { joinRoom } from 'trystero'
+    import randomColor from 'randomcolor'
+    import { onDestroy, onMount } from 'svelte'
+    
+    import { chosen, party, peers, actions, idsToNames } from '$lib/_memoryStore'
+    import { nick } from '$lib/_localStore'
+    
+    // export let roomID
 
-    export let roomID
-
-    let name
     let names = {}
     let namesColors = {}
     let message
@@ -14,75 +16,48 @@
     let getName
     let sendMsg
     let getMsg
-
-    let room
-    let peers
+    
     let nameContainer
+    let chatHelp
 
-    const config = { appId: 'invidious.party' }
-
-    onDestroy(() => {if(room) room.leave()})
-
-    $: if(!room || !Object.keys(room).length) {
-        try {
-            room = joinRoom(config, roomID)
-        } catch(err) {
-            console.log(err.message)
-        }
-    } else {
-        peers = room.getPeers()
-
-        sendName = room.makeAction('name')[0]
-        getName = room.makeAction('name')[1]
-        sendMsg = room.makeAction('msg')[0]
-        getMsg = room.makeAction('msg')[1]
-
-        if(names.self) sendName(names.self)
-        room.onPeerJoin(id => {
-            if(names.self) sendName(names.self, id)
-            if(!names[id]) sendMessage(`someone joined as viewer`, 'app')
-            else sendMessage(`${names[id]} joined the party!`, 'app')
-        })
-        room.onPeerLeave(id => {
-            if(names[id]) {
-                sendMessage(`${names[id]} just left...`, 'app')
-                delete names.id
-            } else sendMessage(`viewer left`, 'app') 
-            delete names.id
-        })
-
-        getName((n, id) => names[id] = n)
-        getMsg((msg, id) => {
-            console.log('msg', msg)
-            const { text, timestamp } = msg
-            messages = [...messages, { id, text, timestamp }]
-            if(!namesColors[id]) namesColors[id] = "#" + ((1<<24)*Math.random() | 0).toString(16)
-        })
+    const setName = n => {
+        $nick = n
+        $peers['self'] = { nick: n }
+        $peers = $peers
+        namesColors['self'] = randomColor()//"#" + ((1<<24)*Math.random() | 0).toString(16)
     }
-
-    let chatHelp = false
-
     const sendMessage = (msg, id) => {
         const msgObj = {
-            id: id || 'self',
-            name: '',
+            id: 'self',
             text: msg,
             timestamp: new Date().getTime()
         }
         messages = [...messages, msgObj]
-        sendMsg(msgObj)
+        $actions.chat[0](msgObj)
         message = ''
     }
-    const setName = n => {
-        name = n
-        names['self'] = n
-        namesColors['self'] = "#" + ((1<<24)*Math.random() | 0).toString(16)
+
+    $: if($actions) {
+        $actions.chat[1]((msg, id) => {
+            console.log('msg', msg)
+            const { text, timestamp } = msg
+            messages = [...messages, {
+                id,
+                text,
+                timestamp
+            }]
+            if(!namesColors[id]) namesColors[id] = randomColor()//"#" + ((1<<24)*Math.random() | 0).toString(16)
+        })
     }
+    $: if($nick) $peers['self'] = { nick: $nick }
+
+    $: console.log($actions)
+    $: console.log('chat:peers', $peers)
 </script>
 
 <div class="chat">
     <div class="info">
-        <span style="font-size: 1.382em;font-weight: bold;">Welcome to p2p chat</span>
+        <span style="font-size: 1.382em;font-weight: bold;">{$nick}, Welcome to p2p chat </span>
         <span class="help" on:click={() => chatHelp = !chatHelp}>?</span>
         {#if chatHelp}
             <p>There are no servers involved, all communication is uncensorable, unlimited, no logs are stored or sent anywhere.</p>
@@ -91,15 +66,12 @@
             <p><b>use it at your own risk, you've been warned.</b></p>
         {/if}
     </div>
-    {#if !names.self}
+    {#if !$nick}
         <div class="namePicker">
             <input placeholder="Pick a name" type="text" bind:this={nameContainer} />
-            <button on:click={() => {setName(nameContainer.value)}}>pick</button>
+            <button on:click={() => setName(nameContainer.value)}>pick</button>
         </div>
         <div style="padding: 7px;">
-            <p>There are no servers involved, all communication is uncensorable, unlimited, no logs are stored or sent anywhere.</p>
-            <p>Anyone can pick any name they want, colors are based on uniqueIDs and randomized everytime somone joins.</p>
-            <p>made possible by brilliant package: <a href="https://github.com/dmotz/trystero">https://github.com/dmotz/trystero</a>
             <p><b>use it at your own risk, you've been warned.</b></p>
         </div>
     {/if}
@@ -110,7 +82,7 @@
                     {#each messages as msg}
                         {#if msg.id !== 'app'}
                             <div class="message">
-                                <b style="color: {namesColors[msg.id]}">{names[msg.id]}</b>: {msg.text}<br>
+                                <b style="color: {namesColors[msg.id]}">{$peers[msg.id].nick}</b>: {msg.text}<br>
                                 <span>{new Date(msg.timestamp).toLocaleTimeString() }<br>{msg.id}</span><br>
                             </div>
                         {:else}
@@ -122,7 +94,7 @@
                 {/key}
             </div>
         </div>
-        {#if names.self}
+        {#if $nick}
             <div class="inputBox">
                 <input type="text" on:keyup={e => {if(e.key === 'Enter') sendMessage(message)}} bind:value={message}>
                 <button on:click={() => sendMessage(message)}>send</button>
@@ -130,8 +102,8 @@
         {/if}
     </div>
     <div class="peersBox">
-        {#if Object.keys(names).length > 0}
-            #of peers: {Object.keys(names).length}
+        {#if Object.keys($peers).length > 0}
+            #of peers: {Object.keys($peers).length}
         {:else}
             status: searching for peers...
         {/if}

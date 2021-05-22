@@ -1,6 +1,6 @@
 <script>
 	import { chooseInstance } from '$lib/_helper'
-	import { chosen } from '$lib/_store'
+	import { chosen } from '$lib/_memoryStore'
 	import { instances } from '$lib/_localStore'
 	
     import AsyncError from '$lib/AsyncError.svelte'

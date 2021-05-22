@@ -2,7 +2,7 @@
 
 <script>
     import { onMount } from 'svelte'
-    import { chosen, ipfs } from '$lib/_store'
+    import { chosen, ipfs } from '$lib/_memoryStore'
     import { instances, SUBs, SUBsCID, SUBcache, SUBcacheCID, SUBsUpdatedAt, SUBcacheUpdatedAt, SUBsRefreshedAt } from '$lib/_localStore'
     import { Queue } from '$lib/_queue'
 

@@ -1,7 +1,7 @@
 
 <script>
     // import { lzw_encode, encodeData, saveLocal } from '$lib/_helper'
-    import { chosen, ipfs } from '$lib/_store'
+    import { chosen } from '$lib/_memoryStore'
     import { instances, settings } from '$lib/_localStore'
 
     let savedCID

@@ -18,11 +18,6 @@
             iconUrl: '/plyr.svg',
             blankVideo: '/blankVideo.mp4'
         })
-        videoAPI.allowedRegions = []
-        videoAPI.videoThumbnails = []
-        videoAPI.authorThumbnails = []
-        videoAPI.storyboards = []
-        videoAPI.recommendedVideos = []
     })
 
     // <source src="/latest_version?id=DTvS9lvRxZ8&amp;itag=140" type="audio/mp4; codecs=&quot;mp4a.40.2&quot;" label="131392k" selected="true">
@@ -32,7 +27,6 @@
     //         <source src="/latest_version?id=DTvS9lvRxZ8&amp;itag=250" type="audio/webm; codecs=&quot;opus&quot;" label="81133k" selected="false">
         
     //         <source src="/latest_version?id=DTvS9lvRxZ8&amp;itag=251" type="audio/webm; codecs=&quot;opus&quot;" label="154016k" selected="false">
-
     const asd = p => {
 console.log(mediaMeta.audio)
         player.source = {
@@ -65,10 +59,10 @@ console.log(mediaMeta.audio)
 
 <button on:click={asd}>ASD</button>
 
-{#if videoAPI && videoAPI.formatStreams}
-<!-- <pre>
+<pre>
     {JSON.stringify(videoAPI, null, 4)}
-</pre> -->
+</pre>
+{#if videoAPI && videoAPI.formatStreams}
 <div class="video-wrapper">
 <!-- {#if audioOnly}
     <div class="poster">
