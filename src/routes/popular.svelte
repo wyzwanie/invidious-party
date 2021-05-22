@@ -28,8 +28,8 @@
 	}
 
 	$: if(retry) {
-        $chosen = chooseInstance($instances)
         retry = false
+        $chosen = chooseInstance($instances)
     }
 </script>
 

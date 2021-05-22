@@ -59,9 +59,9 @@ console.log(mediaMeta.audio)
 
 <button on:click={asd}>ASD</button>
 
-<pre>
+<!-- <pre>
     {JSON.stringify(videoAPI, null, 4)}
-</pre>
+</pre> -->
 {#if videoAPI && videoAPI.formatStreams}
 <div class="video-wrapper">
 <!-- {#if audioOnly}

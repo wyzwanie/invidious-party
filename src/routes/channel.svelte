@@ -2,7 +2,7 @@
     import { onMount } from 'svelte'
 
 	import { chooseInstance, convertCount, getAuthorThumbnail } from '$lib/_helper'
-	import { chosen, ipfs } from '$lib/_store'
+	import { chosen } from '$lib/_memoryStore'
     import { instances, SUBs, SUBsCID, SUBsUpdatedAt } from '$lib/_localStore'
 
     import AsyncError from '$lib/AsyncError.svelte'
@@ -30,10 +30,10 @@ let tmp
         subbed = !subbed
         
         try {
-            const saveToIpfs = await $ipfs.dag.put({ SUBs: $SUBs })
-            $SUBsCID = saveToIpfs.toString()
-            $SUBsUpdatedAt = new Date().getTime()
-            tmp = saveToIpfs.toString()
+            // const saveToIpfs = await $ipfs.dag.put({ SUBs: $SUBs })
+            // $SUBsCID = saveToIpfs.toString()
+            // $SUBsUpdatedAt = new Date().getTime()
+            // tmp = saveToIpfs.toString()
         } catch(err) {
             console.log('ipfs error', err)
         }

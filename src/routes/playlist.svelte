@@ -1,6 +1,6 @@
 <script>
     import { onMount } from 'svelte'
-    import { chosen } from '$lib/_store'
+    import { chosen } from '$lib/_memoryStore'
     import { instances } from '$lib/_localStore'
     import { chooseInstance } from '$lib/_helper'
     
