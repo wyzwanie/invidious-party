@@ -60,10 +60,10 @@
 {:else}
     <div class="sidebar">
         <ul class="menu">
-            <li><a href="/" class={currentPage === '/' ? 'active' : ''}>PARTY</a></li>
-            <li><a href="/popular" class={currentPage === '/popular' ? 'active' : ''}>POPULAR</a></li>
-            <li><a href="/trending" class={currentPage === '/trending' ? 'active' : ''}>TRENDING</a></li>
-            <li><a href="/subscriptions" class={currentPage === '/subscriptions' ? 'active' : ''}>SUB<span style="font-size: 8px;">SCRIPTIONS</span></a></li>
+            <li><a href="/" class={currentPage === '/' ? 'active' : ''}>Party</a></li>
+            <li><a href="/popular" class={currentPage === '/popular' ? 'active' : ''}>Popular</a></li>
+            <li><a href="/trending" class={currentPage === '/trending' ? 'active' : ''}>Trending</a></li>
+            <li><a href="/subscriptions" class={currentPage === '/subscriptions' ? 'active' : ''}>Subscriptions</a></li>
             <li>PLAYLISTS</li>
         </ul>
         <a href="https://github.com/wyzwanie/invidious-party">
