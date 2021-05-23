@@ -64,7 +64,7 @@
             <li><a href="/popular" class={currentPage === '/popular' ? 'active' : ''}>Popular</a></li>
             <li><a href="/trending" class={currentPage === '/trending' ? 'active' : ''}>Trending</a></li>
             <li><a href="/subscriptions" class={currentPage === '/subscriptions' ? 'active' : ''}>Subscriptions</a></li>
-            <li>PLAYLISTS</li>
+            <li>Playlists</li>
         </ul>
         <a href="https://github.com/wyzwanie/invidious-party">
             <div class="git">
