@@ -1,5 +1,5 @@
 // get list of instances from api.invidious.io
-export const getInstances = async () => {
+export const getInstances = async (ynst = undefined) => {
     let parsedInstances = []
     let instancesRequest = await fetch('https://api.invidious.io/instances.json?pretty=0')
     let allInstances = await instancesRequest.json()
@@ -12,12 +12,21 @@ export const getInstances = async () => {
             const name = instance[0]
             const { flag, uri } = instance[1]
 
+            if(ynst) {
+                const index = ynst.findIndex(x => x[0] === name)
+            }
             parsedInstances = [...parsedInstances, [ name, {
-                flag,
-                uri: uri[uri.length-1] !== '/' ? `${uri}/` : uri,
-                metadata,
-                version,
-                enabled: true
+                name,
+                failedRequests: ynst ? ynst[index].failedRequests : 0,
+                lastFailedRequest: ynst? ynst[index].lastFailedRequest : new Date().getTime(),
+                enabled: ynst ? ynst[index].enabled : true,
+                data: {
+                    flag,
+                    uri: uri[uri.length-1] !== '/' ? `${uri}/` : uri,
+                    metadata,
+                    version,
+                },
+                refreshedAt: new Date().getTime()
             }]]
         } catch(e) {
             console.log(instance[0], e)
@@ -28,10 +37,13 @@ export const getInstances = async () => {
 
 // input: parsedInstances, output: chosen
 export const chooseInstance = instances => {
+    console.log('asdsadasd')
     if(!instances || instances.length < 1) return 'oops something went wrong'
     let filteredInstances = []
     for(let i of instances) {
-        if(i[1].enabled) filteredInstances.push(i[0])
+        // console.log(i[1].failedRequests)
+        // console.log(i[1].enabled && i[i].failedRequests < 11)
+        if(i[1].enabled && i[1].failedRequests <11) filteredInstances.push(i[0])
     }
     if(!filteredInstances.length) return 'no valid instances'
     return filteredInstances[Math.floor(Math.random()*filteredInstances.length)]

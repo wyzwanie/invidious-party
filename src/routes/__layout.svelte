@@ -1,8 +1,13 @@
+<script context="module">
+    import { browser } from '$app/env'
+    export const router = browser
+</script>
+
 <script>
-    import { page, navigating } from '$app/stores'
     import '../app.css'
-    import { onDestroy, onMount, afterUpdate } from 'svelte'
+    import { onDestroy, onMount, afterUpdate, beforeUpdate } from 'svelte'
     import { joinRoom, selfId } from 'trystero/torrent'
+    import { page } from '$app/stores'
     import { chosen, peers, party, actions } from '$lib/stores/_memoryStore'
     import { consent, nick, settings, instances, instancesUpdatedAt, SUBsUpdatedAt } from '$lib/stores/_localStore'
     import { chooseInstance, getInstances, log } from '$lib/_helper'
@@ -44,22 +49,43 @@
             log('layout:joinRoom-Error', err.message, 'dev')
         }
     }
+    const refreshInstances = async () => {
+        //never fetched before
+        if(!$instancesUpdatedAt || !$instances.length) {
+            log('instances', 'init', 'dev')
+            $instances = await getInstances()
+            $instancesUpdatedAt = new Date().getTime()
+        }
+        //instances lastUpdated more than 24h ago
+        if ($instancesUpdatedAt && ((new Date().getTime() - $instancesUpdatedAt) > 24 * 60 * 60 * 1000)) {
+            log('instances', 'starting refresh', 'dev')
+            $instances = await getInstances($instances)
+            $instancesUpdatedAt = new Date().getTime()
+            log('instances', $instances , 'dev')
+        }
+        $chosen = chooseInstance($instances)
+    }
 
 	onMount(() => {
-		initParty()
+        if(!$consent) return
+		if($consent === 'party') initParty()
+        refreshInstances()
 	})
-    $: console.log(isSidebarOpen)
 
-    let isSidebarOpen = true
+    beforeUpdate(() => {
+        if(!$consent) return
+        refreshInstances()
+    })
 
+    onDestroy(() => $party ? $party.leave() : null)
 </script>
 
-<Header />
+<Header chosen={$chosen} consent={$consent} />
 <main>
 	<Sidebar />
     <div class="content">
         {#if !$consent}
-            <Consent />
+            <Consent on:consent={e => $consent = e.detail} />
         {:else}
             <slot />
         {/if}

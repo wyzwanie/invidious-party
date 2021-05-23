@@ -77,9 +77,12 @@
     margin-top: 4em;
 }
 
-p, li {
+p {
     font-size: 120%;
     color: var(--text--50)
+}
+b {
+    color: var(--text--80)
 }
 h1, h4 {
     color: var(--text--80);

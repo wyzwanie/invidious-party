@@ -1,5 +1,11 @@
+<script context="module">
+    import { browser } from '$app/env'
+    export const router = browser
+</script>
+
 <script>
     import { createEventDispatcher } from 'svelte'
+    import { goto } from '$app/navigation'
     import { sleep } from '$lib/_helper'
 
     import Toggle from '$lib/UI/Toggle.svelte'
@@ -14,8 +20,8 @@
     
     const dispatch = createEventDispatcher()
     
-    const handleSearch = e => {
-        if(e.keyCode === 13) window.location.href = `/search?q=${searchTerm}`
+    const handleSearch = async e => {
+        if(e.keyCode === 13) await goto(`/search?q=${searchTerm}`)
     }
     const changeInstance = async () => {
         dispatch('changeInstance')

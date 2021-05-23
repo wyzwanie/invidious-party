@@ -18,10 +18,10 @@
 <div class="sidebar" class:isOpen>
 	<ul class="menu">
 		<li class="listToggle" on:click={() => isOpen = !isOpen}><MenuIcon fill=var(--text--50) width=16px /></li>
-		<li><a href="/" class={$page.path === '/' ? 'active' : ''}>PARTY</a></li>
-		<li><a href="/popular" class={$page.path === '/popular' ? 'active' : ''}>POPULAR</a></li>
-		<li><a href="/trending" class={$page.path === '/trending' ? 'active' : ''}>TRENDING</a></li>
-		<li><a href="/subscriptions" class={$page.path === '/subscriptions' ? 'active' : ''}>SUB<span style="font-size: 8px;">SCRIPTIONS</span></a></li>
+		<li><a sveltekit:prefetch href="/" class={$page.path === '/' ? 'active' : ''}>PARTY</a></li>
+		<li><a sveltekit:prefetch href="/popular" class={$page.path === '/popular' ? 'active' : ''}>POPULAR</a></li>
+		<li><a sveltekit:prefetch href="/trending" class={$page.path === '/trending' ? 'active' : ''}>TRENDING</a></li>
+		<li><a sveltekit:prefetch href="/subscriptions" class={$page.path === '/subscriptions' ? 'active' : ''}>SUB<span style="font-size: 8px;">SCRIPTIONS</span></a></li>
 		<li>PLAYLISTS</li>
 	</ul>
 	<div class="bottom">
@@ -70,7 +70,7 @@ a {
 	margin-left: 0;
 }
 .sidebar {
-	margin-left: -88px;
+	margin-left: -96px;
 	display: flex;
     justify-content: space-between;
     flex-direction: column;
