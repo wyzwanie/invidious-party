@@ -1,8 +1,9 @@
 <script>
-    
+    import { page, navigating } from '$app/stores'
+    import '../app.css'
 
     import { onDestroy, onMount, afterUpdate } from 'svelte'
-    import { joinRoom } from 'trystero'
+    import { joinRoom } from 'trystero/torrent'
     import { chosen, peers, party, actions, idsToNames } from '$lib/_memoryStore'
     // import { party, peers, sendName, getName,  } from '$lib/_partyStore'
     import { consent, nick, settings, instances, instancesUpdatedAt, SUBsUpdatedAt } from '$lib/_localStore'
