@@ -8,10 +8,11 @@ git clone https://github.com/wyzwanie/invidious-party.git project-folder
 cd project-folder
 npm i
 
-npm run start
-npm run dev
-npm run build
+npm run dev     // dev environment
+npm run build   // compile svelteKit to static html+css+js in build folder
+npm run preview // preview build
 ```
+
 
 ## inspiration
 showing invidious to non-technical friend, had to try multiple domains before one worked.<br>
