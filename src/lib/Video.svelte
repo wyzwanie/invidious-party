@@ -14,7 +14,7 @@
 
     onMount(() => {
         player = new Plyr('#player', {
-            debug: true,
+            // debug: true,
             iconUrl: '/plyr.svg',
             blankVideo: '/blankVideo.mp4'
         })
@@ -56,43 +56,37 @@ console.log(mediaMeta.audio)
     let audioOnly = false
 </script>
 
-
-<button on:click={asd}>ASD</button>
-
-<!-- <pre>
-    {JSON.stringify(videoAPI, null, 4)}
-</pre> -->
 {#if videoAPI && videoAPI.formatStreams}
-<div class="video-wrapper">
-<!-- {#if audioOnly}
-    <div class="poster">
-        <img src="{`https://${chosen}/vi/${videoAPI.videoId}/maxres.jpg`}" alt="poster" />
+    <div class="video-wrapper">
+    <!-- {#if audioOnly}
+        <div class="poster">
+            <img src="{`https://${chosen}/vi/${videoAPI.videoId}/maxres.jpg`}" alt="poster" />
+        </div>
+    {/if} -->
+        <video controls playsinline data-poster={`https://${chosen}/vi/${videoAPI.videoId}/0.jpg`} id="player">
+            <!-- Video files -->
+            {#each videoAPI.formatStreams as stream}
+                {#if stream.resolution}
+                    <source
+                        src={`https://${chosen}/latest_version?id=${videoAPI.videoId}&itag=${stream.itag}`}
+                        type={stream.type.split(';')[0]}
+                        size={stream.size.split('x')[1]}
+                    >
+                {/if}
+            {/each}
+            <!-- <source src="{}" type="video/mp4" size="720">
+            <source src="@" type="video/mp4" size="1080">
+            <source src="@" type="video/mp4" size="1440"> -->
+
+            <!-- Caption files -->
+            <track kind="captions" label="English" srclang="en" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt"
+                default>
+            <track kind="captions" label="Français" srclang="fr" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt">
+
+            <!-- Fallback for browsers that don't support the <video> element -->
+            <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" download>Download</a>
+        </video>
     </div>
-{/if} -->
- <video controls playsinline data-poster={`https://${chosen}/vi/${videoAPI.videoId}/maxres.jpg`} id="player">
-        <!-- Video files -->
-        {#each videoAPI.formatStreams as stream}
-            {#if stream.resolution}
-                <source
-                    src={`https://${chosen}/latest_version?id=${videoAPI.videoId}&itag=${stream.itag}`}
-                    type={stream.type.split(';')[0]}
-                    size={stream.size.split('x')[1]}
-                >
-            {/if}
-        {/each}
-        <!-- <source src="{}" type="video/mp4" size="720">
-        <source src="@" type="video/mp4" size="1080">
-        <source src="@" type="video/mp4" size="1440"> -->
-
-        <!-- Caption files -->
-        <track kind="captions" label="English" srclang="en" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt"
-            default>
-        <track kind="captions" label="Français" srclang="fr" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt">
-
-        <!-- Fallback for browsers that don't support the <video> element -->
-        <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" download>Download</a>
-    </video>
-</div>
 {:else}
     ...DUPA...
 {/if}

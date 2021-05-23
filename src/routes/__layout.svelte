@@ -47,7 +47,7 @@
             $party.onPeerJoin(id => {
                 console.log('peer join')
                 $actions.name[0]($nick, id)
-                if($peers['self'].videoID) $actions.watching[0]($peers['self'].videoID, id)
+                if($peers['self'] && $peers['self'].videoID) $actions.watching[0]($peers['self'].videoID, id)
             })
             $actions.name[1]((nick, id) => $peers[id] = {...$peers[id], nick })
             $actions.watching[1]((videoID, id) => $peers[id] = {...$peers[id], videoID })
