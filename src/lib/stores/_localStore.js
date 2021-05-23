@@ -43,7 +43,4 @@ export const SUBsUpdatedAt =  writable('SUBsUpdatedAt', null)
 export const SUBcacheUpdatedAt = writable('SUBcacheUpdatedAt', null)
 export const SUBsRefreshedAt = writable('SUBsRefreshedAt', null)
 
-export const settings = writable('settings', {
-    theme: 'dark',
-    accent: '#todo'
-})
+export const settings = writable('settings', null)

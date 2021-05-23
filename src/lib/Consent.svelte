@@ -13,7 +13,7 @@
         <span>invidious.party</span> is a fully static site build using <a href="https://svelte.dev">SvelteKit</a> and hosted on <a href="https://ipfs.io">IPFS</a><br>
         as there are no central servers to store any of your data (by design and principle)<br>
         here you own your data. with freedom comes responsibility.</p>
-        [....]
+        [...]
     </div>
     <div class="right">
 
@@ -79,10 +79,11 @@
 
 p, li {
     font-size: 120%;
-    color: rgba(255,255,255,0.8)
+    color: var(--text--50)
 }
 h1, h4 {
-    color: rgba(255,255,255,0.9);
+    color: var(--text--80);
     margin-bottom: -10px;
+    margin-top: 0;
 }
 </style>

@@ -51,13 +51,6 @@ export const saveLocal = async storeObject => {
     localStorage.lastStoreUpdate = new Date().getTime()
 }
 
-//input: chosen instance, output: version
-export const getVersion = (chosen, instances) => {
-    // console.log(chosen)
-    // console.log(instances)
-    // $store.instances[$store.instances.findIndex(x => w[0] === $chosen)][1].version
-}
-
 export const convertCount = count => {
     if(Math.floor(count/1000) < 1000) return `${(count/1000).toFixed(2)}K`
     if(Math.floor(count/1000000) < 1000) return `${(count/1000000).toFixed(2)}M`
@@ -79,8 +72,6 @@ export const getAuthorThumbnail = (chosen, authorThumbnails) => {
     return `https://${chosen}/ggpht/ytc/${extracted}`
 }
 
-export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
-
 export const getQueryString = (field, url) => {
     const href = url ? url : window.location.href;
     const reg = new RegExp( '[?&]' + field + '=([^]*)', 'i' );
@@ -89,3 +80,4 @@ export const getQueryString = (field, url) => {
 }
 
 export const log = (fromQ, msg, env) => env === 'dev' ? console.log(fromQ, msg) : ''
+export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))

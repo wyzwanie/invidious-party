@@ -1,29 +1,21 @@
 {
-	"name": "kit",
-	"version": "0.0.1",
-	"scripts": {
-		"dev": "svelte-kit dev",
-		"build": "svelte-kit build",
-		"start": "svelte-kit start"
-	},
-	"devDependencies": {
-		"@sveltejs/adapter-static": "^1.0.0-next.9",
-		"@sveltejs/kit": "^1.0.0-next.107",
-		"svelte": "^3.38.2",
-		"vite": "^2.3.3"
-	},
-	"type": "module",
-	"engines": {
-		"node": ">= 12.17.0"
-	},
-	"dependencies": {
-		"@silvermine/videojs-quality-selector": "^1.2.5",
-		"async-await-queue": "^1.1.1",
-		"plyr": "^3.6.8",
-		"randomcolor": "^0.6.2",
-		"trystero": "^0.7.11",
-		"video.js": "^7.12.2",
-		"videojs-contrib-quality-levels": "^2.1.0",
-		"videojs-http-source-selector": "^1.1.6"
-	}
+  "name": "invidious.party",
+  "version": "0.6.5",
+  "scripts": {
+    "dev": "svelte-kit dev",
+    "build": "svelte-kit build",
+    "preview": "svelte-kit preview"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^1.0.0-next.11",
+    "@sveltejs/kit": "next",
+    "svelte": "^3.34.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "async-await-queue": "^1.1.1",
+    "plyr": "^3.6.8",
+    "randomcolor": "^0.6.2",
+    "trystero": "^0.7.11"
+  }
 }
