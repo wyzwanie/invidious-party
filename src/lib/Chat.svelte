@@ -174,7 +174,7 @@ input {
     border: 1px solid #3b3b3b;
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
-    flex: 1 1 89%;
+    width: 100%
 }
 input:focus {
     outline: none;

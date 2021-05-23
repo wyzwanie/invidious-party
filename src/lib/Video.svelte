@@ -63,7 +63,7 @@ console.log(mediaMeta.audio)
             <img src="{`https://${chosen}/vi/${videoAPI.videoId}/maxres.jpg`}" alt="poster" />
         </div>
     {/if} -->
-        <video controls playsinline data-poster={`https://${chosen}/vi/${videoAPI.videoId}/0.jpg`} id="player">
+        <video controls playsinline data-poster={`https://${chosen}/vi/${videoAPI.videoId}/maxresdefault.jpg`} id="player">
             <!-- Video files -->
             {#each videoAPI.formatStreams as stream}
                 {#if stream.resolution}

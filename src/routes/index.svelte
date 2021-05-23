@@ -82,27 +82,28 @@
         })
 	}
 	$: console.log(videosPlaying)
-	const incomingSearch = async e => {
-		console.log(e)
-		try {
-			const res = await fetch(`https://${$chosen}/podpowiedzi`)
-			const podpowiedzi = await res.json()
 
-			console.log(podpowiedzi)
-		} catch(err) {
-
+	let searchTerm = ''
+	const getSuggestions = async e => {
+		for (let instance of $instances) {
+			try {
+				const res = await fetch(`https://${instance[0]}/api/v1/search/suggestions?q=${searchTerm}`)
+				const podpowiedzi = await res.json()
+	
+				console.log(podpowiedzi)
+			} catch(err) {
+				console.log(err)
+			}
 		}
+
 
 	}
 </script>
 
-	{#if $peers.length > 0}
-		There {$peers.length > 1 ? 'are' : 'is'} {$peers.length} {$peers.length > 1 ? 'peers' : 'peer'} @ da party.
-	{/if}
 	<div class="party">
-		<div class="top">
+		<!-- <div class="top"> -->
 			<div class="video {playing ? '' : 'empty'}">
-				{#if Object.keys($peers).length}
+				{#if Object.keys($peers).length > 1}
 					{#if Object.keys(videosPlaying).length}
 						<Video chosen={$chosen} {videoAPI} on:error={$chosen = chooseInstance($instances)} />
 					{:else}
@@ -118,8 +119,8 @@
 					<div class="wrp">
 						<img src="sadge.png" alt="sadge">
 						<div style="text-align: center;">
-							<h3>Party empty</h3>
-							<button>START PLAYING</button>
+							<h3>solo party</h3>
+							<button on:click>START PLAYING</button>
 						</div>
 					</div>
 				{/if}
@@ -127,12 +128,15 @@
 			<div class="chat">
 				<Chat roomID="party" />
 			</div>
-		</div>
-		<div class="bottom">
+			<div class="playingnow">
+
+			</div>
+		<!-- </div> -->
+		<!-- <div class="bottom">
 			<div class="video">
 				<div class="search">
 					<h1>#Search videos</h1>
-					<input type="text" placeholder="find video" on:input={incomingSearch}>
+					<input type="text" placeholder="find video" bind:value={searchTerm} on:input={getSuggestions}>
 				</div>
 			</div>
 			<div class="chat">
@@ -143,7 +147,7 @@
 					{/each}
 				</div>
 			</div>
-		</div>
+		</div> -->
 	</div>
 
 <style>
@@ -161,6 +165,12 @@
 	.search, .playing {
 		padding: 0.618em;
 	}
+	.playingnow {
+		flex: 1;
+		border: 1px solid var(--light-border);
+		border-radius: 5px;
+		margin-left: 11px;
+	}
 .wrp {
     display: flex;
     justify-content: space-around;
@@ -168,18 +178,19 @@
 }
 .party {
     display: flex;
-	flex-direction: column;
+	/* flex-direction: column; */
 }
 .video {
     width: 100%;
     margin-right: 11px;
     border: 1px solid var(--light-border);
     border-radius: 5px;
+	flex: 5.5
 }
 .video img {
 	width: 31.8vw;
 }
 .chat {
-    width: 31.8%;
+    flex: 2
 }
 </style>
