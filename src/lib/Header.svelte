@@ -135,6 +135,7 @@ svg {
     list-style: none;
     justify-content: center;
     flex-flow: column;
+    font-weight: bold;
 }
 .menu li {
     padding: 9px;
