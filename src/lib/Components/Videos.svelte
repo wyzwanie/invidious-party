@@ -32,7 +32,7 @@
             </div>
         {/each}
         {#if videos.length % 4 > 0}
-            <div style="width: calc({25 * (videos.length % 4)}% - 1em)"></div>
+            <div style="width: calc({25 * (videos.length % 4)}% - 0.5em)"></div>
         {/if} 
     </div>
 {:else}
@@ -59,21 +59,21 @@
 }
 .videos::after {
     content: '';
-    width: calc(25% - 1em);
+    width: calc(25% - 0.5em);
 }
 .video-outer {
-    width: calc(25% - 1em);
+    width: calc(25% - 0.5em);
     margin-bottom: 1em;
 }
 @media screen and (max-width: 1366px) {
     .video-outer {
-        width: calc(33% - 1em);
+        width: calc(33% - 0.5em);
         margin-bottom: 1em;
     }
 }
 @media screen and (max-width: 1000px) {
     .video-outer {
-        width: calc(50% - 1em);
+        width: calc(50% - 0.5em);
         margin-bottom: 1em;
     }
 }
@@ -82,7 +82,7 @@
         justify-content: center;
     }
     .video-outer {
-        width: calc(100% - 1em);
+        width: calc(100% - 0.5em);
         margin-bottom: 1em;
     }
 }

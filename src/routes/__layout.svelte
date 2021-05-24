@@ -1,8 +1,3 @@
-<script context="module">
-    import { browser } from '$app/env'
-    export const router = browser
-</script>
-
 <script>
     import '../app.css'
     import { onDestroy, onMount, afterUpdate, beforeUpdate } from 'svelte'
@@ -71,23 +66,19 @@
     }
 
 	onMount(() => {
-        refreshStarted = true
         if($consent) {
+            refreshStarted = true
             console.log('refresh started', refreshStarted)
             if($consent === 'party') initParty()
             refreshInstances()
         } else {
-            // refreshStarted = false
+            console.log($consent, $chosen, 'else')
         }
 	})
-
-    beforeUpdate(() => {
-        // if(!$consent) return
-        // refreshInstances()
-    })
+let updating = true
+    afterUpdate(() => { updating = false })
 
     onDestroy(() => $party ? $party.leave() : null)
-    $: console.log($consent, refreshStarted)
 </script>
 
 <Header chosen={$chosen} consent={$consent} />
@@ -98,6 +89,7 @@
             {#if refreshStarted}
                 <Loader />
             {:else}
+            {#if !updating}
                 <Consent on:consent={e => {
                     $consent = e.detail
                     refreshStarted = true
@@ -105,7 +97,7 @@
                     if($consent === 'party') initParty()
                     refreshInstances()
                 }}/>
-            {/if}
+            {/if}{/if}
         {:else}
             <slot />
         {/if}
@@ -119,20 +111,13 @@ main {
     position: relative;
 }
 .content {
-    padding: 1em;
+    padding: 0.5em;
     overflow: auto;
+    width: 100%;
+    border-radius: 5px;
+    box-shadow: 0px 0px 1px 1px var(--border);
 }
-	/* main {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		padding: 1rem;
-		width: 100%;
-		max-width: 1024px;
-		margin: 0 auto;
-		box-sizing: border-box;
-	}
-
+/* 
 	@media (min-width: 480px) {
 		footer {
 			padding: 40px 0;

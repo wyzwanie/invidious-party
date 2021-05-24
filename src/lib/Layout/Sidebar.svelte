@@ -1,5 +1,6 @@
 <script>
 	import { page } from '$app/stores'
+    import { goto } from '$app/navigation'
 	import { fade } from 'svelte/transition'
 
 	import DropIcon from '$lib/Icons/DropIcon.svelte'
@@ -20,23 +21,23 @@
 <div class="sidebar" class:isOpen>
 	<ul class="menu">
 		<li class="listToggle" on:click={() => isOpen = !isOpen}><MenuIcon fill=var(--text--50) width=16px /></li>
-		<li><a sveltekit:prefetch href="/" class={$page.path === '/' ? 'active' : ''}>PARTY</a></li>
-		<li><a sveltekit:prefetch href="/popular" class={$page.path === '/popular' ? 'active' : ''}>POPULAR</a></li>
-		<li><a sveltekit:prefetch href="/trending" class={$page.path === '/trending' ? 'active' : ''}>TRENDING</a></li>
-		<li><a sveltekit:prefetch href="/subscriptions" class={$page.path === '/subscriptions' ? 'active' : ''}>SUB<span style="font-size: 8px;">SCRIPTIONS</span></a></li>
+		<li><a href="/" class={$page.path === '/' ? 'active' : ''}>PARTY</a></li>
+		<li><a href="/popular" class={$page.path === '/popular' ? 'active' : ''}>POPULAR</a></li>
+		<li><a href="/trending" class={$page.path === '/trending' ? 'active' : ''}>TRENDING</a></li>
+		<li><a href="/subscriptions" class={$page.path === '/subscriptions' ? 'active' : ''}>SUB<span style="font-size: 8px;">SCRIPTIONS</span></a></li>
 		<li>PLAYLISTS</li>
 	</ul>
 	<div class="bottom">
 		<a href="https://github.com/wyzwanie/invidious-party" target="_blank">
 			<div class="git">
 				<p>source:</p>
-				<GitIcon fill=var(--text--30) width=1.618em />
+				<GitIcon fill=var(--text--30) width=23px />
 				<!-- <p>free software</p>
 				<p>license</p> -->
 			</div>
 			<div class="license">
 				<p>license:</p>
-				<DropIcon fill=var(--text--30) width=1.618em />
+				<DropIcon fill=var(--text--30) width=23px />
 			</div>
 		</a>
         <a sveltekit:prefetch href="/thanks">
@@ -48,7 +49,7 @@
         <a href="https://matrix.to/#/#invidious.party:matrix.org?via=matrix.org&via=tchncs.de">
             <div class="support">
                 <p>support:</p>
-                <SupportIcon fill=var(--text--30) width=1.618em />
+                <SupportIcon fill=var(--text--30) width=23px />
             </div>
         </a>
 	</div>
@@ -61,7 +62,6 @@ a {
 .listToggle {
 	padding: 9px;
 	cursor: pointer;
-	/* background: yellowgreen; */
 }
 .toggle {
 	transition: all 3s ease-in-out;
@@ -90,7 +90,6 @@ a {
     flex-direction: column;
 	transition: all 0.3s ease-in-out;
     background: var(--bg-1);
-    border-right: 1px solid var(--border);
 }
 .menu {
     display: flex;

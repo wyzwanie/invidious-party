@@ -93,7 +93,6 @@ header {
     align-items: center;
     background: var(--bg-1);
     padding: 9px;
-    box-shadow: 0 1px 0px 0px var(--border);
 }
 .logo {
     color: var(--accent);

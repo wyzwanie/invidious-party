@@ -7,6 +7,7 @@ export default {
 			assets: 'build',
 			fallback: null
 		}),
+        router: true,
 		vite: {
 			build: {
 				sourcemap: true

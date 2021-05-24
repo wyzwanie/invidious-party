@@ -18,11 +18,20 @@
     let retry = false
     let country = 'US'
     
+    const controller = new AbortController()
+    const signal = controller.signal
+
+    let currentFetch = 0
+
     const fetchTrending = async country => {
+
+
+        $chosen = chooseInstance($instances)
+
         try {
             // type: "music", "gaming", "news", "movies" doesnt work :(
             // region: ISO 3166 country code (default: "US")  
-            const req = await fetch(`https://${$chosen}/api/v1/trending/?region=${country}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
+            const req = await fetch(`https://${$chosen}/api/v1/trending/?region=${country}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`, { signal })
             const res = await req.json()
             return res
         } catch(err) {
@@ -47,25 +56,27 @@
 </script>
 
 <div class="wrapper">
-    <div class="filters">
-        <Filter label="select country:" options={countryCodes} selected={country} on:change={e => country = e.detail} />
-        <Filter label="sort by:" selected=default options={sortOptions} margin />
-    </div>
-    {#if $chosen}
-        {#await fetchTrending(country)}
-            <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
-        {:then videos}
-            <Videos {videos} chosen={$chosen} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
-        {:catch error}
-            <AsyncError {error} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
-        {/await}
-    {:else}
-        <Loader />
-    {/if}
+    {#await fetchTrending(country)}
+        <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+    {:then videos}
+        <div class="filters">
+            <Filter label="Select country:" options={countryCodes} selected={country} on:change={e => country = e.detail} flex=2 />
+            <Filter label="Sort by:" selected=default options={sortOptions} margin />
+            <Filter label="Search by:" options={['all', 'title', 'author']} placeholder="search..." on:input={e => console.log(e)} search margin flex=2 />
+        </div>
+        <Videos {videos} chosen={$chosen} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+    {:catch error}
+        <AsyncError {error} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+    {/await}
 </div>
 
 <style>
+.filters {
+    display: flex;
+}
+@media (max-width: 600px) {
     .filters {
-        display: flex;
+        flex-direction: column;
     }
+}
 </style>

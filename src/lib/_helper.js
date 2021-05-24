@@ -37,7 +37,6 @@ export const getInstances = async (ynst = undefined) => {
 
 // input: parsedInstances, output: chosen
 export const chooseInstance = instances => {
-    console.log('asdsadasd')
     if(!instances || instances.length < 1) return 'oops something went wrong'
     let filteredInstances = []
     for(let i of instances) {

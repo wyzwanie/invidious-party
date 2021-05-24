@@ -1,7 +1,4 @@
-ToDO: finish :) <br>
-
-
-<b>Random order thanks for packages used:</b><br>
+<b>(WIP) Random order thanks for packages used:</b><br>
 - async-await-queue<br>
 - plyr<br>
 - randomcolor<br>
@@ -9,4 +6,3 @@ ToDO: finish :) <br>
 - invidious api<br>
 - svelte<br>
 - svelteKit
-
