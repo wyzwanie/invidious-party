@@ -74,7 +74,7 @@
 
     beforeUpdate(() => {
         if(!$consent) return
-        refreshInstances()
+        // refreshInstances()
     })
 
     onDestroy(() => $party ? $party.leave() : null)
