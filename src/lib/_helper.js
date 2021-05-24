@@ -76,6 +76,38 @@ export const secToMin = seconds => {
     newSeconds = newSeconds < 10 ? `0${newSeconds}` : newSeconds
     return `${newMinutes}:${newSeconds}`
 }
+
+export const howLongAgo = timestamp => {
+    const now = Math.floor(new Date().getTime()/1000)
+    const diff = now - timestamp
+
+    const minute = 60
+    const hour = minute * 60
+    const day = hour * 24
+    const week = day * 7
+    const month = day * 30
+    const year = day * 365
+
+    let result
+    
+    if(diff < 30) result = `just then`
+    else if(diff < minute) result = `${diff} seconds ago`
+    else if(diff < 2 * minute) result = `$a minute ago`
+    else if(diff < hour) result = `${Math.floor(diff / minute)} minutes ago`
+    else if(Math.floor(diff / hour) == 1) result = `1 hour ago`
+
+    else if(diff < day) result = `${Math.floor(diff / hour)} hours ago`
+    else if(diff < day * 2) result = 'yesterday'
+    else if(diff < month) result = `${Math.floor(diff / day)} days ago`
+
+    else if(diff < 2 * month) result = `last month`
+    else if(diff < year) result = `${Math.floor(diff / month)} months ago`
+    else if(diff < 2 * year) result = `last year`
+    else if(diff < 100 * year) result = `${Math.floor(diff / year)} years ago`
+
+    return result
+}
+
 export const getAuthorThumbnail = (chosen, authorThumbnails) => {
     const link = authorThumbnails[authorThumbnails.findIndex(x => x.width == 100)].url
     console.log(link)
@@ -92,3 +124,8 @@ export const getQueryString = (field, url) => {
 
 export const log = (fromQ, msg, env) => env === 'dev' ? console.log(fromQ, msg) : ''
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+export const validateVideoID = videoID => {
+    const pattern = /^([A-Za-z0-9_\-]{11})$/
+    return pattern.test(videoID)
+}

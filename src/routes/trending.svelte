@@ -46,7 +46,6 @@
     $: if(retry) {
         retry = false
         $chosen = chooseInstance($instances)
-        fetchTrending($chosen, country)
     }
 
     const disableInstance = () => {}

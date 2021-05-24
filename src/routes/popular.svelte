@@ -1,8 +1,3 @@
-<script context="module">
-    import { browser } from '$app/env'
-    export const router = browser
-</script>
-
 <script>
     import { chosen } from '$lib/stores/_memoryStore'
     import { instances } from '$lib/stores/_localStore'
@@ -42,7 +37,6 @@
     $: if(retry) {
         retry = false
         $chosen = chooseInstance($instances)
-        fetchPopular($chosen)
     }
 
     const disableInstance = () => {}

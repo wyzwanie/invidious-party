@@ -1,7 +1,7 @@
 <script>
 
     import { createEventDispatcher } from 'svelte'
-    import { convertCount, secToMin } from '$lib/_helper'
+    import { convertCount, howLongAgo, secToMin } from '$lib/_helper'
 
     import ImageLoader from '$lib/ImageLoader/ImageLoader.svelte'
 
@@ -24,7 +24,7 @@
                         <h3 class="title"><a href="/watch?v={video.videoId}">{video.title}</a></h3>
                         <h4 class="author"><a href="/channel#{video.authorId}">{video.author}</a></h4>
                         <div class="stats">
-                            <span>Shared {video.publishedText}</span>
+                            <span>Shared {howLongAgo(video.published)}</span>
                             <span>{convertCount(video.viewCount)}</span>
                         </div>
                     </div>

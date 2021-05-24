@@ -10,13 +10,13 @@
 </script>
 
 <p>...fetching from {chosen}...</p>
-<Loader />
 {#await sleep(2000) then value}
     <div class="df">
         <p>Instance too slow?</p>
         <button on:click={() => dispatch('disable')}>Disable it in your rotation list</button>
     </div>
 {/await}
+<Loader />
 
 <style>
     .df {

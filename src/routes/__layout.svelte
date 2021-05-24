@@ -76,7 +76,9 @@
         }
 	})
 let updating = true
-    afterUpdate(() => { updating = false })
+    afterUpdate(() => {
+        updating = false
+    })
 
     onDestroy(() => $party ? $party.leave() : null)
 </script>
