@@ -22,5 +22,7 @@ img {
 }
 img.loaded {
     opacity: 1;
+    object-fit: cover;
+    object-position: center;
 }
 </style>

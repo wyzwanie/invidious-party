@@ -23,20 +23,18 @@
 
     let currentFetch = 0
 
-    const fetchTrending = async country => {
-
-
-        $chosen = chooseInstance($instances)
+    const fetchTrending = async (czozen, country) => {
+        if(!czozen) czozen = chooseInstance($instances)
 
         try {
             // type: "music", "gaming", "news", "movies" doesnt work :(
             // region: ISO 3166 country code (default: "US")  
-            const req = await fetch(`https://${$chosen}/api/v1/trending/?region=${country}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`, { signal })
+            const req = await fetch(`https://${czozen}/api/v1/trending/?region=${country}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`, { signal })
             const res = await req.json()
             return res
         } catch(err) {
             log('trending->fetch:error', err, 'dev')
-            const index = $instances.findIndex(x => x[0] === $chosen)
+            const index = $instances.findIndex(x => x[0] === czozen)
             if(index < 0) return retry = true
             $instances[index][1].failedRequests++
             $instances[index][1].lastFailedRequest = new Date().getTime()
@@ -48,7 +46,7 @@
     $: if(retry) {
         retry = false
         $chosen = chooseInstance($instances)
-        fetchTrending(country)
+        fetchTrending($chosen, country)
     }
 
     const disableInstance = () => {}
@@ -56,7 +54,7 @@
 </script>
 
 <div class="wrapper">
-    {#await fetchTrending(country)}
+    {#await fetchTrending($chosen, country)}
         <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
     {:then videos}
         <div class="filters">
