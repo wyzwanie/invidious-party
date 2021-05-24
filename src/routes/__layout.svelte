@@ -14,7 +14,10 @@
 
     import Consent from '$lib/Consent.svelte'
     import Header from '$lib/Layout/Header.svelte'
+    import Loader from '$lib/UI/Loader.svelte'
 	import Sidebar from '$lib/Layout/Sidebar.svelte'
+
+    let refreshStarted = false
 
     const initParty = () => {
         console.log('init party')
@@ -64,20 +67,27 @@
             log('instances', $instances , 'dev')
         }
         $chosen = chooseInstance($instances)
+        refreshStarted = false
     }
 
 	onMount(() => {
-        if(!$consent) return
-		if($consent === 'party') initParty()
-        refreshInstances()
+        refreshStarted = true
+        if($consent) {
+            console.log('refresh started', refreshStarted)
+            if($consent === 'party') initParty()
+            refreshInstances()
+        } else {
+            // refreshStarted = false
+        }
 	})
 
     beforeUpdate(() => {
-        if(!$consent) return
+        // if(!$consent) return
         // refreshInstances()
     })
 
     onDestroy(() => $party ? $party.leave() : null)
+    $: console.log($consent, refreshStarted)
 </script>
 
 <Header chosen={$chosen} consent={$consent} />
@@ -85,7 +95,17 @@
 	<Sidebar />
     <div class="content">
         {#if !$consent}
-            <Consent on:consent={e => $consent = e.detail} />
+            {#if refreshStarted}
+                <Loader />
+            {:else}
+                <Consent on:consent={e => {
+                    $consent = e.detail
+                    refreshStarted = true
+                    console.log('refresh started', refreshStarted)
+                    if($consent === 'party') initParty()
+                    refreshInstances()
+                }}/>
+            {/if}
         {:else}
             <slot />
         {/if}

@@ -5,6 +5,8 @@
 	import DropIcon from '$lib/Icons/DropIcon.svelte'
 	import GitIcon from '$lib/Icons/GitIcon.svelte'
 	import MenuIcon from '$lib/Icons/MenuIcon.svelte'
+    import ThanksIcon from '$lib/Icons/ThanksIcon.svelte'
+	import SupportIcon from '$lib/Icons/SupportIcon.svelte'
 
 	export let isOpen = true
 </script>
@@ -25,7 +27,7 @@
 		<li>PLAYLISTS</li>
 	</ul>
 	<div class="bottom">
-		<a href="https://github.com/wyzwanie/invidious-party">
+		<a href="https://github.com/wyzwanie/invidious-party" target="_blank">
 			<div class="git">
 				<p>source:</p>
 				<GitIcon fill=var(--text--30) width=1.618em />
@@ -37,6 +39,18 @@
 				<DropIcon fill=var(--text--30) width=1.618em />
 			</div>
 		</a>
+        <a sveltekit:prefetch href="/thanks">
+            <div class="thanks">
+                <p>thanks:</p>
+                <ThanksIcon fill=var(--text--30) width=23px />
+            </div>
+        </a>
+        <a href="https://matrix.to/#/#invidious.party:matrix.org?via=matrix.org&via=tchncs.de">
+            <div class="support">
+                <p>support:</p>
+                <SupportIcon fill=var(--text--30) width=1.618em />
+            </div>
+        </a>
 	</div>
 </div>
 
@@ -93,7 +107,7 @@ a {
     color: var(--accent);
 }
 
-.git, .license {
+.git, .license, .thanks, .support {
 	display: flex;
 	justify-content: space-evenly;
 	align-items: center;

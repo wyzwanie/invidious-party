@@ -8,14 +8,16 @@
     import { instances } from '$lib/stores/_localStore'
     import { chooseInstance, log } from '$lib/_helper'
     import countryCodes from '$lib/_iso3166countryCodes'
-
+    
     import AsyncError from '$lib/Components/AsyncError.svelte'
 	import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
 	import Videos from '$lib/Components/Videos.svelte'
     import Filter from '$lib/UI/Filter.svelte'
-
+    import Loader from '$lib/UI/Loader.svelte'
+    
     let retry = false
-
+    let country = 'US'
+    
     const fetchTrending = async country => {
         try {
             // type: "music", "gaming", "news", "movies" doesnt work :(
@@ -32,16 +34,13 @@
             $instances = $instances
             retry = true
         }
+    }
 
-}
-let country = 'US'
     $: if(retry) {
         retry = false
         $chosen = chooseInstance($instances)
         fetchTrending(country)
     }
-
-    $: console.log($instances)
 
     const disableInstance = () => {}
     const sortOptions = ['default', 'most views', 'least views', 'shortest', 'newest', 'oldest']
@@ -60,6 +59,8 @@ let country = 'US'
         {:catch error}
             <AsyncError {error} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
         {/await}
+    {:else}
+        <Loader />
     {/if}
 </div>
 

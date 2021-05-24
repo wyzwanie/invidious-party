@@ -30,8 +30,8 @@ function writable(key, initialValue) {
   }
 }
 
-export const consent = writable('consent', false)
-export const nick = writable('name', false)
+export const consent = writable('consent', null)
+export const nick = writable('name', null)
 export const instances = writable('instances', [])
 export const instancesUpdatedAt = writable('instancesUpdatedAt', null)
 

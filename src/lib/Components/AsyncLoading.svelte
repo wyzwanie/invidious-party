@@ -2,7 +2,7 @@
     import { createEventDispatcher } from 'svelte'
     import { sleep } from '$lib/_helper'
 
-    import Loading from '$lib/UI/Loading.svelte'
+    import Loader from '$lib/UI/Loader.svelte'
 
     export let chosen
 
@@ -10,7 +10,7 @@
 </script>
 
 <p>...fetching from {chosen}...</p>
-<Loading />
+<Loader />
 {#await sleep(2000) then value}
     <div class="df">
         <p>Instance too slow?</p>
