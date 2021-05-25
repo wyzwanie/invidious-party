@@ -45,13 +45,13 @@
 </script>
 
 <div class="wrapper">
+    <div class="filters">
+        <Filter label="Sort by:" selected=default options={sortOptions} />
+        <Filter label="Search by:" options={searchOptions} placeholder="search..." on:input={e => searchTerm = e.detail} search margin />
+    </div>
     {#await fetchPopular($chosen)}
         <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
     {:then videos}
-        <div class="filters">
-            <Filter label="Sort by:" selected=default options={sortOptions} />
-            <Filter label="Search by:" options={searchOptions} placeholder="search..." on:input={e => searchTerm = e.detail} search margin />
-        </div>
         <Videos {videos} chosen={$chosen} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
     {:catch error}
         <AsyncError {error} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />

@@ -64,7 +64,7 @@ a {
 	cursor: pointer;
 }
 .toggle {
-	transition: all 3s ease-in-out;
+	transition: all 0.3s ease-in-out;
     position: absolute;
     display: flex;
     width: 33px;
@@ -77,7 +77,7 @@ a {
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    opacity: 0.8;
+    opacity: 0.618;
     cursor: pointer;
 }
 .sidebar.isOpen {

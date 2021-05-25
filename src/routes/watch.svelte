@@ -32,7 +32,7 @@
         log('video->fetch:from', czozen, 'dev')
         try {
             ///api/v1/videos/aqz-KE-bpKQ?fields=videoId,title,description
-            const req = await fetch(`https://${czozen}/api/v1/videos/${videoID}?fields=videoId,title,description,published,keywords,viewCount,likeCount,dislikeCount,paid,premium,isFamilyFriendly,author,authorId,authorThumbnails,lengthSeconds,allowRatings,rating,isListed,liveNow,dashUrl,adaptiveFormats,formatStreams,captions,recommendedVideos`)
+            const req = await fetch(`https://${czozen}/api/v1/videos/${videoID}`) //?fields=videoId,title,description,published,keywords,viewCount,likeCount,dislikeCount,paid,premium,isFamilyFriendly,author,authorId,authorThumbnails,lengthSeconds,allowRatings,rating,isListed,liveNow,dashUrl,adaptiveFormats,formatStreams,captions,recommendedVideos,subCountText
             const res = await req.json()
             return res
 		} catch(err) {

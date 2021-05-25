@@ -5,4 +5,5 @@
 - trystero<br>
 - invidious api<br>
 - svelte<br>
-- svelteKit
+- svelteKit<br>
+- heart animation

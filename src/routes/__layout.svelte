@@ -119,10 +119,9 @@ main {
     border-radius: 5px;
     box-shadow: 0px 0px 1px 1px var(--border);
 }
-/* 
-	@media (min-width: 480px) {
-		footer {
-			padding: 40px 0;
-		}
-	} */
+@media (min-width: 600px) {
+    .content {
+        padding: 11px 5%;
+    }
+}
 </style>

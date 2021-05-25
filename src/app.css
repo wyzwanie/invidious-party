@@ -11,7 +11,12 @@
     --text--30: rgba(255,255,255,0.3);
     --text--50: rgba(255,255,255,0.5);
     --text--80: rgba(255,255,255,0.8);
+    --text-100: rgba(0,0,0,0.1);
+    --text-130: rgba(0,0,0,0.3);
+    --text-150: rgba(0,0,0,0.5);
+    --text-180: rgba(0,0,0,0.8);
     --accent: #4ecdc4;
+    --accent-dim: hsl(176deg 56% 55% / 62%);
     --accent-hover: #65c6bb;
 }
 html {
@@ -40,6 +45,14 @@ body {
 a {
     text-decoration: none;
     color: var(--accent);
+    transition: all 0.3s ease-in-out;
+}
+a:hover {
+    color: var(--accent-dim)
+}
+p, h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    padding: 0;
 }
 ul, li {
     padding: 0;
@@ -48,7 +61,6 @@ ul, li {
 .df {
     display: flex;
 }
-/*  */
 button {
     padding: 7px;
     border: none;
