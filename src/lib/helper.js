@@ -95,24 +95,21 @@ export const howLongAgo = timestamp => {
     else if(diff < 2 * minute) result = `$a minute ago`
     else if(diff < hour) result = `${Math.floor(diff / minute)} minutes ago`
     else if(Math.floor(diff / hour) == 1) result = `1 hour ago`
-
-    else if(diff < day) result = `${Math.floor(diff / hour)} hours ago`
-    else if(diff < day * 2) result = 'yesterday'
-    else if(diff < month) result = `${Math.floor(diff / day)} days ago`
-
-    else if(diff < 2 * month) result = `last month`
+    else if(diff < (day * 2)) result = `${Math.floor(diff / hour)} hours ago`
+    // else if(diff < day * 2) result = 'yesterday'
+    else if(diff < month * 2) result = `${Math.floor(diff / day)} days ago`
+    // else if(diff < 2 * month) result = `last month`
     else if(diff < year) result = `${Math.floor(diff / month)} months ago`
-    else if(diff < 2 * year) result = `last year`
-    else if(diff < 100 * year) result = `${Math.floor(diff / year)} years ago`
+    else if(diff < year * 2) result = `${Math.floor(diff / month)} months ago`
+    else if(diff < year * 100) result = `${Math.floor(diff / year)} years ago`
 
     return result
 }
 
 export const getAuthorThumbnail = (chosen, authorThumbnails) => {
-    const link = authorThumbnails[authorThumbnails.findIndex(x => x.width == 100)].url
-    console.log(link)
+    const link = authorThumbnails[authorThumbnails.findIndex(x => x.width == 100 || x.width == 88)].url
     const extracted = link.split('/')[4]
-    return `https://${chosen}/ggpht/ytc/${extracted}`
+    return extracted ? `https://${chosen}/ggpht/ytc/${extracted}` : ''
 }
 
 export const getQueryString = (field, url) => {

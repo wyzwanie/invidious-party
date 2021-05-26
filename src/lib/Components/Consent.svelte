@@ -1,10 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-import { consent, instances } from './stores/_localStore'
-import { chosen } from './stores/_memoryStore'
-
     const dispatch = createEventDispatcher()
-    $: console.log('consent', $consent, $instances, $chosen)
 </script>
 
 <h1>Greetings Explorer!</h1>

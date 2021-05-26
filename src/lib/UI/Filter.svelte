@@ -66,7 +66,7 @@
     font-weight: bold;
     color: var(--text--50);
     border-right: 1px solid var(--border);
-    background: var(--bg-1);
+    background: var(--bg-2);
     border-top-left-radius: 5px;
     border-bottom-left-radius: 5px;
     white-space: nowrap;
@@ -79,15 +79,15 @@
     color: var(--accent);
     font-size: inherit;
     font-weight: bold;
-    padding: 10px;
+    padding: 11px;
     padding-right: 26px;
     border: 0;
     margin: 0;
-    border-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
     text-indent: 0.01px;
     appearance: none;
     cursor: pointer;
-    background: transparent;
     background-image: url(data:image/svg+xml;base64,PHN2ZyBmaWxsPScjNGVjZGM0JyBoZWlnaHQ9JzI0JyB2aWV3Qm94PScwIDAgMjQgMjQnIHdpZHRoPScyNCcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJz48cGF0aCBkPSdNNyAxMGw1IDUgNS01eicvPjxwYXRoIGQ9J00wIDBoMjR2MjRIMHonIGZpbGw9J25vbmUnLz48L3N2Zz4=);
     background-repeat: no-repeat;
     background-position-x: 100%;
@@ -100,7 +100,7 @@ option {
 }
 input {
     margin: 0;
-    background: var(--text--00);
+    background: var(--bg-1);
     padding: 11px;
     font-size: 14px;
     border: none;
@@ -110,7 +110,7 @@ input {
     margin-left: 7px;
     color: var(--text--50);
     font-weight: bold;
-    width: 100%;
+    flex: 4;
 }
 input::placeholder {
     color: var(--text--30);

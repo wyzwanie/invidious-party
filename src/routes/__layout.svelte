@@ -1,13 +1,13 @@
 <script>
     import '../app.css'
-    import { onDestroy, onMount, afterUpdate, beforeUpdate } from 'svelte'
+    import { onDestroy, onMount, afterUpdate } from 'svelte'
     import { joinRoom, selfId } from 'trystero/torrent'
-    import { page } from '$app/stores'
-    import { chosen, peers, party, actions } from '$lib/stores/_memoryStore'
-    import { consent, nick, settings, instances, instancesUpdatedAt, SUBsUpdatedAt } from '$lib/stores/_localStore'
-    import { chooseInstance, getInstances, log } from '$lib/_helper'
 
-    import Consent from '$lib/Consent.svelte'
+    import { chosen, peers, party, actions } from '$lib/Stores/memoryStore'
+    import { consent, nick, settings, instances, instancesUpdatedAt, SUBsUpdatedAt } from '$lib/Stores/localStore'
+    import { chooseInstance, getInstances, log } from '$lib/helper'
+
+    import Consent from '$lib/Components/Consent.svelte'
     import Header from '$lib/Layout/Header.svelte'
     import Loader from '$lib/UI/Loader.svelte'
 	import Sidebar from '$lib/Layout/Sidebar.svelte'

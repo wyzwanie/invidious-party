@@ -1,4 +1,5 @@
 <script context="module">
+    import { version } from '$lib/config'
     import { browser } from '$app/env'
     export const router = browser
 </script>
@@ -6,7 +7,7 @@
 <script>
     import { createEventDispatcher } from 'svelte'
     import { goto } from '$app/navigation'
-    import { sleep } from '$lib/_helper'
+    import { sleep } from '$lib/helper'
 
     import Toggle from '$lib/UI/Toggle.svelte'
     import SettingsIcon from '$lib/Icons/SettingsIcon.svelte'
@@ -35,7 +36,7 @@
 
 <header>
     <div class="logo">
-        invidious.party<span style="font-size: 69%; color: unset;">&nbsp;v0.6.3</span><br>
+        invidious.party<span style="font-size: 69%; color: unset;">&nbsp;v{version}</span><br>
         <span>instance: {#if chosen}<a style="color: white;" href="{chosen}">{chosen}</a>{:else}...initializing...{/if}</span>
         <br><span>mode: {consent ? consent : 'no consent'}</span>
     </div>

@@ -1,6 +1,6 @@
 <script>
-    import { SUBs } from '$lib/stores/_localStore'
-    import { convertCount } from '$lib/_helper'
+    import { SUBs } from '$lib/Stores/localStore'
+    import { convertCount } from '$lib/helper'
 
     export let channelID
     export let subCount

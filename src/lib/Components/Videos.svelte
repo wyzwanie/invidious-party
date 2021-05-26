@@ -1,7 +1,7 @@
 <script>
 
     import { createEventDispatcher } from 'svelte'
-    import { convertCount, howLongAgo, secToMin } from '$lib/_helper'
+    import { convertCount, howLongAgo, secToMin } from '$lib/helper'
 
     import ImageLoader from '$lib/ImageLoader/ImageLoader.svelte'
 

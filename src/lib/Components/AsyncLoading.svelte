@@ -1,6 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-    import { sleep } from '$lib/_helper'
+    import { sleep } from '$lib/helper'
 
     import Loader from '$lib/UI/Loader.svelte'
 

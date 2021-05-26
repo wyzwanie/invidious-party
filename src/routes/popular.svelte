@@ -1,14 +1,12 @@
 <script>
-    import { chosen } from '$lib/stores/_memoryStore'
-    import { instances } from '$lib/stores/_localStore'
-    import { chooseInstance, log } from '$lib/_helper'
-    import countryCodes from '$lib/_iso3166countryCodes'
+    import { chosen } from '$lib/Stores/memoryStore'
+    import { instances } from '$lib/Stores/localStore'
+    import { chooseInstance, log } from '$lib/helper'
     
     import AsyncError from '$lib/Components/AsyncError.svelte'
 	import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
 	import Videos from '$lib/Components/Videos.svelte'
     import Filter from '$lib/UI/Filter.svelte'
-    import Loader from '$lib/UI/Loader.svelte'
 
     let searchTerm
     let oryginalFetch = {}
