@@ -126,6 +126,15 @@ export const validateVideoID = videoID => {
     const pattern = /^([A-Za-z0-9_\-]{11})$/
     return pattern.test(videoID)
 }
+export const validateChannelID = channelID => {
+    const pattern = /^([A-Za-z0-9_\-]{24})$/
+    return pattern.test(channelID)
+}
+export const validatePlaylistID = playlistID => {
+    const pattern = /^([A-Za-z0-9_\-]{34})$/
+    return pattern.test(playlistID)
+}
+
 
 export function ftch(url, signal) {
     return fetch(url, signal)

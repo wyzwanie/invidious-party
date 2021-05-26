@@ -12,18 +12,20 @@
     let oryginalFetch = {}
     let retry = false
 
-    const fetchPopular = async czozen => {
-        if(!czozen) $chosen = chooseInstance($instances)
+    const fetchPopular = async instance => {
+        if(!instance) $chosen = chooseInstance($instances)
+
         try {
-            // type: "music", "gaming", "news", "movies" doesnt work :(
-            // region: ISO 3166 country code (default: "US")  
-            const req = await fetch(`https://${czozen}/api/v1/popular/?&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
+            const req = await fetch(`https://${instance}/api/v1/popular/?&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
             const res = await req.json()
-            oryginalFetch = res
-            return res
+
+            if(res.length > 0) {
+                oryginalFetch = res
+                return res
+            } else throw new Error(res)
         } catch(err) {
             log('popular->fetch:error', err, 'dev')
-            const index = $instances.findIndex(x => x[0] === czozen)
+            const index = $instances.findIndex(x => x[0] === instance)
             if(index < 0) return retry = true
             $instances[index][1].failedRequests++
             $instances[index][1].lastFailedRequest = new Date().getTime()
@@ -36,7 +38,7 @@
         retry = false
         $chosen = chooseInstance($instances)
     }
-
+$: console.log($chosen)
     const disableInstance = () => {}
     const sortOptions = ['default', 'most views', 'least views', 'shortest', 'newest', 'oldest']
     const searchOptions = ['all', 'title', 'author']
@@ -48,11 +50,11 @@
         <Filter label="Search by:" options={searchOptions} placeholder="search..." on:input={e => searchTerm = e.detail} search margin />
     </div>
     {#await fetchPopular($chosen)}
-        <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+        <AsyncLoading chosen={$chosen} />
     {:then videos}
-        <Videos {videos} chosen={$chosen} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+        <Videos {videos} chosen={$chosen} />
     {:catch error}
-        <AsyncError {error} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+        <AsyncError {error} />
     {/await}
 </div>
 

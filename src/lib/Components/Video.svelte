@@ -1,17 +1,14 @@
 <script>
-    import { createEventDispatcher, onMount } from 'svelte'
+    import { onMount } from 'svelte'
     import Plyr from 'plyr'
     import 'plyr/dist/plyr.css'
-import AsyncError from './AsyncError.svelte'
 
     export let chosen
     export let videoAPI
+    export let borderRadiusTop = true
     
     let player = {}
 
-    let mediaMeta = {
-
-    }
 
     onMount(() => {
         player = new Plyr('#player', {
@@ -19,6 +16,18 @@ import AsyncError from './AsyncError.svelte'
             iconUrl: '/plyr.svg',
             blankVideo: '/blankVideo.mp4'
         })
+        const wrapper = document.querySelector('.plyr__video-wrapper')
+        const plr = document.querySelector('.plyr')
+        if(borderRadiusTop) {
+            plr.style.borderRadius = '5px'
+            wrapper.style.borderRadius = '5px'
+        }
+        else {
+            plr.style.borderBottomLeftRadius = '5px'
+            // plr.style.borderBottomRightRadius = '5px'
+            wrapper.style.borderBottomLeftRadius = '5px'
+            // wrapper.style.borderBottomRightRadius = '5px'
+        }
     })
 
     // <source src="/latest_version?id=DTvS9lvRxZ8&amp;itag=140" type="audio/mp4; codecs=&quot;mp4a.40.2&quot;" label="131392k" selected="true">
@@ -29,7 +38,6 @@ import AsyncError from './AsyncError.svelte'
         
     //         <source src="/latest_version?id=DTvS9lvRxZ8&amp;itag=251" type="audio/webm; codecs=&quot;opus&quot;" label="154016k" selected="false">
     const asd = p => {
-console.log(mediaMeta.audio)
         player.source = {
             type: 'audio',
             title: 'Example title',
@@ -91,11 +99,9 @@ console.log(mediaMeta.audio)
     no streams available, please rotate instance in top right corner.
 {/if}
 <style>
-:global(.plyr--video) {
-    border-radius: 5px;
-}
 :global(.plyr__poster) {
     object-fit: cover;
+    background-size: 101%;
 }
 :global(:root) {
     --plyr-color-main: var(--accent);

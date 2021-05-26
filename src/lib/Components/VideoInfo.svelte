@@ -1,4 +1,5 @@
 <script>
+    import { env } from '$lib/config'
     import { convertCount, getAuthorThumbnail, howLongAgo } from '$lib/helper'
 
     import ImageLoader from '$lib/ImageLoader/ImageLoader.svelte'
@@ -16,11 +17,14 @@
 </script>
 
 {#if videoAPI}
-    <button on:click={() => isOpen = !isOpen}>toggle</button>
-    {#if isOpen}
-        <pre>{JSON.stringify(videoAPI, null, 4)}</pre>
-    {/if}
-
+    <!-- {#if env === 'dev'}
+        <div>
+            <button on:click={() => isOpen = !isOpen}>view videoAPI response</button>
+            {#if isOpen}
+                <pre>{JSON.stringify(videoAPI, null, 4)}</pre>
+            {/if}
+        </div>
+    {/if} -->
     <div class="info">
         <div class="titleBar">
             <div class="titleWrap">

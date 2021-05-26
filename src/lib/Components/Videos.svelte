@@ -36,9 +36,9 @@
     </div>
 {:else}
     <div class="df">
-        <p>Instance returned empty result.</p>
-        <p style="font-size: 90%">Click Rotate icon in top right corner, to try on next invidious instance, or</p>
-        <button on:click={() => dispatch('disable')}>Disable instance</button> so it will not be used, you can change that later in settings.
+        <p><span style="font-weight: bold">ERROR:</span> Instance returned empty result.</p>
+        <p>Click Rotate icon in top right corner, to try on next invidious instance, or</p>
+        <button on:click={() => dispatch('disable')}>Disable instance</button><br>so it will not be used, you can change that later in settings.
     </div>
 {/if}
 
@@ -49,16 +49,12 @@
     align-items: flex-start;
 }
 .df p {
-    padding: 7px;
+    margin-bottom: 7px;
 }
 .videos {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-}
-.videos::after {
-    content: '';
-    width: calc(25% - 0.5em);
 }
 .video-outer {
     width: calc(25% - 0.5em);
@@ -104,7 +100,6 @@
 }
 :global(.thumbnail img) {
     width: 100%;
-    /* height: 215px; */
     flex-grow: 1;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;

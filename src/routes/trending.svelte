@@ -18,21 +18,22 @@
     let country = 'US'
     let type = 'Default'
     
-    let currentFetch = 0
+    let oryginalFetch
 
-    const fetchTrending = async (czozen, country, type) => {
-        if(!czozen) czozen = chooseInstance($instances)
-        $controller = new AbortController()
-        const signal = $controller.signal
+    const fetchTrending = async (instance, country, type) => {
+        if(!instance) $chosen = chooseInstance($instances)
+
         try {
-            // type: "music", "gaming", "news", "movies" doesnt work :(
-            // region: ISO 3166 country code (default: "US")  
-            return await ftch(`https://${czozen}/api/v1/trending/?region=${country}&type=${type}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`, { signal })
-            // const res = await req.json()
-            // return res
+            const req = await fetch(`https://${instance}/api/v1/trending/?region=${country}&type=${type}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
+            const res = await req.json()
+
+            if(res.length > 0) {
+                oryginalFetch = res
+                return res
+            } else throw new Error(res)
         } catch(err) {
-            log('trending->fetch:error', err, 'dev')
-            const index = $instances.findIndex(x => x[0] === czozen)
+            log('popular->fetch:error', err, 'dev')
+            const index = $instances.findIndex(x => x[0] === instance)
             if(index < 0) return retry = true
             $instances[index][1].failedRequests++
             $instances[index][1].lastFailedRequest = new Date().getTime()
@@ -46,7 +47,6 @@
         $chosen = chooseInstance($instances)
     }
 
-    const disableInstance = () => {}
     const sortOptions = ['default', 'most views', 'least views', 'shortest', 'newest', 'oldest']
     const typeOptions = ['Default', 'Music', 'Gaming', 'Movies']
     const srchOptions = ['all', 'title', 'author']
@@ -60,11 +60,11 @@
         <Filter label="Search by:" selected=all options={srchOptions} placeholder="search..." on:input={e => console.log(e)} search margin flex=2 />
     </div>
     {#await fetchTrending($chosen, country, type)}
-        <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+        <AsyncLoading chosen={$chosen} />
     {:then videos}
-        <Videos {videos} chosen={$chosen} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+        <Videos {videos} chosen={$chosen} />
     {:catch error}
-        <AsyncError {error} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+        <AsyncError {error} />
     {/await}
 </div>
 
