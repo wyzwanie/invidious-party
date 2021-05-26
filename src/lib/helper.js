@@ -126,3 +126,15 @@ export const validateVideoID = videoID => {
     const pattern = /^([A-Za-z0-9_\-]{11})$/
     return pattern.test(videoID)
 }
+
+export function ftch(url, signal) {
+    return fetch(url, signal)
+        .then(async response => {
+            if (response.ok) {
+                return await response.json()
+            } else {
+                const errorMessage = await response.text()
+            return Promise.reject(new Error(errorMessage))
+            }
+        })
+}

@@ -1,6 +1,5 @@
 <script>
 	import { page } from '$app/stores'
-    import { goto } from '$app/navigation'
 	import { fade } from 'svelte/transition'
 
 	import DropIcon from '$lib/Icons/DropIcon.svelte'

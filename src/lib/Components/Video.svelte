@@ -2,6 +2,7 @@
     import { createEventDispatcher, onMount } from 'svelte'
     import Plyr from 'plyr'
     import 'plyr/dist/plyr.css'
+import AsyncError from './AsyncError.svelte'
 
     export let chosen
     export let videoAPI
@@ -63,6 +64,7 @@ console.log(mediaMeta.audio)
             <img src="{`https://${chosen}/vi/${videoAPI.videoId}/maxres.jpg`}" alt="poster" />
         </div>
     {/if} -->
+    <!-- svelte-ignore a11y-media-has-caption -->
         <video controls playsinline data-poster={`https://${chosen}/vi/${videoAPI.videoId}/maxresdefault.jpg`} id="player">
             <!-- Video files -->
             {#each videoAPI.formatStreams as stream}
@@ -74,21 +76,19 @@ console.log(mediaMeta.audio)
                     >
                 {/if}
             {/each}
-            <!-- <source src="{}" type="video/mp4" size="720">
-            <source src="@" type="video/mp4" size="1080">
-            <source src="@" type="video/mp4" size="1440"> -->
 
-            <!-- Caption files -->
-            <!-- <track kind="captions" label="English" srclang="en" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt"
-                default>
-            <track kind="captions" label="Français" srclang="fr" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt"> -->
+            {#if videoAPI.captions.length}
+                {#each videoAPI.captions as caption}
+                    <track kind="captions" label="English" srclang="en" src="url.en.vtt" />
+                {/each}
+            {/if}
 
             <!-- Fallback for browsers that don't support the <video> element -->
             <!-- <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4" download>Download</a> -->
         </video>
     </div>
 {:else}
-    ...DUPA...
+    no streams available, please rotate instance in top right corner.
 {/if}
 <style>
 :global(.plyr--video) {

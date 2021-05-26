@@ -15,6 +15,7 @@
     let retry = false
 
     const fetchComments = async (czozen, videoID, continuation = '') => {
+        if(!czozen) czozen = chooseInstance($instances)
         loading = true
 
         try {

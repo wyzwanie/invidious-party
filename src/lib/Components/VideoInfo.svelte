@@ -14,11 +14,13 @@
     let isOpen = false
     let isMore = false
 </script>
+
 {#if videoAPI}
-<button on:click={() => isOpen = !isOpen}>toggle</button>
-{#if isOpen}
-<pre>{JSON.stringify(videoAPI, null, 4)}</pre>
-{/if}
+    <button on:click={() => isOpen = !isOpen}>toggle</button>
+    {#if isOpen}
+        <pre>{JSON.stringify(videoAPI, null, 4)}</pre>
+    {/if}
+
     <div class="info">
         <div class="titleBar">
             <div class="titleWrap">
@@ -72,7 +74,7 @@
         </div>
     </div>
 {:else}
-...loading...
+... something went wrong, try rotating instance ...
 {/if}
 
 <style>

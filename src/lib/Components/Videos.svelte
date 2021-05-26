@@ -1,5 +1,4 @@
 <script>
-
     import { createEventDispatcher } from 'svelte'
     import { convertCount, howLongAgo, secToMin } from '$lib/helper'
 
@@ -38,8 +37,8 @@
 {:else}
     <div class="df">
         <p>Instance returned empty result.</p>
-        <button on:click={() => dispatch('disable')}>Disable it in your rotation list</button>
-        <p style="font-size: 90%">OR click Rotate icon next to search, to try on next invidious instance</p>
+        <p style="font-size: 90%">Click Rotate icon in top right corner, to try on next invidious instance, or</p>
+        <button on:click={() => dispatch('disable')}>Disable instance</button> so it will not be used, you can change that later in settings.
     </div>
 {/if}
 

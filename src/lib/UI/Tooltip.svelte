@@ -1,6 +1,6 @@
 <script>
     export let text
-    export let mb = '80px';
+    export let mb = '80px'
 </script>
 
 <div class="tooltip">
@@ -17,7 +17,6 @@
     justify-content: center;
     align-items: center;
 }
-/* Tooltip text */
 .tooltip .tooltiptext {
     visibility: hidden;
     background-color: var(--text--00);

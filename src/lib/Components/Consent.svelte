@@ -20,8 +20,10 @@
 </div>
 <div class="row">
     <div class="left">
-        <h3 style="margin-bottom: -10px; font-size: 1.25em">there are couple ways you can use <span>invidious.party</span>:</h3>
-        <h4 style="margin-bottom: -10px; font-size: 1.25em">soloMODE</h4>
+        <br>
+        <h3>there are couple ways you can use <span>invidious.party</span>:</h3>
+        <br>
+        <h4>soloMODE</h4>
         <p>in soloMODE your browser communicates only with invidious instances to serve you content.<br>
         by default your subscriptions and settings are stored only in browser' localStorage[#]<br>
         because of that if you switch browser or clear history you will lose data you've saved<br>
@@ -37,7 +39,8 @@
 </div>
 <div class="row">
     <div class="left">
-        <h4 style="margin-bottom: -10px; font-size: 1.25em">partyMODE</h4>
+        <br>
+        <h4>partyMODE</h4>
         <p>in order to have a party there needs to be a way for browsers to communicate between each other.<br>
         unfortunately due to limitations in <a href="https://medium.com/quick-code/webrtc-advantages-technical-hurdles-and-a-case-study-4737d6ccd1a0">webRTC [2]</a> there needs to be some remote machine,<br>
         that will help browsers (peers) to discover themselfs</p>
@@ -51,7 +54,9 @@
         chat does not hold history, nor there are any moderators.<br>
         on one hand that makes you pretty close to anonymous, but you don't know who is listening.<br>
         it is not feasible to try to try to track everyone, but with enough resources it is possible to track you down.</p>
+        <br>
         <p><b>YOU'VE BEEN WARNED</b></p>
+        <br>
         <button on:click={() => dispatch('consent', 'solo')}>ACCEPT and go soloMODE</button>   \ <button on:click={() => dispatch('consent', 'party')}>ACCEPT and go partyMODE</button>
     </div>
     <div class="right">
@@ -85,7 +90,5 @@ b {
 }
 h1, h4 {
     color: var(--text--80);
-    margin-bottom: -10px;
-    margin-top: 0;
 }
 </style>

@@ -4,9 +4,9 @@
 </script>
 
 <script>
-    import { chosen } from '$lib/Stores/memoryStore'
+    import { chosen, controller } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, log } from '$lib/helper'
+    import { chooseInstance, ftch, log } from '$lib/helper'
     import countryCodes from '$lib/iso3166countryCodes'
     
     import AsyncError from '$lib/Components/AsyncError.svelte'
@@ -18,20 +18,18 @@
     let country = 'US'
     let type = 'Default'
     
-    const controller = new AbortController()
-    const signal = controller.signal
-
     let currentFetch = 0
 
     const fetchTrending = async (czozen, country, type) => {
         if(!czozen) czozen = chooseInstance($instances)
-
+        $controller = new AbortController()
+        const signal = $controller.signal
         try {
             // type: "music", "gaming", "news", "movies" doesnt work :(
             // region: ISO 3166 country code (default: "US")  
-            const req = await fetch(`https://${czozen}/api/v1/trending/?region=${country}&type=${type}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`, { signal })
-            const res = await req.json()
-            return res
+            return await ftch(`https://${czozen}/api/v1/trending/?region=${country}&type=${type}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`, { signal })
+            // const res = await req.json()
+            // return res
         } catch(err) {
             log('trending->fetch:error', err, 'dev')
             const index = $instances.findIndex(x => x[0] === czozen)

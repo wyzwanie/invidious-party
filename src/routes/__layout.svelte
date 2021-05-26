@@ -3,7 +3,7 @@
     import { onDestroy, onMount, afterUpdate } from 'svelte'
     import { joinRoom, selfId } from 'trystero/torrent'
 
-    import { chosen, peers, party, actions } from '$lib/Stores/memoryStore'
+    import { chosen, controller, peers, party, actions } from '$lib/Stores/memoryStore'
     import { consent, nick, settings, instances, instancesUpdatedAt, SUBsUpdatedAt } from '$lib/Stores/localStore'
     import { chooseInstance, getInstances, log } from '$lib/helper'
 
@@ -83,7 +83,7 @@ let updating = true
     onDestroy(() => $party ? $party.leave() : null)
 </script>
 
-<Header chosen={$chosen} consent={$consent} />
+<Header chosen={$chosen} consent={$consent} on:rotate={() => $chosen = chooseInstance($instances)} />
 <main>
 	<Sidebar />
     <div class="content">
