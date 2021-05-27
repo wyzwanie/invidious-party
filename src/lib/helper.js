@@ -134,7 +134,11 @@ export const validatePlaylistID = playlistID => {
     const pattern = /^([A-Za-z0-9_\-]{34})$/
     return pattern.test(playlistID)
 }
-
+export const sortThings = (a, b) => {
+    if (a > b) return 1
+    else if (a < b) return -1
+    else if (a === b) return 0
+}
 
 export function ftch(url, signal) {
     return fetch(url, signal)

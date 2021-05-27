@@ -164,7 +164,6 @@
 <style>
 .comments {
     margin-top: 11px;
-    background: #181818;
 }
 .comment {
     flex-direction: column;
@@ -216,7 +215,8 @@
     padding: 7px;
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid var(--border);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 .likeCount {
     display: flex;

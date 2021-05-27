@@ -83,6 +83,8 @@ let updating = true
     onDestroy(() => $party ? $party.leave() : null)
 </script>
 
+<svelte:window on:sveltekit:navigation-start="{() => $chosen = chooseInstance($instances)}" />
+
 <Header chosen={$chosen} consent={$consent} on:rotate={() => $chosen = chooseInstance($instances)} />
 <main>
 	<Sidebar />

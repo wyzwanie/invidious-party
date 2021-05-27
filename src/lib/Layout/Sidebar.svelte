@@ -78,6 +78,7 @@ a {
     font-weight: bold;
     opacity: 0.618;
     cursor: pointer;
+    z-index: 1000;
 }
 .sidebar.isOpen {
 	margin-left: 0;

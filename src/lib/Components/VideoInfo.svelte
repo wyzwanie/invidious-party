@@ -62,7 +62,11 @@
         <div class="authorBar">
             <div class="authorInfo">
                 <div class="authorImg">
-                    <ImageLoader src={getAuthorThumbnail(chosen, videoAPI.authorThumbnails)} alt={videoAPI.author} />
+                    {#if getAuthorThumbnail(chosen, videoAPI.authorThumbnails)}
+                        <ImageLoader src={getAuthorThumbnail(chosen, videoAPI.authorThumbnails)} alt={videoAPI.author} />
+                    {:else}
+                        <div class="empty"></div>
+                    {/if}
                 </div>
                 <div class="authorDetails">
                     <a href="/channel#{videoAPI.authorId}">{videoAPI.author}</a>
@@ -134,9 +138,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 1px;
-    margin-bottom: -2px;
-    margin-left: 1px;
+}
+.empty {
+    width: 41px;
+    height: 42px;
+    background: var(--bg-1)
 }
 :global(.authorInfo img) {
     width: 42px;

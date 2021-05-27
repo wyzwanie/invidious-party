@@ -1,7 +1,7 @@
 <script>
     import { onMount, afterUpdate } from 'svelte'
     import { chosen } from '$lib/Stores/memoryStore'
-    import { instances} from '$lib/Stores/localStore'
+    import { instances } from '$lib/Stores/localStore'
     import { chooseInstance, getQueryString, validatePlaylistID } from '$lib/helper'
 
     import AsyncError from '$lib/Components/AsyncError.svelte'

@@ -37,6 +37,10 @@
     flex-wrap: wrap;
     justify-content: space-between;
 }
+.playlists::after {
+    content: '';
+    width: calc(25% - 0.5em);
+}
 .playlist-outer {
     width: calc(25% - 0.5em);
     margin-bottom: 1em;

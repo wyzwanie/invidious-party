@@ -15,4 +15,5 @@
 <div>
     <button on:click={() => $controller.abort()}>abort</button>
     nothing here yet sadge
+    <img src="asd" on:error={() => alert(1)} />
 </div>

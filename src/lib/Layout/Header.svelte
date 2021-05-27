@@ -1,13 +1,13 @@
-<script context="module">
-    import { version } from '$lib/config'
+<!-- <script context="module">
     import { browser } from '$app/env'
     export const router = browser
-</script>
+</script> -->
 
 <script>
     import { createEventDispatcher } from 'svelte'
     import { goto } from '$app/navigation'
-
+    
+    import { version } from '$lib/config'
     import Rotate from '$lib/Components/Rotate.svelte'
     import Toggle from '$lib/UI/Toggle.svelte'
     import SettingsIcon from '$lib/Icons/SettingsIcon.svelte'

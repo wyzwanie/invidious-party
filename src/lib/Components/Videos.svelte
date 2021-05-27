@@ -20,11 +20,13 @@
                             <ImageLoader src={`https://${chosen}/vi/${video.videoId}/mqdefault.jpg`} alt={video.title} />
                             <div class="duration">{secToMin(video.lengthSeconds)}</div>
                         </a>
-                        <h3 class="title"><a href="/watch?v={video.videoId}">{video.title}</a></h3>
-                        <h4 class="author"><a href="/channel#{video.authorId}">{video.author}</a></h4>
-                        <div class="stats">
-                            <span>Shared {howLongAgo(video.published)}</span>
-                            <span>{convertCount(video.viewCount)}</span>
+                        <div class="infoBox">
+                            <h3 class="title"><a href="/watch?v={video.videoId}">{video.title}</a></h3>
+                            <h4 class="author"><a href="/channel#{video.authorId}">{video.author}</a></h4>
+                            <div class="stats">
+                                <span>Shared {howLongAgo(video.published)}</span>
+                                <span>{convertCount(video.viewCount)} views</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -56,7 +58,14 @@
     flex-wrap: wrap;
     justify-content: space-between;
 }
+.videos::after {
+    content: '';
+    width: calc(25% - 0.5em);
+}
 .video-outer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     width: calc(25% - 0.5em);
     margin-bottom: 1em;
 }
@@ -82,6 +91,7 @@
     }
 }
 .video-inner {
+    width: 100%;
     display: flex;
     flex-direction: row;
     background: rgb(0 0 0 / 35%);
@@ -104,16 +114,22 @@
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
 }
+.infoBox {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
 .title {
     font-weight: 400;
-    flex-grow: 1;
+    flex: 10;
     margin: 0;
     padding: 7px;
-    height: 38px;
 }
 .author {
+    flex: 1;
     margin: 0;
     padding: 7px;
+    color: var(--accent-hover);
 }
 .stats {
     display: flex;
@@ -131,9 +147,5 @@
     background: rgba(0,0,0,0.6);
     padding: 3px;
     color: white;
-}
-.author {
-    flex-grow: 1;
-    color: var(--accent-hover);
 }
 </style>

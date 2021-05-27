@@ -71,7 +71,11 @@
             <AsyncLoading chosen={$chosen} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
         {:then channel}
             <div class="banner">
-                <img src="{getAuthorBanner(channel.authorBanners)}" alt="author banner" />
+                {#if channel.authorBanners.length}
+                    <img src="{getAuthorBanner(channel.authorBanners)}" alt="author banner" />
+                {:else}
+                    <div class="noBanner">no banner :)</div>
+                {/if}
                 <div class="info">
                     <img src="{getAuthorThumbnail($chosen, channel.authorThumbnails)}" alt="author icon" />
                     <span class="author">{channel.author}</span>
@@ -125,6 +129,15 @@
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     filter: brightness(0.69)
+}
+.noBanner {
+    height: 225px;
+    background: var(--accent-dim);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .info {
     display: flex;
