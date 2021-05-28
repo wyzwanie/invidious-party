@@ -1,7 +1,7 @@
 <script>
     import { onMount, afterUpdate } from 'svelte'
 
-    import { chooseInstance, convertCount, getAuthorThumbnail, validateChannelID } from '$lib/helper'
+    import { chooseInstance, convertCount, ftch, getAuthorThumbnail, log, validateChannelID } from '$lib/helper'
 	import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
 
@@ -16,22 +16,52 @@
     let retry = false
     let activeTab = 'videos'
 
+    let channelController
+    let channelSignal
+    let playlistController
+    let playlistSignal
+
     const updateAddress = () => {
         channelID = window.location.href.split('#')[1]
         isChannelIDvalid = validateChannelID(channelID)
     }
 
     const fetchChannel = async (instance, channelID) => {
-        if(!instance) instance = chooseInstance($instances)
+        if(!instance) $chosen = chooseInstance($instances)
+        
+        if(channelController !== undefined) channelController.abort()
+        channelController = new AbortController
+        channelSignal = channelController.signal
 
-        const req = await fetch(`https://${instance}/api/v1/channels/${channelID}`) //?fields=
-        const res = await req.json()
+        try {
+            const id = setTimeout(() => channelController.abort(), 5000)
 
-        if(req.ok) return res
-        else throw res.error
+             //?fields=
+            const req = await fetch(`https://${instance}/api/v1/channels/${channelID}`, { signal: channelSignal })
+            const res = await req.json()
+
+            clearTimeout(id)
+            
+            if(req.ok) return res
+            else throw new Error(res)
+		} catch(err) {
+            log('fetch:channel', err, 'dev')
+            const index = $instances.findIndex(x => x[0] === instance)
+            if(index < 0) return retry = true
+            $instances[index][1].failedRequests++
+            $instances[index][1].lastFailedRequest = new Date().getTime()
+            $instances = $instances
+            retry = true
+		}
     }
 
     const fetchPlaylists = async (instance, channelID) => {
+        if(!instance) $chosen = chooseInstance($instances)
+        
+        if(channelController !== undefined) channelController.abort()
+        channelController = new AbortController
+        channelSignal = channelController.signal
+
         const req = await fetch(`https://${instance}/api/v1/channels/${channelID}/playlists`) //?fields=
         const res = await req.json()
 
@@ -40,7 +70,7 @@
     }
 
     const getAuthorBanner = authorBanners => {
-        console.log(authorBanners)
+        log('channel:getAuthorBanner', authorBanners, 'dev')
         const link = authorBanners[authorBanners.findIndex(x => x.width == 1060)].url
         const extracted = link.split('/')[3]
         return `https://${$chosen}/ggpht/${extracted}`

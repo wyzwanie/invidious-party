@@ -14,7 +14,35 @@
     let retry = false
     let videoID
     let validVideoID
+    let controller
+    let signal
 
+	const fetchVideo = async (instance, videoID) => {
+        if(!instance) $chosen = chooseInstance($instances)
+        
+        if(controller !== undefined) controller.abort()
+        controller = new AbortController
+        signal = controller.signal
+
+        try {
+            const id = setTimeout(() => controller.abort(), 5000)
+
+            const req = await fetch(`https://${instance}/api/v1/videos/${videoID}?fields=error,videoId,title,description,published,keywords,viewCount,likeCount,dislikeCount,paid,premium,isFamilyFriendly,author,authorId,authorThumbnails,lengthSeconds,allowRatings,rating,isListed,liveNow,dashUrl,adaptiveFormats,formatStreams,captions,recommendedVideos,subCountText`)
+            const res = await req.json()
+
+            clearTimeout(id)
+
+            return res
+		} catch(err) {
+            log('watch:fetch', err, 'dev')
+            const index = $instances.findIndex(x => x[0] === instance)
+            if(index < 0) return retry = true
+            $instances[index][1].failedRequests++
+            $instances[index][1].lastFailedRequest = new Date().getTime()
+            $instances = $instances
+            retry = true
+		}
+	}
 
     onMount(async () => {
         videoID = window.location.search.split('=')[1]
@@ -24,37 +52,17 @@
         videoID = window.location.search.split('=')[1]
         validVideoID = validateVideoID(videoID)
     })
-    
-	const fetchVideo = async (czozen, videoID) => {
-        if(!czozen) czozen = chooseInstance($instances)
-        log('video->fetch:from', czozen, 'dev')
-        try {
-            ///api/v1/videos/aqz-KE-bpKQ?fields=videoId,title,description
-            const req = await fetch(`https://${czozen}/api/v1/videos/${videoID}?fields=error,videoId,title,description,published,keywords,viewCount,likeCount,dislikeCount,paid,premium,isFamilyFriendly,author,authorId,authorThumbnails,lengthSeconds,allowRatings,rating,isListed,liveNow,dashUrl,adaptiveFormats,formatStreams,captions,recommendedVideos,subCountText`) //
-            const res = await req.json()
-            return res
-		} catch(err) {
-            const index = $instances.findIndex(x => x[0] === czozen)
-            if(index < 0) return retry = true
-            $instances[index][1].failedRequests++
-            $instances[index][1].lastFailedRequest = new Date().getTime()
-            $instances = $instances
-            retry = true
-		}
-	}
 
 	$: if(retry) {
         retry = false
         $chosen = chooseInstance($instances)
     }
-
-    const disableInstance = () => {}
 </script>
 
 {#if validVideoID}
     <div class="wrapper">
         {#await fetchVideo($chosen, videoID)}
-            <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($instances)} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
+            <AsyncLoading chosen={$chosen} />
         {:then videoAPI}
             {#if videoAPI.error && !videoAPI.authorId}
                 <p><span style="font-weight:bold">ERROR:</span> {videoAPI.error}</p>
@@ -63,7 +71,7 @@
                 <div class="top">
                     <div class="video">
                         {#if $chosen}
-                            <Video chosen={$chosen} {videoAPI} on:error={$chosen = chooseInstance($instances)} />
+                            <Video chosen={$chosen} {videoAPI} />
                         {/if}
                     </div>
                     <div class="chat">
@@ -73,7 +81,7 @@
                 <!-- <Videoo chosen={$chosen} {video} /> -->
                 <div class="bottom">
                     <div class="info">
-                        <VideoInfo chosen={$chosen} {videoAPI} on:rotate={$chosen = chooseInstance($instances)} />
+                        <VideoInfo chosen={$chosen} {videoAPI} />
                         <Comments {videoID} chosen={$chosen} />
                     </div>
                     <div class="related">
@@ -83,7 +91,7 @@
                 </div>
             {/if}
         {:catch error}
-            <AsyncError {error} on:rotate={$chosen = chooseInstance($instances)} />
+            <AsyncError {error} />
         {/await} 
     </div>
 {:else}

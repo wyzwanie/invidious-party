@@ -8,26 +8,29 @@ export const getInstances = async (ynst = undefined) => {
         try {
             const version = instance[1].stats.software.version.split('-')[0]
             const newEnough = new Date(version) > new Date('2021-04-30')
-            const metadata = instance[1].stats.metadata
-            const name = instance[0]
-            const { flag, uri } = instance[1]
 
-            if(ynst) {
-                const index = ynst.findIndex(x => x[0] === name)
+            if(version && newEnough) {
+                const metadata = instance[1].stats.metadata
+                const name = instance[0]
+                const { flag, uri } = instance[1]
+    
+                if(ynst) {
+                    const index = ynst.findIndex(x => x[0] === name)
+                }
+                parsedInstances = [...parsedInstances, [ name, {
+                    name,
+                    failedRequests: ynst ? ynst[index].failedRequests : 0,
+                    lastFailedRequest: ynst? ynst[index].lastFailedRequest : new Date().getTime(),
+                    enabled: ynst ? ynst[index].enabled : true,
+                    data: {
+                        flag,
+                        uri: uri[uri.length-1] !== '/' ? `${uri}/` : uri,
+                        metadata,
+                        version,
+                    },
+                    refreshedAt: new Date().getTime()
+                }]]
             }
-            parsedInstances = [...parsedInstances, [ name, {
-                name,
-                failedRequests: ynst ? ynst[index].failedRequests : 0,
-                lastFailedRequest: ynst? ynst[index].lastFailedRequest : new Date().getTime(),
-                enabled: ynst ? ynst[index].enabled : true,
-                data: {
-                    flag,
-                    uri: uri[uri.length-1] !== '/' ? `${uri}/` : uri,
-                    metadata,
-                    version,
-                },
-                refreshedAt: new Date().getTime()
-            }]]
         } catch(e) {
             console.log(instance[0], e)
         }
@@ -140,14 +143,73 @@ export const validatePlaylistID = playlistID => {
 //     else if (a === b) return 0
 // }
 
-// export function ftch(url, signal) {
-//     return fetch(url, signal)
-//         .then(async response => {
-//             if (response.ok) {
-//                 return await response.json()
-//             } else {
-//                 const errorMessage = await response.text()
-//             return Promise.reject(new Error(errorMessage))
-//             }
-//         })
-// }
+
+import { EventEmitter } from 'events'
+
+export class Fetcher extends EventEmitter {
+    constructor(instance, url) {
+        super()
+        this.instance = instance
+        this.url = url
+        this.controller = undefined
+        this.signal = undefined
+        this.failedCount = 0
+        this.running = false
+    }
+
+    abort() {
+        if(this.controller) {
+            this.controller.abort()
+            this.signal = undefined
+            this.controller = undefined
+        }
+        this.running = false
+    }
+
+    async go() {
+        this.running = true
+        if(this.failedCount > 10) return this.abort()
+        if(!this.instance) return this.abort()
+        if(this.instance === 'no valid instances' || this.instance === 'oops something went wrong') {
+            this.failedCount++
+            this.emit('err', this.instance)
+            return this.abort()
+        }
+        if(this.controller === undefined) {
+            this.controller = new AbortController()
+            this.signal = this.controller.signal
+        } else {
+            return this.abort()
+        }
+        
+        try {
+            this.emit('start')
+            const id = setTimeout(() => this.abort(), 5000)
+            const req = await fetch(`https://${this.instance}/api/v1${this.url}`, { signal: this.signal })
+            const res = await req.json()
+            clearTimeout(id)
+
+            this.signal = undefined
+            this.controller = undefined
+            this.running = false
+            this.emit('ok', res)
+            return res
+        } catch(err) {
+            this.failedCount++
+            this.signal = undefined
+            this.controller = undefined
+            this.running = false
+            this.emit('err', err)
+            return err
+        }
+    }
+}
+
+
+export const instanceFailedRequest = (instances, chosen) => {
+    const index = instances.findIndex(x => x[0] === chosen)
+    if(index < 0) return false
+    instances[index][1].failedRequests++
+    instances[index][1].lastFailedRequest = new Date().getTime()
+    return instances
+}

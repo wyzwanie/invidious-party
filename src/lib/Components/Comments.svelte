@@ -1,4 +1,4 @@
-<script>
+<!-- <script>
     import { onMount } from 'svelte'
     import { instances } from '$lib/Stores/localStore'
     import { chooseInstance, getAuthorThumbnail, howLongAgo, log } from '$lib/helper'
@@ -273,4 +273,4 @@
 .reply:nth-child(even) {
     background: var(--bg-0);
 }
-</style>
+</style> -->

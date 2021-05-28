@@ -1,20 +1,22 @@
 <script>
-    // import { ftch } from '$lib/helper'
-    // import { controller } from '$lib/Stores/memoryStore'
+    import { onMount } from 'svelte'
+    import { Fetch } from '$lib/helper'
+    import { chosen } from '$lib/Stores/memoryStore'
 
-    // const signal = controller.signal
+    let test
 
+    $: if($chosen) {
+        test = new Fetch($chosen, '/popular/')
+        test.on('err', err => console.log('yea!!', err))
+    }
 
-    // ftch('https://vid.puffyan.us/api/v1/popular/', { signal })
-    //     .then(data => console.log(data))
-    //     .catch(err => console.log(err))
-
-    
+    $: console.log($chosen, test)
 </script>
 
 <div>
     [TODO]
-    <!-- <button on:click={() => $controller.abort()}>abort</button>
-    nothing here yet sadge
-    <img src="asd" on:error={() => alert(1)} /> -->
+<button on:click={async () => {
+    const wynik = await test.go()
+    console.log('wynik:', wynik)
+}}>test</button>
 </div>

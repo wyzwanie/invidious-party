@@ -1,45 +1,48 @@
 <script>
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, log } from '$lib/helper'
+    import { chooseInstance, Fetcher, instanceFailedRequest, log } from '$lib/helper'
     
     import AsyncError from '$lib/Components/AsyncError.svelte'
 	import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
 	import Videos from '$lib/Components/Videos.svelte'
     import Filter from '$lib/UI/Filter.svelte'
 
-    let searchTerm
-    let oryginalFetch = {}
+    let error
     let retry = false
+    let popular
+    let loading
+    let searchTerm
 
-    const fetchPopular = async instance => {
-        if(!instance) $chosen = chooseInstance($instances)
+    const fetcher = new Fetcher($chosen, `/popular/?fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
+    fetcher.on('start', () => loading = true)
+    fetcher.on('ok', data => {
+        error = false
+        loading = false
+        popular = data
+    })
+    fetcher.on('err', err => {
+        loading = false
+        error = err
+        log('popular:fetch', err, 'dev')
+        const updated = instanceFailedRequest($instances, $chosen)
+        if(updated) $instances = updated
+        retry = true
+    })
 
-        try {
-            const req = await fetch(`https://${instance}/api/v1/popular/?&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
-            const res = await req.json()
-
-            if(res.length > 0) {
-                oryginalFetch = res
-                return res
-            } else throw new Error(res)
-        } catch(err) {
-            log('popular->fetch:error', err, 'dev')
-            const index = $instances.findIndex(x => x[0] === instance)
-            if(index < 0) return retry = true
-            $instances[index][1].failedRequests++
-            $instances[index][1].lastFailedRequest = new Date().getTime()
-            $instances = $instances
-            retry = true
-        }
+    const runFetcher = instance => {
+        if(!instance || fetcher.running) return
+        fetcher.instance = instance
+        fetcher.go()
     }
 
+    $: runFetcher($chosen)
     $: if(retry) {
         retry = false
         $chosen = chooseInstance($instances)
+        runFetcher($chosen)
     }
-$: console.log($chosen)
-    const disableInstance = () => {}
+
     const sortOptions = ['default', 'most views', 'least views', 'shortest', 'newest', 'oldest']
     const searchOptions = ['all', 'title', 'author']
 </script>
@@ -49,13 +52,16 @@ $: console.log($chosen)
         <Filter label="Sort by:" selected=default options={sortOptions} />
         <Filter label="Search by:" options={searchOptions} placeholder="search..." on:input={e => searchTerm = e.detail} search margin />
     </div>
-    {#await fetchPopular($chosen)}
+
+    {#if loading}
         <AsyncLoading chosen={$chosen} />
-    {:then videos}
-        <Videos {videos} chosen={$chosen} />
-    {:catch error}
-        <AsyncError {error} />
-    {/await}
+    {:else}
+        {#if !error}
+            <Videos videos={popular} chosen={$chosen} />
+        {:else}
+            ERROR: {JSON.stringify(error)}
+        {/if}
+    {/if}
 </div>
 
 <style>

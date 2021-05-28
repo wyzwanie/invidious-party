@@ -1,12 +1,8 @@
-<script context="module">
-    import { browser } from '$app/env'
-    export const router = browser
-</script>
-
 <script>
-    import { chosen, controller } from '$lib/Stores/memoryStore'
+    import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, log } from '$lib/helper'
+    import { chooseInstance, Fetcher, instanceFailedRequest, log } from '$lib/helper'
+
     import countryCodes from '$lib/iso3166countryCodes'
     
     import AsyncError from '$lib/Components/AsyncError.svelte'
@@ -14,37 +10,41 @@
 	import Videos from '$lib/Components/Videos.svelte'
     import Filter from '$lib/UI/Filter.svelte'
     
+    let error
     let retry = false
     let country = 'US'
     let type = 'Default'
+    let trending
+    let loading
+
+    const fetcher = new Fetcher($chosen, `/trending/?region=${country}&type=${type}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
+    fetcher.on('start', () => loading = true)
+    fetcher.on('ok', data => {
+        error = false
+        loading = false
+        trending = data
+    })
+    fetcher.on('err', err => {
+        log('trending:fetch', err, 'dev')
+        loading = false
+        error = err
+        const updated = instanceFailedRequest($instances, $chosen)
+        if(updated) $instances = updated
+        retry = true
+    })
     
-    let oryginalFetch
-
-    const fetchTrending = async (instance, country, type) => {
-        if(!instance) $chosen = chooseInstance($instances)
-
-        try {
-            const req = await fetch(`https://${instance}/api/v1/trending/?region=${country}&type=${type}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
-            const res = await req.json()
-
-            if(res.length > 0) {
-                oryginalFetch = res
-                return res
-            } else throw new Error(res)
-        } catch(err) {
-            log('popular->fetch:error', err, 'dev')
-            const index = $instances.findIndex(x => x[0] === instance)
-            if(index < 0) return retry = true
-            $instances[index][1].failedRequests++
-            $instances[index][1].lastFailedRequest = new Date().getTime()
-            $instances = $instances
-            retry = true
-        }
+    const runFetcher = (instance, country, type) => {
+        if(!instance || fetcher.running) return
+        fetcher.instance = instance
+        fetcher.url = `/trending/?region=${country}&type=${type}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`
+        fetcher.go()
     }
 
+    $: runFetcher($chosen, country, type)
     $: if(retry) {
         retry = false
         $chosen = chooseInstance($instances)
+        runFetcher($chosen, country, type)
     }
 
     const sortOptions = ['default', 'most views', 'least views', 'shortest', 'newest', 'oldest']
@@ -59,13 +59,16 @@
         <Filter label="Sort by:" selected=default options={sortOptions} margin />
         <Filter label="Search by:" selected=all options={srchOptions} placeholder="search..." on:input={e => console.log(e)} search margin flex=2 />
     </div>
-    {#await fetchTrending($chosen, country, type)}
+
+    {#if loading}
         <AsyncLoading chosen={$chosen} />
-    {:then videos}
-        <Videos {videos} chosen={$chosen} />
-    {:catch error}
-        <AsyncError {error} />
-    {/await}
+    {:else}
+        {#if !error}
+            <Videos videos={trending} chosen={$chosen} />
+        {:else}
+            ERROR: {JSON.stringify(error)}
+        {/if}
+    {/if}
 </div>
 
 <style>

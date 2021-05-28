@@ -11,11 +11,12 @@
     import Header from '$lib/Layout/Header.svelte'
     import Loader from '$lib/UI/Loader.svelte'
 	import Sidebar from '$lib/Layout/Sidebar.svelte'
-
+    
     let refreshStarted = false
+    let updating = true
 
     const initParty = () => {
-        console.log('init party')
+        log('layout:initParty', 'initializing', 'dev')
         const config = { appId: 'invidious.party' }
         const roomID = 'party'
         try {
@@ -30,7 +31,7 @@
             $actions.name[0]($nick || 'anon')
 
             $party.onPeerJoin(id => {
-                console.log('peer join')
+                log('party', 'peer join', 'dev')
                 $actions.name[0]($nick || 'anon', id)
                 if($peers['self'] && $peers['self'].videoID) $actions.watching[0]($peers['self'].videoID, id)
             })
@@ -38,28 +39,28 @@
             $actions.name[1]((nick, id) => $peers[id] = {...$peers[id], nick })
             $actions.watching[1]((videoID, id) => $peers[id] = {...$peers[id], videoID })
             $party.onPeerLeave(id => {
-                console.log('peer leave')
+                log('party', 'peer leave', 'dev')
                 delete $peers[id]
                 $peers = $peers
             })
             log('layout:initParty', 'party started🎉', 'dev')
         } catch(err) {
-            log('layout:joinRoom-Error', err.message, 'dev')
+            log('layout:initParty', err.message, 'dev')
         }
     }
     const refreshInstances = async () => {
         //never fetched before
         if(!$instancesUpdatedAt || !$instances.length) {
-            log('instances', 'init', 'dev')
+            log('layout:refreshInstances', 'initial refresh', 'dev')
             $instances = await getInstances()
             $instancesUpdatedAt = new Date().getTime()
         }
         //instances lastUpdated more than 24h ago
         if ($instancesUpdatedAt && ((new Date().getTime() - $instancesUpdatedAt) > 24 * 60 * 60 * 1000)) {
-            log('instances', 'starting refresh', 'dev')
+            log('layout:refreshInstances', 'starting refresh', 'dev')
             $instances = await getInstances($instances)
             $instancesUpdatedAt = new Date().getTime()
-            log('instances', $instances , 'dev')
+            log('layout:refreshInstances', $instances , 'dev')
         }
         $chosen = chooseInstance($instances)
         refreshStarted = false
@@ -68,18 +69,14 @@
 	onMount(() => {
         if($consent) {
             refreshStarted = true
-            console.log('refresh started', refreshStarted)
+            log('layout:onmount', refreshStarted, 'dev')
             if($consent === 'party') initParty()
             refreshInstances()
         } else {
             console.log($consent, $chosen, 'else')
         }
 	})
-let updating = true
-    afterUpdate(() => {
-        updating = false
-    })
-
+    afterUpdate(() => updating = false)
     onDestroy(() => $party ? $party.leave() : null)
 </script>
 
@@ -95,9 +92,9 @@ let updating = true
             {:else}
             {#if !updating}
                 <Consent on:consent={e => {
+                    log('layout:onConsent', 'refreshStarted', 'dev')
                     $consent = e.detail
                     refreshStarted = true
-                    console.log('refresh started', refreshStarted)
                     if($consent === 'party') initParty()
                     refreshInstances()
                 }}/>
