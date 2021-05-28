@@ -21,8 +21,8 @@
     }
 </script>
 
-<svg class:loaded viewBox="0 0 320 180"><rect width="100%" height="100%" fill="var(--text-100)"/></svg>
 <img {src} {alt} class:loaded bind:this={thisImage} loading="lazy" on:error={replaceImage} />
+<svg class:loaded viewBox="0 0 320 180"><rect width="100%" height="100%" fill="var(--text-100)"/></svg>
 <!-- {#if !loaded} -->
 <!-- {/if} -->
 

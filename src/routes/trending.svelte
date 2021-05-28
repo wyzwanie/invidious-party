@@ -6,7 +6,7 @@
 <script>
     import { chosen, controller } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, ftch, log } from '$lib/helper'
+    import { chooseInstance, log } from '$lib/helper'
     import countryCodes from '$lib/iso3166countryCodes'
     
     import AsyncError from '$lib/Components/AsyncError.svelte'

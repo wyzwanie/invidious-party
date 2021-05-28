@@ -1,6 +1,5 @@
 <script>
     import { createEventDispatcher } from 'svelte'
-    import { controller } from '$lib/Stores/memoryStore'
     import { sleep } from '$lib/helper'
 
     export let color = '--accent'
@@ -8,7 +7,6 @@
     let rotate = false
 
     const sendRotate = async () => {
-        if($controller) $controller.abort()
         dispatch('rotate')
         rotate = true
         await sleep(1000)

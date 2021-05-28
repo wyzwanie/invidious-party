@@ -43,4 +43,6 @@ export const SUBsUpdatedAt =  writable('SUBsUpdatedAt', null)
 export const SUBcacheUpdatedAt = writable('SUBcacheUpdatedAt', null)
 export const SUBsRefreshedAt = writable('SUBsRefreshedAt', null)
 
+export const playlists = writable('playlists', [])
+
 export const settings = writable('settings', null)

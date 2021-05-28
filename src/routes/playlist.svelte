@@ -1,8 +1,9 @@
 <script>
     import { onMount, afterUpdate } from 'svelte'
+    import { page } from '$app/stores'
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, getQueryString, validatePlaylistID } from '$lib/helper'
+    import { chooseInstance, validatePlaylistID } from '$lib/helper'
 
     import AsyncError from '$lib/Components/AsyncError.svelte'
     import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
@@ -19,7 +20,7 @@
     let videoContainer
 
     const getPlaylistID = () => {
-        playlistID = getQueryString('list')
+        playlistID = $page.query.get('list')
         isPlaylistIDvalid = validatePlaylistID(playlistID)
     }
 

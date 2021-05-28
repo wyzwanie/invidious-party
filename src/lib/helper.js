@@ -112,12 +112,12 @@ export const getAuthorThumbnail = (chosen, authorThumbnails) => {
     return extracted ? `https://${chosen}/ggpht/ytc/${extracted}` : ''
 }
 
-export const getQueryString = (field, url) => {
-    const href = url ? url : window.location.href;
-    const reg = new RegExp( '[?&]' + field + '=([^]*)', 'i' );
-    const string = reg.exec(href);
-    return string ? string[1] : null;
-}
+// export const getQueryString = (field, url) => {
+//     const href = url ? url : window.location.href;
+//     const reg = new RegExp( '[?&]' + field + '=([^]*)', 'i' );
+//     const string = reg.exec(href);
+//     return string ? string[1] : null;
+// }
 
 export const log = (fromQ, msg, env) => env === 'dev' ? console.log(fromQ, msg) : ''
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -134,20 +134,20 @@ export const validatePlaylistID = playlistID => {
     const pattern = /^([A-Za-z0-9_\-]{34})$/
     return pattern.test(playlistID)
 }
-export const sortThings = (a, b) => {
-    if (a > b) return 1
-    else if (a < b) return -1
-    else if (a === b) return 0
-}
+// export const sortThings = (a, b) => {
+//     if (a > b) return 1
+//     else if (a < b) return -1
+//     else if (a === b) return 0
+// }
 
-export function ftch(url, signal) {
-    return fetch(url, signal)
-        .then(async response => {
-            if (response.ok) {
-                return await response.json()
-            } else {
-                const errorMessage = await response.text()
-            return Promise.reject(new Error(errorMessage))
-            }
-        })
-}
+// export function ftch(url, signal) {
+//     return fetch(url, signal)
+//         .then(async response => {
+//             if (response.ok) {
+//                 return await response.json()
+//             } else {
+//                 const errorMessage = await response.text()
+//             return Promise.reject(new Error(errorMessage))
+//             }
+//         })
+// }

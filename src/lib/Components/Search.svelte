@@ -1,6 +1,4 @@
 <script>
-    import { onMount, afterUpdate } from 'svelte'
-    import { page } from '$app/stores'
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
     import { chooseInstance, log } from '$lib/helper'
@@ -10,13 +8,13 @@
     import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
     import Videos from '$lib/Components/Videos.svelte'
     import Filter from '$lib/UI/Filter.svelte'
-    
+
     let features
     let oryginalFetch
     let retry = false
-    let searchQuery
+    export let searchQuery
     let thisFeatures
-
+$: console.log(searchQuery)
     let searchFilters = {
         sortBy: '',
         uploadDate: '',
@@ -71,16 +69,6 @@
         }
     }
 
-    onMount(() => {
-        searchQuery = $page.query.get('q')
-        // features = new MultiSelect('.features', {
-        //     items: featuresOptions,
-        //     placeholder: 'Select features'
-        // })
-        // features.on('change', e => searchFilters.features = features.getCurrent())
-    })
-    afterUpdate(() => searchQuery = $page.query.get('q'))
-
     $: if(retry) {
         retry = false
         $chosen = chooseInstance($instances)
@@ -116,10 +104,5 @@
 <style>
 .filters {
     display: flex;
-}
-@media (max-width: 600px) {
-    .filters {
-        flex-direction: column;
-    }
 }
 </style>

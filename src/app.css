@@ -19,6 +19,7 @@
     --accent: #4ecdc4;
     --accent-dim: hsl(176deg 56% 55% / 62%);
     --accent-hover: #65c6bb;
+    --error: #fb3d4a;
 }
 
 *, *::before, *::after {
@@ -91,4 +92,10 @@ button {
 ::-webkit-scrollbar-track{
     background: var(--bg-2);
     border-radius: 10px;
+}
+.mb-1 {
+    margin-bottom: 7px;
+}
+.p-1 {
+    padding: 7px;
 }

@@ -20,11 +20,11 @@
 <div class="sidebar" class:isOpen>
 	<ul class="menu">
 		<li class="listToggle" on:click={() => isOpen = !isOpen}><MenuIcon fill=var(--text--50) width=16px /></li>
-		<li><a href="/" class={$page.path === '/' ? 'active' : ''}>PARTY</a></li>
-		<li><a href="/popular" class={$page.path === '/popular' ? 'active' : ''}>POPULAR</a></li>
-		<li><a href="/trending" class={$page.path === '/trending' ? 'active' : ''}>TRENDING</a></li>
-		<li><a href="/subscriptions" class={$page.path === '/subscriptions' ? 'active' : ''}>SUB<span style="font-size: 8px;">SCRIPTIONS</span></a></li>
-		<li>PLAYLISTS</li>
+		<li><a href="/" class={$page.path === '/' ? 'active' : ''}>Party</a></li>
+		<li><a href="/popular" class={$page.path === '/popular' ? 'active' : ''}>Popular</a></li>
+		<li><a href="/trending" class={$page.path === '/trending' ? 'active' : ''}>Trending</a></li>
+		<li><a href="/subscriptions" class={$page.path === '/subscriptions' ? 'active' : ''}>Sub<span style="font-size: 8px;">scriptions</span></a></li>
+		<li><a href="/playlists" class={$page.path === '/playlists' ? 'active' : ''}>Playlists</a></li>
 	</ul>
 	<div class="bottom">
 		<a href="https://github.com/wyzwanie/invidious-party" target="_blank">
@@ -57,6 +57,9 @@
 <style>
 a {
     color: var(--text-50);
+}
+li {
+    text-transform: uppercase;
 }
 .listToggle {
 	padding: 9px;
