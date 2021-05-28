@@ -11,7 +11,7 @@
         {#if error.message}
             {error.message}
         {:else}
-            {error}
+            {JSON.stringify(error)}
         {/if}
     </div>
     <div class="info">

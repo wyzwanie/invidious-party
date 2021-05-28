@@ -17,7 +17,7 @@
                 <div class="video-inner">
                     <div class="card">
                         <a class="thumbnail" href="/watch?v={video.videoId}">
-                            <ImageLoader src={`https://${chosen}/vi/${video.videoId}/mqdefault.jpg`} alt={video.title} />
+                            <ImageLoader size=320x180 src={`https://${chosen}/vi/${video.videoId}/mqdefault.jpg`} alt={video.title} />
                             <div class="duration">{secToMin(video.lengthSeconds)}</div>
                         </a>
                         <div class="infoBox">

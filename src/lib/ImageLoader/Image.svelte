@@ -1,11 +1,11 @@
 <script>
     import { onMount } from 'svelte'
-    import { slide } from 'svelte/transition'
     import { chooseInstance } from '$lib/helper'
     import { instances } from '$lib/Stores/localStore'
 
     export let src
     export let alt
+    export let size = '320x180'
     
     let loaded = false
     let thisImage
@@ -22,9 +22,10 @@
 </script>
 
 <img {src} {alt} class:loaded bind:this={thisImage} loading="lazy" on:error={replaceImage} />
-<svg class:loaded viewBox="0 0 320 180"><rect width="100%" height="100%" fill="var(--text-100)"/></svg>
-<!-- {#if !loaded} -->
-<!-- {/if} -->
+
+{#if !loaded}
+    <svg class:loaded viewBox="0 0 {size.split('x')[0]} {size.split('x')[1]}"><rect width="100%" height="100%" fill="var(--text-100)"/></svg>
+{/if}
 
 <style>
 svg {
@@ -49,11 +50,12 @@ svg.loaded rect {
     visibility: hidden
 }
 img {
-    height: auto;
+    height: 0;
     opacity: 0;
-    transition: opacity 0.3s ease-out;
+    transition: opacity 0.6s ease-out;
 }
 img.loaded {
+    height: 100%;
     opacity: 1;
     object-fit: cover;
     object-position: center;

@@ -43,13 +43,13 @@ if(counter > 50) return
         
         try {
             if(!instance) instance = chooseInstance($instances)
-            const req = await fetch(`https://${instance}/api/v1/search/suggestions/?q=${term}`, { signal })
+            const req = await fetch(`https://${chooseInstance($instances)}/api/v1/search/suggestions/?q=${term}`, { signal })
             const res = await req.json()
             return res
         } catch(err) {
             counter++
             // log('suggestions->fetch:error', err, 'dev')
-            retry = true
+            // retry = true
         }
     }
 
@@ -65,9 +65,6 @@ if(counter > 50) return
         retry = false
         chosen = chooseInstance($instances)
     }
-
-    $: console.log(suggestions)
-    $: console.log(searchTerm, suggestions)
 </script>
 
 <header>

@@ -81,7 +81,7 @@
             <div class="authorInfo">
                 <div class="authorImg">
                     {#if getAuthorThumbnail(chosen, videoAPI.authorThumbnails)}
-                        <ImageLoader src={getAuthorThumbnail(chosen, videoAPI.authorThumbnails)} alt={videoAPI.author} />
+                        <ImageLoader size=100x100 src={getAuthorThumbnail(chosen, videoAPI.authorThumbnails)} alt={videoAPI.author} />
                     {:else}
                         <div class="empty"></div>
                     {/if}
@@ -219,10 +219,12 @@
     padding: 7px;
     flex: 1;
     -webkit-mask-image: -webkit-gradient(linear, left 30%, left bottom, from(black), to(rgba(0, 0, 0, 0)));
+    mask-image: gradient(linear, left 30%, left bottom, from(black), to(rgba(0, 0, 0, 0)));
     overflow-wrap: anywhere;
 }
 .description.isMore p {
     -webkit-mask-image: none;
+    mask-image: none;
 }
 .readMore {
     position: absolute;

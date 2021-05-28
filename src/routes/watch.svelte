@@ -40,29 +40,21 @@
         fetcher.url = `/videos/${videoID}?fields=error,videoId,title,descriptionHtml,description,published,keywords,viewCount,likeCount,dislikeCount,paid,premium,isFamilyFriendly,author,authorId,authorThumbnails,lengthSeconds,allowRatings,rating,isListed,liveNow,dashUrl,adaptiveFormats,formatStreams,captions,recommendedVideos,subCountText`
         fetcher.go() 
     }
+    const updateVideoID = () => {
+        videoID = window.location.search.split('=')[1]
+        validVideoID = validateVideoID(videoID)
+    }
 
-    onMount(async () => {
-        videoID = window.location.search.split('=')[1]
-        validVideoID = validateVideoID(videoID)
-    })
-    afterUpdate(async () => {
-        videoID = window.location.search.split('=')[1]
-        validVideoID = validateVideoID(videoID)
-    })
+    onMount(updateVideoID)
+    afterUpdate(updateVideoID)
 
     $: runFetcher($chosen, videoID, validVideoID)
-        $: if(retry) {
-            retry = false
-            $chosen = chooseInstance($instances)
-            runFetcher($chosen, videoID)
-        }
+    $: if(retry) {
+        retry = false
+        $chosen = chooseInstance($instances)
+        runFetcher($chosen, videoID)
+    }
 </script>
-
-<!-- {loading}<br>
-{error}<br>
-{validVideoID}<br>
-{JSON.stringify(videoAPI, null, 4)} -->
-
 
 {#if validVideoID}
     <div class="wrapper">

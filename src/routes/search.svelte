@@ -1,9 +1,10 @@
 <script>
     import { onMount, afterUpdate } from 'svelte'
+
     import { page } from '$app/stores'
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, log } from '$lib/helper'
+    import { chooseInstance, Fetcher, instanceFailedRequest } from '$lib/helper'
     import countryCodes from '$lib/iso3166countryCodes'
 
     import AsyncError from '$lib/Components/AsyncError.svelte'
@@ -11,12 +12,12 @@
     import Videos from '$lib/Components/Videos.svelte'
     import Filter from '$lib/UI/Filter.svelte'
     
-    let features
-    let oryginalFetch
+    let error
+    let loading
     let retry = false
-    let searchQuery
-    let thisFeatures
 
+    let searchQuery
+    let searchResult
     let searchFilters = {
         sortBy: '',
         uploadDate: '',
@@ -24,22 +25,6 @@
         type: 'video',
         country: ''
     }
-
-
-    const sortByOptions = ['', 'relevance', 'rating', 'upload_date', 'view_count']
-    const dateOptions = ['', 'hour', 'today', 'week', 'month', 'year']
-    const durationOptions = ['', 'short', 'long']
-    const typeOptions = ['all', 'channel', 'playlist','video']
-    const featuresOptions = ['hd', 'subtitles', 'creative_commons', '3d', 'live', 'purchased', '4k', '360', 'location', 'hdr']
-
-//     q: String
-// page: Int32
-// sort_by: "relevance", "rating", "upload_date", "view_count"
-// date: "hour", "today", "week", "month", "year"
-// duration: "short", "long"
-// type: "video", "playlist", "channel", "all", (default: video)
-// features: "hd", "subtitles", "creative_commons", "3d", "live", "purchased", "4k", "360", "location", "hdr" (comma separated: e.g. "&features=hd,subtitles,3d,live")
-// region: ISO 3166 country code (default: "US")
 
     const buildSearchQuery = params => {
         let queryString = '&'
@@ -49,44 +34,44 @@
         return queryString.slice(0, -1)
     }
 
-    const fetchSearch = async (instance, query, params) => {
-        if(!instance) instance = chooseInstance($instances)
-// return console.log(`https://${instance}/api/v1/search/?q=${query}${buildSearchQuery(params)}`)
-        try {
-            const req = await fetch(`https://${instance}/api/v1/search/?q=${query}${buildSearchQuery(params)}`) //&fields
-            const res = await req.json()
-
-            if(res.length > 0) {
-                oryginalFetch = res
-                return res
-            } else throw new Error(res)
-        } catch(err) {
-            log('popular->fetch:error', err, 'dev')
-            const index = $instances.findIndex(x => x[0] === instance)
-            if(index < 0) return retry = true
-            $instances[index][1].failedRequests++
-            $instances[index][1].lastFailedRequest = new Date().getTime()
-            $instances = $instances
-            retry = true
-        }
-    }
-
-    onMount(() => {
-        searchQuery = $page.query.get('q')
-        // features = new MultiSelect('.features', {
-        //     items: featuresOptions,
-        //     placeholder: 'Select features'
-        // })
-        // features.on('change', e => searchFilters.features = features.getCurrent())
+    const fetcher = new Fetcher($chosen, `/search/?q=${searchQuery}${buildSearchQuery(searchFilters)}`)
+    fetcher.on('start', () => loading = true)
+    fetcher.on('ok', data => {
+        error = loading = false
+        searchResult = data
     })
+    fetcher.on('err', err => {
+        console.log('search:fetchError', err, 'dev')
+        loading = false
+        error = err
+        const updated = instanceFailedRequest($instances, $chosen)
+        if(updated) $instances = updated
+        retry = true
+    })
+
+    const runFetcher = (instance, query, params) => {
+        if(!instance || !query) return
+        fetcher.instance = instance
+        fetcher.url = `/search/?q=${searchQuery}${buildSearchQuery(params)}`
+        fetcher.go()
+    }
+        
+    onMount(() => searchQuery = $page.query.get('q'))
     afterUpdate(() => searchQuery = $page.query.get('q'))
 
+    $: runFetcher($chosen, searchQuery, searchFilters)
     $: if(retry) {
         retry = false
         $chosen = chooseInstance($instances)
+        runFetcher($chosen, searchQuery, searchFilters)
     }
 
-    $: console.log(searchFilters)
+    const sortByOptions = ['', 'relevance', 'rating', 'upload_date', 'view_count']
+    const dateOptions = ['', 'hour', 'today', 'week', 'month', 'year']
+    const durationOptions = ['', 'short', 'long']
+    const typeOptions = ['all', 'channel', 'playlist','video']
+    //todo multiselect
+    const featuresOptions = ['hd', 'subtitles', 'creative_commons', '3d', 'live', 'purchased', '4k', '360', 'location', 'hdr']
 </script>
 
 <div class="container">
@@ -102,13 +87,15 @@
     </div>
     <div class="search">
         {#if searchQuery}
-            {#await fetchSearch($chosen, searchQuery, searchFilters)}
+            {#if loading}
                 <AsyncLoading chosen={$chosen} />
-            {:then videos}
-                <Videos {videos} chosen={$chosen} />
-            {:catch error}
-                <AsyncError {error} />
-            {/await}
+            {:else}
+                {#if !error}
+                    <Videos videos={searchResult} chosen={$chosen} />
+                {:else}
+                    <AsyncError {error} />
+                {/if}
+            {/if}
         {/if}
     </div>
 </div>

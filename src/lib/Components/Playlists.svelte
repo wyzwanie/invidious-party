@@ -5,10 +5,6 @@
     export let playlists
 </script>
 
-<pre>
-    {JSON.stringify(playlists, null, 4)}
-</pre>
-
 {#if playlists && playlists.length > 0}
     <div class="playlists">
         {#each playlists as playlist}
@@ -16,7 +12,7 @@
                 <div class="playlist-inner">
                     <div class="card">
                         <a class="thumbnail" href="/playlist?list={playlist.playlistId}">
-                            <ImageLoader src={`https://${chosen}/vi/${playlist.playlistThumbnail.split('/vi/')[1]}`} alt={playlist.title} />
+                            <ImageLoader size=480x360 src={`https://${chosen}/vi/${playlist.playlistThumbnail.split('/vi/')[1]}`} alt={playlist.title} />
                         </a>
                         <div class="info">
                             <h3 class="title"><a href="/playlist?list={playlist.playlistId}">{playlist.title}</a></h3>

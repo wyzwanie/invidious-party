@@ -8,13 +8,17 @@
     export let borderRadiusTop = true
     
     let player = {}
-
+    let dashSource = videoAPI.dashUrl || false
+    let dash = false
 
     onMount(() => {
         player = new Plyr('#player', {
-            // debug: true,
+            debug: true,
             iconUrl: '/plyr.svg',
             blankVideo: '/blankVideo.mp4'
+        })
+        player.on('error', () => {
+            dash = true
         })
         const wrapper = document.querySelector('.plyr__video-wrapper')
         const plr = document.querySelector('.plyr')
@@ -64,6 +68,18 @@
     }
     let audioOnly = false
 </script>
+
+<svelte:head>
+    {#if dash}
+        <script src="https://cdn.dashjs.org/latest/dash.all.min.js" on:load={() => {
+                const dash = dashjs.MediaPlayer().create()
+                const video = document.querySelector('video')
+                dash.initialize(video, dashSource, true)
+                player = new Plyr(video)
+        }} />
+    {/if}
+</svelte:head>
+
 
 {#if videoAPI && videoAPI.formatStreams}
     <div class="video-wrapper">

@@ -153,6 +153,7 @@ export class Fetcher extends EventEmitter {
         this.signal = undefined
         this.failedCount = 0
         this.running = false
+        this.what
     }
 
     abort() {
@@ -165,9 +166,8 @@ export class Fetcher extends EventEmitter {
     }
 
     async go() {
-        console.log('go', this)
         this.running = true
-        if(this.failedCount > 10) return this.abort()
+        // if(this.failedCount > 20) return this.abort()
         if(!this.instance) return this.abort()
         if(this.instance === 'no valid instances' || this.instance === 'oops something went wrong') {
             this.failedCount++
@@ -182,7 +182,7 @@ export class Fetcher extends EventEmitter {
         }
         
         try {
-            this.emit('start')
+            this.emit('start', this.url)
             const id = setTimeout(() => this.abort(), 5000)
             const req = await fetch(`https://${this.instance}/api/v1${this.url}`, { signal: this.signal })
             const res = await req.json()
