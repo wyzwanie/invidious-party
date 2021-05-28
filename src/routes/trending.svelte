@@ -11,17 +11,17 @@
     import Filter from '$lib/UI/Filter.svelte'
     
     let error
+    let loading
     let retry = false
+    
     let country = 'US'
     let type = 'Default'
     let trending
-    let loading
 
     const fetcher = new Fetcher($chosen, `/trending/?region=${country}&type=${type}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
     fetcher.on('start', () => loading = true)
     fetcher.on('ok', data => {
-        error = false
-        loading = false
+        error = loading = false
         trending = data
     })
     fetcher.on('err', err => {

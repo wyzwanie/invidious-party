@@ -14,6 +14,24 @@
 
     let isOpen = false
     let isMore = false
+
+
+    const replaceURLs = text => {
+        const urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g
+        return text.replace(urlRegex, url => {
+            let hyperlink = url
+            if (!hyperlink.match('^https?:\/\/')) hyperlink = 'http://' + hyperlink
+            return `<a href="${hyperlink}" target="_blank" rel="noopener noreferrer">${url}</a>`
+        })
+    }
+    const parseDescription = description => {
+        if(!description) return ''
+        const newLined = description.split(/\r?\n/)
+
+        let parsed = ''
+        newLined.forEach(line => parsed += `${replaceURLs(line)}<br>`)
+        return parsed
+    }
 </script>
 
 {#if videoAPI}
@@ -75,7 +93,9 @@
             <Subscribe channelID={videoAPI.authorId} subCount={videoAPI.subCountText} />
         </div>
         <div class="description" class:isMore>
-            <p>{@html videoAPI.descriptionHtml}</p>
+            <p>
+                {@html parseDescription(videoAPI.description)}
+            </p>
             <div class="readMore" on:click={() => isMore = !isMore}>
                 read {isMore ? 'less' : 'more'} ↕
             </div>
@@ -184,20 +204,25 @@
 
 /* refresh */
 .description {
-    padding: 7px;
     color: var(--text--50);
     background: var(--text-130);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     transition: all 0.6s ease-in-out;
-    max-height: 69px;
+    max-height: 100px;
     overflow: hidden;
     position: relative;
     display: flex;
     justify-content: center;
 }
 .description p {
+    padding: 7px;
     flex: 1;
+    -webkit-mask-image: -webkit-gradient(linear, left 30%, left bottom, from(black), to(rgba(0, 0, 0, 0)));
+    overflow-wrap: anywhere;
+}
+.description.isMore p {
+    -webkit-mask-image: none;
 }
 .readMore {
     position: absolute;

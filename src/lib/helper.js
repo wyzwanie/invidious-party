@@ -5,18 +5,18 @@ export const getInstances = async (ynst = undefined) => {
     let allInstances = await instancesRequest.json()
 
     allInstances.forEach(instance => {
-        try {
-            const version = instance[1].stats.software.version.split('-')[0]
-            const newEnough = new Date(version) > new Date('2021-04-30')
+        const version = instance[1]?.stats?.software?.version.split('-')[0]
+        if(version) {
+            const newEnough = new Date(version.replaceAll('.', '-')) > new Date('2021-04-30')
+            if(newEnough) {
 
-            if(version && newEnough) {
-                const metadata = instance[1].stats.metadata
+                const metadata = instance[1]?.stats?.metadata
                 const name = instance[0]
                 const { flag, uri } = instance[1]
-    
                 if(ynst) {
                     const index = ynst.findIndex(x => x[0] === name)
                 }
+
                 parsedInstances = [...parsedInstances, [ name, {
                     name,
                     failedRequests: ynst ? ynst[index].failedRequests : 0,
@@ -31,8 +31,6 @@ export const getInstances = async (ynst = undefined) => {
                     refreshedAt: new Date().getTime()
                 }]]
             }
-        } catch(e) {
-            console.log(instance[0], e)
         }
     })
     return parsedInstances
@@ -167,6 +165,7 @@ export class Fetcher extends EventEmitter {
     }
 
     async go() {
+        console.log('go', this)
         this.running = true
         if(this.failedCount > 10) return this.abort()
         if(!this.instance) return this.abort()
