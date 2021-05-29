@@ -18,7 +18,7 @@
             blankVideo: '/blankVideo.mp4'
         })
         player.on('error', () => {
-            dash = true
+            // dash = true
         })
         const wrapper = document.querySelector('.plyr__video-wrapper')
         const plr = document.querySelector('.plyr')
@@ -69,7 +69,7 @@
     let audioOnly = false
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
     {#if dash}
         <script src="https://cdn.dashjs.org/latest/dash.all.min.js" on:load={() => {
                 const dash = dashjs.MediaPlayer().create()
@@ -78,7 +78,7 @@
                 player = new Plyr(video)
         }} />
     {/if}
-</svelte:head>
+</svelte:head> -->
 
 
 {#if videoAPI && videoAPI.formatStreams}

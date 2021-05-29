@@ -2,7 +2,7 @@
     import Queue from 'async-await-queue'
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances, SUBs, SUBcache, SUBsUpdatedAt, SUBcacheUpdatedAt, SUBsRefreshedAt } from '$lib/Stores/localStore'
-    import { sortThings } from '$lib/helper'
+    // import { sortThings } from '$lib/helper'
 
     import Videos from '$lib/Components/Videos.svelte'
     import ProgressBar from '$lib/UI/ProgressBar.svelte'
