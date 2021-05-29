@@ -1,0 +1,2 @@
+import{S as s,i as a,s as r,e as t,t as e,c as o,a as c,g as n,d as u,f as d,D as i,F as l}from"../chunks/vendor-78501628.js";function f(s){let a,r;return{c(){a=t("div"),r=e("[TODO]")},l(s){a=o(s,"DIV",{});var t=c(a);r=n(t,"[TODO]"),t.forEach(u)},m(s,t){d(s,a,t),i(a,r)},p:l,i:l,o:l,d(s){s&&u(a)}}}export default class extends s{constructor(s){super(),a(this,s,null,f,r,{})}}
+//# sourceMappingURL=index.svelte-4fb39b7e.js.map
