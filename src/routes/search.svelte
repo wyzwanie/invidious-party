@@ -4,7 +4,7 @@
     import { page } from '$app/stores'
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, Fetcher, instanceFailedRequest } from '$lib/helper'
+    import { chooseInstance, Fetcher, instanceRequestStatus } from '$lib/helper'
     import countryCodes from '$lib/iso3166countryCodes'
 
     import AsyncError from '$lib/Components/AsyncError.svelte'
@@ -39,12 +39,14 @@
     fetcher.on('ok', data => {
         error = loading = false
         searchResult = data
+        const updated = instanceRequestStatus($instances, $chosen, 'ok')
+        if(updated) $instances = updated
     })
     fetcher.on('err', err => {
         console.log('search:fetchError', err, 'dev')
         loading = false
         error = err
-        const updated = instanceFailedRequest($instances, $chosen)
+        const updated = instanceRequestStatus($instances, $chosen, 'fail')
         if(updated) $instances = updated
         retry = true
     })
