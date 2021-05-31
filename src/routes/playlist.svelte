@@ -25,10 +25,12 @@
     let videoAPI
     let videoContainer
     let active = 0
+    let initial
+    let innerWidth
 
 
     const getPlaylistID = () => {
-        playlistID = $page.query.get('list')
+        if(playlistID !== $page.query.get('list')) playlistID = $page.query.get('list')
         isPlaylistIDvalid = validatePlaylistID(playlistID)
     }
 
@@ -70,8 +72,8 @@
 
     const runFetcher = (instance, resourceID, what) => {
         if(!instance || !what) return
-        if(what === 'playlist' && !isPlaylistIDvalid) return
-        if(what === 'video' && !validateVideoID(resourceID)) return
+        if(what === 'playlist' && !isPlaylistIDvalid) return playlistError = 'invalid playlistID'
+        if(what === 'video' && !validateVideoID(resourceID)) return videoError = 'invalid videoID'
 
         fetcher.what = what
         fetcher.instance = instance
@@ -85,6 +87,8 @@
         runFetcher($chosen, currentVideo, 'video')
     }
 
+    const updateHeight = windowWidth => initial = videoContainer ? videoContainer.offsetHeight : 0
+
     onMount(() => getPlaylistID())
     afterUpdate(() => getPlaylistID())
 
@@ -94,7 +98,11 @@
         $chosen = chooseInstance($instances)
         runFetcher($chosen, playlistID, 'playlist')
     }
+    $: if(!initial && !loadingVideo && innerWidth) initial = videoContainer ? videoContainer.offsetHeight : 0
+    $: updateHeight(innerWidth)
 </script>
+
+<svelte:window bind:innerWidth={innerWidth} />
 
 {#if isPlaylistIDvalid}
     <div class="container">
@@ -112,28 +120,26 @@
                     </div>
                     <div class="wrapper">
                         <div class="video">
-                            {#if currentVideo}
-                                {#if validateVideoID(currentVideo)}
-                                    {#if loadingVideo}
-                                        <AsyncLoading chosen={$chosen} />
-                                    {:else}
-                                        {#if !videoError}
-                                            <div class="top" bind:this={videoContainer}>
-                                                <Video chosen={$chosen} {videoAPI} borderRadiusTop={false} />
-                                            </div>
-                                            <div class="bottom">
-                                                <VideoInfo chosen={$chosen} {videoAPI} />
-                                            </div>
-                                        {:else}
-                                            <AsyncError error={videoError} />
-                                        {/if}   
-                                    {/if}
+                            {#if currentVideo && validateVideoID(currentVideo)}
+                                {#if loadingVideo}
+                                    <AsyncLoading chosen={$chosen} />
                                 {:else}
-                                    ERROR: invalid videoID
+                                    {#if !videoError}
+                                        <div class="top" bind:this={videoContainer}>
+                                            <Video chosen={$chosen} {videoAPI} borderRadiusTop={false} />
+                                        </div>
+                                        <div class="bottom">
+                                            <VideoInfo chosen={$chosen} {videoAPI} />
+                                        </div>
+                                    {:else}
+                                        <AsyncError error={videoError} />
+                                    {/if}   
                                 {/if}
+                            {:else}
+                                ERROR: invalid videoID
                             {/if}
                         </div>
-                        <div class="videoList" style="height:{videoContainer ? videoContainer.offsetHeight : 0}px;overflow:auto;">
+                        <div class="videoList {innerWidth < 600 ? 'mobile' : ''}" style="height: {initial}px; overflow:auto;">
                             <ListOfVideos {active} chosen={$chosen}
                                 videos={playlist.videos}
                                 aktiv={playlist.videos.findIndex(x => x.videoId === currentVideo)}

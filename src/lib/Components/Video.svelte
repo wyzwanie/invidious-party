@@ -13,7 +13,7 @@
 
     onMount(() => {
         player = new Plyr('#player', {
-            debug: true,
+            // debug: true,
             iconUrl: '/plyr.svg',
             blankVideo: '/blankVideo.mp4'
         })
