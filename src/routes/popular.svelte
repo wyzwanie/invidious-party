@@ -1,7 +1,7 @@
 <script>
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, Fetcher, instanceFailedRequest, log } from '$lib/helper'
+    import { chooseInstance, Fetcher, filterTable, instanceFailedRequest, log } from '$lib/helper'
     
     import AsyncError from '$lib/Components/AsyncError.svelte'
 	import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
@@ -13,13 +13,14 @@
     let popular
     let loading
     let searchTerm
+    let oryginalPopular
 
     const fetcher = new Fetcher($chosen, `/popular/?fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
     fetcher.on('start', () => loading = true)
     fetcher.on('ok', data => {
         error = false
         loading = false
-        popular = data
+        popular = oryginalPopular = data
     })
     fetcher.on('err', err => {
         loading = false
@@ -43,14 +44,26 @@
         runFetcher($chosen)
     }
 
-    const sortOptions = ['default', 'most views', 'least views', 'shortest', 'newest', 'oldest']
+    const sortOptions = ['default', 'most views', 'least views', 'shortest', 'longest', 'newest', 'oldest']
     const searchOptions = ['all', 'title', 'author']
 </script>
 
 <div class="wrapper">
     <div class="filters">
-        <Filter label="Sort by:" selected=default options={sortOptions} />
-        <Filter label="Search by:" options={searchOptions} placeholder="search..." on:input={e => searchTerm = e.detail} search margin />
+        <Filter label="Sort by:" selected=default options={sortOptions} on:change={e => {
+            popular = oryginalPopular
+            popular = popular.sort(filterTable[e.detail])
+        }} />
+        <Filter label="Search by:" options={searchOptions} placeholder="search..." on:input={e => {
+            popular = oryginalPopular
+            searchTerm = e.detail
+            if(searchTerm === '') return
+            let result = []
+            for(let item of popular) {
+                if(item.title.toLowerCase().includes(searchTerm) || item.author.toLowerCase().includes(searchTerm)) result.push(item)
+            }
+            popular = result
+            }} search margin />
     </div>
 
     {#if loading}

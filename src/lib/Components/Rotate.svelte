@@ -9,7 +9,7 @@
     const sendRotate = async () => {
         dispatch('rotate')
         rotate = true
-        await sleep(1000)
+        await sleep(600)
         rotate = false
     }
 
@@ -46,7 +46,7 @@
     fill: var(--text--50);
     width: 32px;
     cursor: pointer;
-    transition: 1s;
+    transition: 0.6s;
 }
 .refresh svg.rotate {
     transform: rotate(360deg);

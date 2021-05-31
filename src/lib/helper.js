@@ -179,7 +179,7 @@ export const validateChannelID = channelID => {
     return pattern.test(channelID)
 }
 export const validatePlaylistID = playlistID => {
-    const pattern = /^([A-Za-z0-9_\-]{34})$/
+    const pattern = /^([A-Za-z0-9_\-]{12,})$/
     return pattern.test(playlistID)
 }
 // export const sortThings = (a, b) => {
@@ -258,4 +258,13 @@ export const instanceFailedRequest = (instances, chosen) => {
     instances[index][1].failedRequests++
     instances[index][1].lastFailedRequest = new Date().getTime()
     return instances
+}
+
+export const filterTable = {
+    'most views': (a, b) => b.viewCount - a.viewCount,
+    'least views': (a, b) => a.viewCount - b.viewCount,
+    shortest: (a, b) => a.lengthSeconds - b.lengthSeconds,
+    longest: (a, b) => b.lengthSeconds - a.lengthSeconds,
+    newest: (a, b) => b.published - a.published,
+    oldest: (a, b) => a.published - b.published
 }

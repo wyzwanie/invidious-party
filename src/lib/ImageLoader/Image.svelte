@@ -22,12 +22,15 @@
 </script>
 
 <img {src} {alt} class:loaded bind:this={thisImage} loading="lazy" on:error={replaceImage} />
-
 {#if !loaded}
     <svg class:loaded viewBox="0 0 {size.split('x')[0]} {size.split('x')[1]}"><rect width="100%" height="100%" fill="var(--text-100)"/></svg>
 {/if}
 
+
 <style>
+
+
+    
 svg {
     height: auto;
     transition: all 0.3s ease-out;
@@ -53,6 +56,13 @@ img {
     height: 0;
     opacity: 0;
     transition: opacity 0.6s ease-out;
+}
+img:after {
+    display: block;
+    content: "";
+    width: 100%;
+    padding-top: 56.25%;
+    background-color: rgba(0,0,0,0.1);
 }
 img.loaded {
     height: 100%;

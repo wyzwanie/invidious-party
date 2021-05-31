@@ -44,8 +44,8 @@
 .slider:before {
     position: absolute;
     padding: 3px;
-    height: 16px;
-    width: 16px;
+    height: 22px;
+    width: 22px;
     left: 2px;
     bottom: 2px;
     transition: .4s;
@@ -58,7 +58,7 @@ input:focus + .slider {
     box-shadow: 0 0 1px var(--accent);
 }
 input:checked + .slider:before {
-    transform: translateX(1.236em);
+    transform: translateX(18px);
 }
 .slider.round {
     border-radius: 3em;

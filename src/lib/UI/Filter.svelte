@@ -12,9 +12,10 @@
     export let flex = 1
 
     $: dispatch('change', selected)
+    $: if(value === '') dispatch('input', value)
 </script>
 
-<div class="wrapper" class:margin style="flex: {flex}">
+<div class="wrapper" class:margin style="flex: {flex}; position: relative">
     <div class="label">{label}</div>
     <div class="dropdown">
         <select bind:value={selected}>
@@ -41,7 +42,10 @@
         <input type="text" placeholder={placeholder}
             on:input={() => dispatch('input', value)} bind:value={value}
         />
-    {/if}
+        {#if value}
+            <div class="clear" on:click={() => {value = '';dispatch('input', value)}}>X</div>
+        {/if}
+{/if}
 </div>
 
 <style>
@@ -122,5 +126,12 @@ input:focus {
     .wrapper {
         margin-left: 0;
     }
+}
+.clear {
+    position: absolute;
+    right: 11px;
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: bold;
 }
 </style>

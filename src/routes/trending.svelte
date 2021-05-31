@@ -1,7 +1,7 @@
 <script>
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, Fetcher, instanceFailedRequest, log } from '$lib/helper'
+    import { chooseInstance, Fetcher, filterTable, instanceFailedRequest, log } from '$lib/helper'
 
     import countryCodes from '$lib/iso3166countryCodes'
     
@@ -17,12 +17,14 @@
     let country = 'US'
     let type = 'Default'
     let trending
+    let oryginalTrending
+    let searchTerm
 
     const fetcher = new Fetcher($chosen, `/trending/?region=${country}&type=${type}&fields=type,title,videoId,author,authorId,viewCount,published,lengthSeconds`)
     fetcher.on('start', () => loading = true)
     fetcher.on('ok', data => {
         error = loading = false
-        trending = data
+        trending = oryginalTrending = data
     })
     fetcher.on('err', err => {
         log('trending:fetch', err, 'dev')
@@ -47,7 +49,7 @@
         runFetcher($chosen, country, type)
     }
 
-    const sortOptions = ['default', 'most views', 'least views', 'shortest', 'newest', 'oldest']
+    const sortOptions = ['default', 'most views', 'least views', 'shortest', 'longest', 'newest', 'oldest']
     const typeOptions = ['Default', 'Music', 'Gaming', 'Movies']
     const srchOptions = ['all', 'title', 'author']
 </script>
@@ -56,8 +58,20 @@
     <div class="filters">
         <Filter label="Country:" selected={country} options={countryCodes}  on:change={e => country = e.detail} flex=2 />
         <Filter label="Type:" selected={type} options={typeOptions}  on:change={e => type = e.detail} margin />
-        <Filter label="Sort by:" selected=default options={sortOptions} margin />
-        <Filter label="Search by:" selected=all options={srchOptions} placeholder="search..." on:input={e => console.log(e)} search margin flex=2 />
+        <Filter label="Sort by:" selected=default options={sortOptions} on:change={e => {
+            trending = oryginalTrending
+            trending = trending.sort(filterTable[e.detail])
+        }} margin />
+        <Filter label="Search by:" selected=all options={srchOptions} placeholder="search..." on:input={e => {
+            trending = oryginalTrending
+            searchTerm = e.detail
+            if(searchTerm === '') return
+            let result = []
+            for(let item of trending) {
+                if(item.title.toLowerCase().includes(searchTerm) || item.author.toLowerCase().includes(searchTerm)) result.push(item)
+            }
+            trending = result
+            }} search margin flex=2 />
     </div>
 
     {#if loading}
