@@ -1,95 +1,109 @@
 <script>
-    import { createEventDispatcher, onMount, afterUpdate } from 'svelte'
+    import { createEventDispatcher, onMount } from 'svelte'
     import { goto } from '$app/navigation'
     import { page } from '$app/stores'
     
     import { version } from '$lib/config'
-    import { searchQuery } from '$lib/Stores/memoryStore'
+    import { chosen, searchQuery } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, log } from '$lib/helper'
+    import { chooseInstance, Fetcher, instanceRequestStatus } from '$lib/helper'
 
+    import Loading from '$lib/UI/Loading.svelte'
     import Rotate from '$lib/Components/Rotate.svelte'
     import Toggle from '$lib/UI/Toggle.svelte'
     import SettingsIcon from '$lib/Icons/SettingsIcon.svelte'
 
-    export let chosen
     export let searchTerm
     export let consent
 
     const dispatch = createEventDispatcher()
 
     let retry
-    let controller
-    let signal
-    let suggestions
+    let suggestions = []
+    let loading
+    let error
+    let component
     
-let counter = 0
+    const fetcher = new Fetcher($chosen, `/search/suggestions/?q=${searchTerm}`)
+    fetcher.on('start', () => loading = true)
+    fetcher.on('ok', result => {
+        error = loading = false
+        suggestions = result.suggestions
+        const updated = instanceRequestStatus($instances, $chosen, 'ok')
+        if(updated) $instances = updated
+    })
+    fetcher.on('err', err => {
+        loading = false
+        error = err
+        const updated = instanceRequestStatus($instances, $chosen, 'fail')
+        if(updated) $instances = updated
+        retry = true
+    })
+
+    const runFetcher = (instance, query) => {
+        if(!instance || !query) return suggestions = []
+        fetcher.instance = instance
+        fetcher.url = `/search/suggestions/?q=${query}`
+        fetcher.go()
+    }
+
+////
+$: if(typeof document !== 'undefined') {
+        if (suggestions.length) ['click', 'touchstart', 'keyup'].forEach(event =>
+                document.addEventListener(event, handleDocumentClick, true))
+        else ['click', 'touchstart', 'keyup'].forEach(event =>
+                document.removeEventListener(event, handleDocumentClick, true))
+	}
+
+	const handleDocumentClick = e => {
+		if(e && (e.which === 3 || (e.type === 'keyup' && e.which !== 9))) return
+		if(component && component.contains(e.target) && component !== e.target && (e.type !== 'keyup' || e.which === 9)) return
+		suggestions = []
+	}
 
     const handleSearch = async e => {
         if(e.keyCode === 13) {
             if($page.path !== '/playlists') await goto(`/search?q=${searchTerm}`)
-            else return $searchQuery = searchTerm
-        } else {
-            suggestions = await fetchSuggestions(null, searchTerm)
-        }
+            // else return $searchQuery = searchTerm
+        } else if (e.keyCode === 27) suggestions = []
     }
-
-    const fetchSuggestions = async (instance, term) => {
-        if(!term) return { suggestions: [] }
-if(counter > 50) return
-        if(controller !== undefined) controller.abort()
-        controller = new AbortController
-        signal = controller.signal
-        
-        try {
-            if(!instance) instance = chooseInstance($instances)
-            const req = await fetch(`https://${chooseInstance($instances)}/api/v1/search/suggestions/?q=${term}`, { signal })
-            const res = await req.json()
-            return res
-        } catch(err) {
-            counter++
-            // log('suggestions->fetch:error', err, 'dev')
-            // retry = true
-        }
-    }
-
     const chooseSuggestion = suggestion => {
         searchTerm = suggestion
+        suggestions = []
         handleSearch({ keyCode: 13})
-        suggestions = null
     }
 
     onMount(() => searchTerm = $page.query.get('q'))
 
     $: if(retry) {
         retry = false
-        chosen = chooseInstance($instances)
+        runFetcher(chooseInstance($instances), searchTerm)
     }
+    $: runFetcher($chosen, searchTerm)
 </script>
 
 <header>
     <div class="logo">
         invidious.party<span style="font-size: 69%; color: unset;">&nbsp;v{version}</span><br>
-        <span>instance: {#if chosen}<a style="color: white;" href="{chosen}">{chosen}</a>{:else}...initializing...{/if}</span>
+        <span>instance: {#if $chosen}<a style="color: white;" href="{$chosen}">{$chosen}</a>{:else}...initializing...{/if}</span>
         <br><span>mode: {consent ? consent : 'no consent'}</span>
     </div>
     <div class="search">
-        <input type="text" bind:value={searchTerm} placeholder="search" on:keyup={handleSearch}>
-        <div class="suggestions">
-            <!-- {#await fetchSuggestions(chosen, searchTerm)}
-                suggestions<br>
-                ... loading ...
-            {:then s} -->
-                {#if suggestions}
-                    {#each suggestions.suggestions as suggestion}
+        <input type="text" bind:value={searchTerm} placeholder="search" on:keydown={handleSearch}>
+        <div class="suggestions" bind:this={component}>
+            {#if loading}
+                <Loading />
+            {:else}
+                {#if !error}
+                    {#each suggestions as suggestion}
                         <div class="s" on:click={() => chooseSuggestion(suggestion)}>
                             {suggestion}
                         </div>
                     {/each}
+                {:else}
+                    ERROR: {error}
                 {/if}
-            <!-- {:catch error}
-                ERROR: {error}
-            {/await} -->
+            {/if}
         </div>
     </div>
     <div class="menu">

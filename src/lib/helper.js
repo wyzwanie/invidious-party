@@ -85,80 +85,62 @@ export const secToMin = seconds => {
     return `${newMinutes}:${newSeconds}`
 }
 
-export const howLongAgo = timestamp => {
-    const now = Math.floor(new Date().getTime()/1000)
-    const diff = now - timestamp
+export function howLongAgo(timestamp) {
+    let diff = Math.floor(new Date().getTime()/1000) - timestamp
+    let part = 0
+    let prefix = ''
+    let suffix = ''
 
-    const minute = 60
-    const hour = minute * 60
-    const day = hour * 24
-    const week = day * 7
-    const month = day * 30
-    const year = day * 365
+    if(diff > 0) {
+        prefix = ''
+        suffix = ' ago'
+    } else {
+        prefix = 'in '
+        suffix = ''
+    }
 
-    let result
-    
-    if(diff < 30) result = `just then`
-    else if(diff < minute) result = `${diff} seconds ago`
-    else if(diff < 2 * minute) result = `$a minute ago`
-    else if(diff < hour) result = `${Math.floor(diff / minute)} minutes ago`
-    else if(Math.floor(diff / hour) == 1) result = `1 hour ago`
-    else if(diff < (day * 2)) result = `${Math.floor(diff / hour)} hours ago`
-    // else if(diff < day * 2) result = 'yesterday'
-    else if(diff < month * 2) result = `${Math.floor(diff / day)} days ago`
-    // else if(diff < 2 * month) result = `last month`
-    else if(diff < year) result = `${Math.floor(diff / month)} months ago`
-    else if(diff < year * 2) result = `${Math.floor(diff / month)} months ago`
-    else if(diff < year * 100) result = `${Math.floor(diff / year)} years ago`
+    diff = Math.abs(diff)
+  
+    if(diff < 2) return `${prefix}a moment${suffix}`
+    if(diff < 5) return `${prefix}moments${suffix}`
+    if(diff < 60) return `${prefix}${diff} seconds${suffix}`
+  
+    if(diff < 120) `${prefix}a minute${suffix}`
+    if(diff < 3600) {
+        while (diff >= 60) { diff -= 60; part += 1 }
+        return `${prefix}${part} minutes${suffix}`
+    }
+  
+    if(diff < 7200) return `${prefix}an hour${suffix}`
+    if(diff < 86400) {
+        while (diff >= 3600) { diff -= 3600; part += 1 }
+        return `${prefix}${part} hours${suffix}`
+    }
+  
+    if(diff < 172800) return `${prefix}a day${suffix}`
+    if(diff < 604800) {
+        while (diff >= 172800) { diff -= 172800; part += 1 }
+        return `${prefix}${part} days${suffix}`
+    }
+  
+    if(diff < 1209600) return `${prefix}a week${suffix}`
+    if(diff < 2592000) {
+        while (diff >= 604800) { diff -= 604800; part += 1 }
+        return `${prefix}${part} weeks${suffix}`
+    }
+  
+    if(diff < 5184000) return `${prefix}a month${suffix}`
+    if(diff < 31536000) {
+      while (diff >= 2592000) { diff -= 2592000; part += 1 }
+      return `${prefix}${part} months${suffix}`
+    }
 
-    return result
-}
-
-// export function howLongAgo(seconds) {
-//     let ago = Math.floor(new Date().getTime()/1000) - seconds
-//     var part = 0;
-  
-//     if (ago < 2) { return "a moment ago"; }
-//     if (ago < 5) { return "moments ago"; }
-//     if (ago < 60) { return ago + " seconds ago"; }
-  
-//     if (ago < 120) { return "a minute ago"; }
-//     if (ago < 3600) {
-//       while (ago >= 60) { ago -= 60; part += 1; }
-//       return part + " minutes ago";
-//     }
-  
-//     if (ago < 7200) { return "an hour ago"; }
-//     if (ago < 86400) {
-//       while (ago >= 3600) { ago -= 3600; part += 1; }
-//       return part + " hours ago";
-//     }
-  
-//     if (ago < 172800) { return "a day ago"; }
-//     if (ago < 604800) {
-//       while (ago >= 172800) { ago -= 172800; part += 1; }
-//       return part + " days ago";
-//     }
-  
-//     if (ago < 1209600) { return "a week ago"; }
-//     if (ago < 2592000) {
-//       while (ago >= 604800) { ago -= 604800; part += 1; }
-//       return part + " weeks ago";
-//     }
-  
-//     if (ago < 5184000) { return "a month ago"; }
-//     if (ago < 31536000) {
-//       while (ago >= 2592000) { ago -= 2592000; part += 1; }
-//       return part + " months ago";
-//     }
-  
-//     if (ago < 1419120000) { // 45 years, approximately the epoch
-//       return "more than year ago";
-//     }
-  
-//     // TODO pass in Date.now() and ms to check for 0 as never
-//     return "never";
-//   }
+    if(diff < 6307200) return `${prefix}a year${suffix}`
+    if(diff < Infinity) {
+        while (diff >= 31536000) { diff -= 31536000; part += 1}
+        return `${prefix}${part} years${suffix}`
+    }
+  }
 
 
 export const getAuthorThumbnail = (chosen, authorThumbnails) => {
