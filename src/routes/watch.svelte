@@ -3,7 +3,7 @@
 
 	import { chosen } from '$lib/Stores/memoryStore'
 	import { instances } from '$lib/Stores/localStore'
-	import { chooseInstance, Fetcher, instanceFailedRequest, log, validateVideoID } from '$lib/helper'
+	import { chooseInstance, Fetcher, instanceRequestStatus, log, validateVideoID } from '$lib/helper'
 
     import AsyncError from '$lib/Components/AsyncError.svelte'
     import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
@@ -24,12 +24,14 @@
     fetcher.on('ok', data => {
         error = loading = false
         videoAPI = data
+        const updated = instanceRequestStatus($instances, $chosen, 'ok')
+        if(updated) $instances = updated
     })
     fetcher.on('err', err => {
         log('watch:fetch', err, 'dev')
         loading = false
         error = err
-        const updated = instanceFailedRequest($instances, $chosen)
+        const updated = instanceRequestStatus($instances, $chosen, 'fail')
         if(updated) $instances = updated
         retry = true
     })

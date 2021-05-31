@@ -1,127 +1,151 @@
 <script>
     import { onMount, afterUpdate } from 'svelte'
     import { page } from '$app/stores'
+
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, validatePlaylistID } from '$lib/helper'
+    import { chooseInstance, Fetcher, instanceRequestStatus, validatePlaylistID, validateVideoID } from '$lib/helper'
 
     import AsyncError from '$lib/Components/AsyncError.svelte'
     import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
     import ListOfVideos from '$lib/Components/ListOfVideos.svelte'
     import Video from '$lib/Components/Video.svelte'
     import VideoInfo from '$lib/Components/VideoInfo.svelte'
-
-    let active = 0
+    
+    let loadingPlaylist
+    let loadingVideo
+    let playlistError
+    let videoError
+    let retry = false
     let currentVideo
-    let videoAPI
     let playlistID
     let isPlaylistIDvalid
-    let retry = false
+    
+    let playlist
+    let videoAPI
     let videoContainer
+    let active = 0
+
 
     const getPlaylistID = () => {
         playlistID = $page.query.get('list')
         isPlaylistIDvalid = validatePlaylistID(playlistID)
     }
 
-    const fetchPlaylist = async (instance, playlistID) => {
-        if(!instance) instance = chooseInstance($instances)
-
-        try {
-            console.log('start')
-            const req = await fetch(`https://${instance}/api/v1/playlists/${playlistID}`)
-            const res = await req.json()
-
-            if(res.playlistId && res.videos) {
-                currentVideo = res.videos[0].videoId
-                videoAPI = await fetchVideo(instance, currentVideo)
-                return res
-            } else {
-                throw new Error(res)
-            }
-        } catch(err) {
-            const index = $instances.findIndex(x => x[0] === instance)
-            if(index < 0) return retry = true
-            $instances[index][1].failedRequests++
-            $instances[index][1].lastFailedRequest = new Date().getTime()
-            $instances = $instances
-            retry = true
-            throw new Error(err)
+    const handleError = err => {
+        if(fetcher.what === 'video') {
+            loadingVideo = false
+            videoError = err
         }
+        if(fetcher.what === 'playlist') {
+            loadingPlaylist = false
+            playlistError = err
+        }
+        const updated = instanceRequestStatus($instances, $chosen, 'fail')
+        if(updated) $instances = updated
+        retry = true
     }
 
-	const fetchVideo = async (instance, videoID) => {
-        if(!instance) instance = chooseInstance($instances)
+    const fetcher = new Fetcher($chosen, ``)
+    fetcher.on('start', url => {
+        if(!url) return
+        if(fetcher.what === 'video') loadingVideo = true
+        if(fetcher.what === 'playlist') loadingPlaylist = true
+    })
+    fetcher.on('ok', result => {
+        if(fetcher.what === 'video') {
+            loadingVideo = videoError = false
+            videoAPI = result
+        }
+        if(fetcher.what === 'playlist') {
+            loadingPlaylist = playlistError = false
+            currentVideo = result.videos[0].videoId
+            runFetcher($chosen, currentVideo, 'video')
+            playlist = result
+        }
+        const updated = instanceRequestStatus($instances, $chosen, 'ok')
+        if(updated) $instances = updated
+    })
+    fetcher.on('err', err => handleError(err))
 
-        try {
-            const req = await fetch(`https://${instance}/api/v1/videos/${videoID}?fields=error,videoId,title,descriptionHtml,published,keywords,viewCount,likeCount,dislikeCount,paid,premium,isFamilyFriendly,author,authorId,authorThumbnails,lengthSeconds,allowRatings,rating,isListed,liveNow,dashUrl,adaptiveFormats,formatStreams,captions,recommendedVideos,subCountText`) //
-            const res = await req.json()
-            
-            if(res.videoId) return res
-            else throw new Error('no kurwa???')
-		} catch(err) {
-            const index = $instances.findIndex(x => x[0] === instance)
-            if(index < 0) return retry = true
-            $instances[index][1].failedRequests++
-            $instances[index][1].lastFailedRequest = new Date().getTime()
-            $instances = $instances
-            retry = true
-            throw new Error(err)
-		}
-	}
+    const runFetcher = (instance, resourceID, what) => {
+        if(!instance || !what) return
+        if(what === 'playlist' && !isPlaylistIDvalid) return
+        if(what === 'video' && !validateVideoID(resourceID)) return
+
+        fetcher.what = what
+        fetcher.instance = instance
+        if(fetcher.what === 'video') fetcher.url = `/videos/${resourceID}?fields=error,videoId,title,descriptionHtml,published,keywords,viewCount,likeCount,dislikeCount,paid,premium,isFamilyFriendly,author,authorId,authorThumbnails,lengthSeconds,allowRatings,rating,isListed,liveNow,dashUrl,adaptiveFormats,formatStreams,captions,recommendedVideos,subCountText`
+        if(fetcher.what === 'playlist') fetcher.url = `/playlists/${resourceID}`
+        fetcher.go()
+    }
 
     const updateCurrentVideo = async e => {
         currentVideo = e.detail
-        videoAPI = await fetchVideo($chosen, currentVideo)
+        runFetcher($chosen, currentVideo, 'video')
     }
 
     onMount(() => getPlaylistID())
     afterUpdate(() => getPlaylistID())
 
+    $: runFetcher($chosen, playlistID, 'playlist')
     $: if(retry) {
         retry = false
         $chosen = chooseInstance($instances)
+        runFetcher($chosen, playlistID, 'playlist')
     }
 </script>
 
 {#if isPlaylistIDvalid}
     <div class="container">
-        {#await fetchPlaylist($chosen, playlistID)}
+        {#if loadingPlaylist}
             <AsyncLoading chosen={$chosen} />
-        {:then playlist}
-            <div class="playlist">
-                <!-- <pre>
-                    pre: {JSON.stringify(playlist, null, 4)}
-                </pre> -->
-                <div class="info">
-                    <h3>{playlist.title}</h3>
-                    <h4><span>by:</span> {playlist.author}</h4>
-                </div>
-                <div class="wrapper">
-                    <div class="video">
-                        {#if currentVideo}
-                            {#key currentVideo}
-                                <div class="top" bind:this={videoContainer}>
-                                    <Video chosen={$chosen} {videoAPI} borderRadiusTop={false} />
-                                </div>
-                                <div class="bottom">
-                                    <VideoInfo chosen={$chosen} {videoAPI} />
-                                </div>
-                            {/key}
-                        {/if}
+        {:else}
+            {#if !playlistError}
+                <div class="playlist">
+                    <!-- <pre>
+                        pre: {JSON.stringify(playlist, null, 4)}
+                    </pre> -->
+                    <div class="info">
+                        <h3>{playlist.title}</h3>
+                        <h4><span>by:</span> {playlist.author}</h4>
                     </div>
-                    <div class="videoList" style="height:{videoContainer ? videoContainer.offsetHeight-1 : 0}px;overflow:auto;">
-                        <ListOfVideos {active} chosen={$chosen}
-                            videos={playlist.videos}
-                            aktiv={playlist.videos.findIndex(x => x.videoId === currentVideo)}
-                            on:play={updateCurrentVideo}
-                        />
+                    <div class="wrapper">
+                        <div class="video">
+                            {#if currentVideo}
+                                {#if validateVideoID(currentVideo)}
+                                    {#if loadingVideo}
+                                        <AsyncLoading chosen={$chosen} />
+                                    {:else}
+                                        {#if !videoError}
+                                            <div class="top" bind:this={videoContainer}>
+                                                <Video chosen={$chosen} {videoAPI} borderRadiusTop={false} />
+                                            </div>
+                                            <div class="bottom">
+                                                <VideoInfo chosen={$chosen} {videoAPI} />
+                                            </div>
+                                        {:else}
+                                            <AsyncError error={videoError} />
+                                        {/if}   
+                                    {/if}
+                                {:else}
+                                    ERROR: invalid videoID
+                                {/if}
+                            {/if}
+                        </div>
+                        <div class="videoList" style="height:{videoContainer ? videoContainer.offsetHeight : 0}px;overflow:auto;">
+                            <ListOfVideos {active} chosen={$chosen}
+                                videos={playlist.videos}
+                                aktiv={playlist.videos.findIndex(x => x.videoId === currentVideo)}
+                                on:play={updateCurrentVideo}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
-        {:catch error}
-            <AsyncError {error} />
-        {/await}
+            {:else}
+                <AsyncError error={playlistError} />
+            {/if}
+        {/if}
     </div>
 {:else}
     ERROR: invalid playlistID

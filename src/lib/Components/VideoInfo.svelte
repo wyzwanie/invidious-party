@@ -12,9 +12,8 @@
     export let chosen
     export let videoAPI
 
-    let isOpen = false
     let isMore = false
-
+    let description = {}
 
     const replaceURLs = text => {
         const urlRegex = /(((https?:\/\/)|(www\.))[^\s]+)/g
@@ -92,13 +91,19 @@
             </div>
             <Subscribe channelID={videoAPI.authorId} subCount={videoAPI.subCountText} />
         </div>
-        <div class="description" class:isMore>
+        <div class="description" class:isMore bind:this={description}>
             <p>
-                {@html parseDescription(videoAPI.description)}
+                {#if videoAPI.description?.length > 0}
+                    {@html parseDescription(videoAPI.description)}
+                {:else}
+                    no description
+                {/if}
             </p>
-            <div class="readMore" on:click={() => isMore = !isMore}>
-                read {isMore ? 'less' : 'more'} ↕
-            </div>
+            {#if description.scrollHeight > 99}
+                <div class="readMore" on:click={() => isMore = !isMore}>
+                    read {isMore ? 'less' : 'more'} ↕
+                </div>
+            {/if}
         </div>
     </div>
 {:else}

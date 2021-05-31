@@ -2,7 +2,8 @@
     import Queue from 'async-await-queue'
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances, SUBs, SUBcache, SUBsUpdatedAt, SUBcacheUpdatedAt, SUBsRefreshedAt } from '$lib/Stores/localStore'
-    // import { sortThings } from '$lib/helper'
+
+    import { chooseInstance, instanceRequestStatus } from '$lib/helper'
 
     import Videos from '$lib/Components/Videos.svelte'
     import ProgressBar from '$lib/UI/ProgressBar.svelte'
@@ -25,27 +26,6 @@
     let inProgress = 0
 
     let q
-    let ynstancez = $instances.map(x => x[1].enabled ? x[0] : '')
-    const prepareInstances = instances => {
-        const wynik = {}
-        instances.forEach(x => wynik[x] = [0,0])
-        return wynik
-    }
-    let ynstancezStatus = prepareInstances(ynstancez)
-    const getGudInstance = (instancesFail) => {
-        const wynik = []
-        Object.keys(instancesFail).forEach(key => {
-            const total = instancesFail[key][0] + instancesFail[key][1]
-            const successRatio = total > 0 ? instancesFail[key][1] / total : 0
-            // console.log(successRatio)
-            if(total > 0) {
-                if(instancesFail[key][0] < 10 && instancesFail[key][1] > 0 && key) wynik.push(key)
-            } else wynik.push(key)
-        })
-        const a = wynik[Math.floor(Math.random() * wynik.length)]
-        // console.log('instancja', a, 'fejli', instancesFail[a])
-        return a
-    }
     
     const processResult = res => {
         $SUBsRefreshedAt = new Date().getTime()
@@ -82,38 +62,44 @@
         $SUBcache = wynikk
     }
     
-    const fetchSubscriptions = async (tasks, instances) => {
+    const fetchSubscriptions = async tasks => {
         toDo = [...tasks]
         q = []
         for (let channelID of toDo) {
-            // const instance = Math.random() > 0.5 ? 'yewtu.be' : 'vid.puffyan.us'
             const me = Symbol()
-            const instance = getGudInstance(instances)
+            const instance = chooseInstance($instances)
             q.push(SUBque.wait(me, -1)
             .then(async () => {
-                
-                // setTimeout(async () => {
                 try {
-                    const controller = new AbortController()
-                    const id = setTimeout(() => controller.abort(), 3000)
                     inProgress++
                     requestCount++
-                        const req = await fetch(`https://${instance}/api/v1/channels/${channelID}?fields=authorId,author,latestVideos`, { signal: controller.signal })
-                        const res = await req.json()
-                        clearTimeout(id)
-                        inProgress--
-                        if(res.authorId) {
-                            toDo = toDo.filter(x => x !== res.authorId)
-                            ynstancezStatus[instance][1]++
-                            const exist = result.findIndex(x => x.authorId === res.authorId) > -1
-                            if(!exist) {
-                                result = [...result, res]
-                                processResult(result)
-                            }
+
+                    const controller = new AbortController()
+                    const id = setTimeout(() => controller.abort(), 3000)
+                    const req = await fetch(`https://${instance}/api/v1/channels/${channelID}?fields=authorId,author,latestVideos`, { signal: controller.signal })
+                    const res = await req.json()
+                    inProgress--
+                    clearTimeout(id)
+
+                    if(res.authorId) {
+                        toDo = toDo.filter(x => x !== res.authorId)
+                        
+                        const updated = instanceRequestStatus($instances, instance, 'ok')
+                        if(updated) $instances = updated
+
+                        const exist = result.findIndex(x => x.authorId === res.authorId) > -1
+                        if(!exist) {
+                            result = [...result, res]
+                            processResult(result)
                         }
+                    }
+
                     } catch(err) {
                         console.log('err', err)
-                        ynstancezStatus[instance][0]++
+                        
+                        const updated = instanceRequestStatus($instances, instance, 'fail')
+                        if(updated) $instances = updated
+
                         failCount++
                         failedTasks = [...failedTasks, channelID]
                     } finally {
@@ -130,7 +116,7 @@
 
     let counter = 0
 
-    fetchSubscriptions(Youtube, ynstancezStatus)
+    fetchSubscriptions(Youtube)
     $: if(done) {
         counter++
         done = false
@@ -140,9 +126,9 @@
         console.log('result', result)
         console.log('Youtube', Youtube)
         console.log('counter', counter)
-        console.log('ynstancezStatus', ynstancezStatus)
+        console.log('ynstancezStatus', $instances)
         console.log('--- END nextRound ---')
-        if(toDo.length > 0 && counter < 5) fetchSubscriptions(toDo, ynstancezStatus)
+        if(toDo.length > 0 && counter < 5) fetchSubscriptions(toDo)
     }
     const test = instances => {
         return instances.map(x => x[0])[Math.floor(Math.random()*instances.length)]

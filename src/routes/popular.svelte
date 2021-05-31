@@ -1,7 +1,7 @@
 <script>
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, Fetcher, filterTable, instanceFailedRequest, log } from '$lib/helper'
+    import { chooseInstance, Fetcher, filterTable, instanceRequestStatus, log } from '$lib/helper'
     
     import AsyncError from '$lib/Components/AsyncError.svelte'
 	import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
@@ -21,12 +21,14 @@
         error = false
         loading = false
         popular = oryginalPopular = data
+        const updated = instanceRequestStatus($instances, $chosen, 'ok')
+        if(updated) $instances = updated
     })
     fetcher.on('err', err => {
         loading = false
         error = err
         log('popular:fetch', err, 'dev')
-        const updated = instanceFailedRequest($instances, $chosen)
+        const updated = instanceRequestStatus($instances, $chosen, 'fail')
         if(updated) $instances = updated
         retry = true
     })

@@ -8,7 +8,7 @@
     export let borderRadiusTop = true
     
     let player = {}
-    let dashSource = videoAPI.dashUrl || false
+    // let dashSource = videoAPI.dashUrl || false
     let dash = false
 
     onMount(() => {

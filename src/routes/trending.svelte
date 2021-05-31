@@ -1,7 +1,7 @@
 <script>
     import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
-    import { chooseInstance, Fetcher, filterTable, instanceFailedRequest, log } from '$lib/helper'
+    import { chooseInstance, Fetcher, filterTable, instanceRequestStatus, log } from '$lib/helper'
 
     import countryCodes from '$lib/iso3166countryCodes'
     
@@ -25,12 +25,14 @@
     fetcher.on('ok', data => {
         error = loading = false
         trending = oryginalTrending = data
+        const updated = instanceRequestStatus($instances, $chosen, 'ok')
+        if(updated) $instances = updated
     })
     fetcher.on('err', err => {
         log('trending:fetch', err, 'dev')
         loading = false
         error = err
-        const updated = instanceFailedRequest($instances, $chosen)
+        const updated = instanceRequestStatus($instances, $chosen, 'fail')
         if(updated) $instances = updated
         retry = true
     })

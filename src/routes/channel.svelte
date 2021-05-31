@@ -1,7 +1,7 @@
 <script>
     import { onMount, afterUpdate } from 'svelte'
 
-    import { chooseInstance, convertCount, Fetcher, getAuthorThumbnail, instanceFailedRequest, log, validateChannelID } from '$lib/helper'
+    import { chooseInstance, convertCount, Fetcher, getAuthorThumbnail, instanceRequestStatus, log, validateChannelID } from '$lib/helper'
 	import { chosen } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
 
@@ -37,7 +37,7 @@
             loadingPlaylst = false
             playlistError = err
         }
-        const updated = instanceFailedRequest($instances, $chosen)
+        const updated = instanceRequestStatus($instances, $chosen, 'fail')
         if(updated) $instances = updated
         retry = true
     }
@@ -56,7 +56,6 @@
         if(fetcher.what === 'playlists') loadingPlaylst = true
     })
     fetcher.on('ok', result => {
-        console.log('here?', result)
         if(fetcher.what === 'videos') {
             loadingChannel = false
             channelError = false
@@ -67,9 +66,11 @@
             playlistError = false
             playlists = result.playlists
         }
+        const updated = instanceRequestStatus($instances, $chosen, 'ok')
+        if(updated) $instances = updated
     })
-
     fetcher.on('err', err => handleError(err, fetcher.what))
+    
     const runFetcher = (instance, channelID, what) => {
         if(!instance || !isChannelIDvalid || !what) return
         if(activeTab === 'videos' && channel) return

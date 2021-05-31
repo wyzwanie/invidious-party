@@ -19,6 +19,7 @@ export const getInstances = async (ynst = undefined) => {
 
                 parsedInstances = [...parsedInstances, [ name, {
                     name,
+                    successRequests: ynst ? ynst[index].successRequests : 0,
                     failedRequests: ynst ? ynst[index].failedRequests : 0,
                     lastFailedRequest: ynst? ynst[index].lastFailedRequest : new Date().getTime(),
                     enabled: ynst ? ynst[index].enabled : true,
@@ -36,31 +37,37 @@ export const getInstances = async (ynst = undefined) => {
     return parsedInstances
 }
 
-// input: parsedInstances, output: chosen
+// input: instances store , output: chosen
 export const chooseInstance = instances => {
     if(!instances || instances.length < 1) return 'oops something went wrong'
     let filteredInstances = []
     for(let i of instances) {
-        // console.log(i[1].failedRequests)
+        const total = i[1].successRequests + i[1].failedRequests
+        const successRatio = total > 0 ? i[1].successRequests / total : 0
+        if(i[1].enabled) {
+            if(total > 0) {
+                if(successRatio > 0.3) filteredInstances.push(i[0])
+            } else {
+                filteredInstances.push(i[0])
+            }
+        }
         // console.log(i[1].enabled && i[i].failedRequests < 11)
-        if(i[1].enabled && i[1].failedRequests <11) filteredInstances.push(i[0])
+        // if(i[1].enabled && i[1].failedRequests <11) filteredInstances.push(i[0])
     }
     if(!filteredInstances.length) return 'no valid instances'
     return filteredInstances[Math.floor(Math.random()*filteredInstances.length)]
 }
 
-//save parameter to localStorage
-export const saveLocal = async storeObject => {
-    const { instances, theme, subscriptions, SUBcache, consent } = storeObject
-    if(consent) localStorage.consent = consent
-    if(instances) {
-        localStorage.instances = JSON.stringify(instances)
-        localStorage.lastInstancesUpdate = new Date().getTime()
+//input: instances store, current chosen, request status, output: updated instances store
+export const instanceRequestStatus = (instances, chosen, status) => {
+    const index = instances.findIndex(x => x[0] === chosen)
+    if(index < 0) return false
+    if(status === 'fail') {
+        instances[index][1].failedRequests++
+        instances[index][1].lastFailedRequest = new Date().getTime()
     }
-    if(subscriptions) localStorage.subscriptions = JSON.stringify(subscriptions)
-    if(theme) localStorage.theme = theme
-    if(SUBcache) localStorage.SUBcache = JSON.stringify(SUBcache)
-    localStorage.lastStoreUpdate = new Date().getTime()
+    if(status === 'ok') instances[index][1].successRequests++
+    return instances
 }
 
 export const convertCount = count => {
@@ -160,13 +167,6 @@ export const getAuthorThumbnail = (chosen, authorThumbnails) => {
     return extracted ? `https://${chosen}/ggpht/ytc/${extracted}` : ''
 }
 
-// export const getQueryString = (field, url) => {
-//     const href = url ? url : window.location.href;
-//     const reg = new RegExp( '[?&]' + field + '=([^]*)', 'i' );
-//     const string = reg.exec(href);
-//     return string ? string[1] : null;
-// }
-
 export const log = (fromQ, msg, env) => env === 'dev' ? console.log(fromQ, msg) : ''
 export const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -182,12 +182,6 @@ export const validatePlaylistID = playlistID => {
     const pattern = /^([A-Za-z0-9_\-]{12,})$/
     return pattern.test(playlistID)
 }
-// export const sortThings = (a, b) => {
-//     if (a > b) return 1
-//     else if (a < b) return -1
-//     else if (a === b) return 0
-// }
-
 
 import { EventEmitter } from 'events'
 
@@ -249,15 +243,6 @@ export class Fetcher extends EventEmitter {
             return err
         }
     }
-}
-
-
-export const instanceFailedRequest = (instances, chosen) => {
-    const index = instances.findIndex(x => x[0] === chosen)
-    if(index < 0) return false
-    instances[index][1].failedRequests++
-    instances[index][1].lastFailedRequest = new Date().getTime()
-    return instances
 }
 
 export const filterTable = {
