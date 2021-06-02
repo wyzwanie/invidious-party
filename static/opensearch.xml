@@ -1,0 +1,8 @@
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    <ShortName>invidious.party</ShortName>
+    <LongName>invidious.party Search</LongName>
+    <Description>Search for videos, channels, and playlists on Invidious</Description>
+    <InputEncoding>UTF-8</InputEncoding>
+    <Image width="48" height="48" type="image/x-icon">https://localhost:3000/favicon.ico</Image>
+    <Url type="text/html" method="get" template="http://localhost:3000/search?q={searchTerms}"/>
+</OpenSearchDescription>

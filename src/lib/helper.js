@@ -51,8 +51,6 @@ export const chooseInstance = instances => {
                 filteredInstances.push(i[0])
             }
         }
-        // console.log(i[1].enabled && i[i].failedRequests < 11)
-        // if(i[1].enabled && i[1].failedRequests <11) filteredInstances.push(i[0])
     }
     if(!filteredInstances.length) return 'no valid instances'
     return filteredInstances[Math.floor(Math.random()*filteredInstances.length)]
@@ -70,6 +68,7 @@ export const instanceRequestStatus = (instances, chosen, status) => {
     return instances
 }
 
+//input: 123456, output: 123.45K
 export const convertCount = count => {
     if(Math.floor(count/1000) < 1000) return `${(count/1000).toFixed(2)}K`
     if(Math.floor(count/1000000) < 1000) return `${(count/1000000).toFixed(2)}M`

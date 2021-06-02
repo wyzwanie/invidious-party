@@ -1,5 +1,5 @@
 <script>
-    import { onMount } from 'svelte'
+    import { onMount, createEventDispatcher } from 'svelte'
     import Plyr from 'plyr'
     import 'plyr/dist/plyr.css'
 
@@ -7,9 +7,13 @@
     export let videoAPI
     export let borderRadiusTop = true
     
+    const dispatch = createEventDispatcher()
+
     let player = {}
     // let dashSource = videoAPI.dashUrl || false
     let dash = false
+
+    let videoHeight
 
     onMount(() => {
         player = new Plyr('#player', {
@@ -67,6 +71,8 @@
         audioOnly = true
     }
     let audioOnly = false
+
+    $: dispatch('height', videoHeight?.offsetHeight)
 </script>
 
 <!-- <svelte:head>
@@ -82,7 +88,7 @@
 
 
 {#if videoAPI && videoAPI.formatStreams}
-    <div class="video-wrapper">
+    <div class="video-wrapper" bind:this={videoHeight}>
     <!-- {#if audioOnly}
         <div class="poster">
             <img src="{`https://${chosen}/vi/${videoAPI.videoId}/maxres.jpg`}" alt="poster" />
