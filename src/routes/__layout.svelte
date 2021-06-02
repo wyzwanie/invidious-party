@@ -1,37 +1,22 @@
 <script>
-    import { page, navigating } from '$app/stores'
     import '../app.css'
-
     import { onDestroy, onMount, afterUpdate } from 'svelte'
-    import { joinRoom } from 'trystero/torrent'
-    import { chosen, peers, party, actions, idsToNames } from '$lib/_memoryStore'
-    // import { party, peers, sendName, getName,  } from '$lib/_partyStore'
-    import { consent, nick, settings, instances, instancesUpdatedAt, SUBsUpdatedAt } from '$lib/_localStore'
-    import { chooseInstance, getInstances, log } from '$lib/_helper'
+    import { joinRoom, selfId } from 'trystero/torrent'
 
-    import Consent from '$lib/Consent.svelte'
-    import Header from '$lib/Header.svelte'
+    import { chosen, peers, party, actions } from '$lib/Stores/memoryStore'
+    import { consent, nick, settings, instances, instancesUpdatedAt, SUBsUpdatedAt } from '$lib/Stores/localStore'
+    import { chooseInstance, getInstances, log } from '$lib/helper'
 
-    let currentPage
-    let searchTerm
-
-    let partyStarted
-
-    const changeTheme = e => {
-        $settings = {
-            ...$settings,
-            theme: e.detail
-        }
-        if(e.detail === 'light') document.documentElement.classList.toggle('light')
-    }
-    const route = () => {
-        currentPage = window.location.pathname
-        if(currentPage.includes('/search')) searchTerm = window.decodeURI(window.location.search.split('=')[1])
-    }
-
+    import Consent from '$lib/Components/Consent.svelte'
+    import Header from '$lib/Layout/Header.svelte'
+    import Loader from '$lib/UI/Loader.svelte'
+	import Sidebar from '$lib/Layout/Sidebar.svelte'
+    
+    let refreshStarted = false
+    let updating = true
 
     const initParty = () => {
-        console.log('init party')
+        log('layout:initParty', 'initializing', 'dev')
         const config = { appId: 'invidious.party' }
         const roomID = 'party'
         try {
@@ -42,98 +27,100 @@
                 chat: $party.makeAction('msg'),
                 watching: $party.makeAction('watching')
             }
-            console.log($actions)
 
-            $actions.name[0]($nick)
+            $actions.name[0]($nick || 'anon')
+
             $party.onPeerJoin(id => {
-                console.log('peer join')
-                $actions.name[0]($nick, id)
+                log('party', 'peer join', 'dev')
+                $actions.name[0]($nick || 'anon', id)
                 if($peers['self'] && $peers['self'].videoID) $actions.watching[0]($peers['self'].videoID, id)
             })
+
             $actions.name[1]((nick, id) => $peers[id] = {...$peers[id], nick })
             $actions.watching[1]((videoID, id) => $peers[id] = {...$peers[id], videoID })
             $party.onPeerLeave(id => {
-                console.log('peer leave')
+                log('party', 'peer leave', 'dev')
                 delete $peers[id]
                 $peers = $peers
             })
             log('layout:initParty', 'party started🎉', 'dev')
         } catch(err) {
-            log('layout:joinRoom-Error', err.message, 'dev')
+            log('layout:initParty', err.message, 'dev')
         }
     }
-
-    onMount(async () => {
-        if($consent !== 'party') return
-        initParty()
-        route()
-    })
-
-    $: if($consent) {
-        
-        (async () => {
-            log('$layout:afterUpdate', 'init', 'dev')
-            // if(!$consent) return
-            //never fetched before
-            if(!$instancesUpdatedAt || !$instances.length) {
-                log('$layout:updateInstances', '--- fetching instances ---', 'dev')
-                $instances = await getInstances()
-                $instancesUpdatedAt = new Date().getTime()
-            }
-            //instances lastUpdated more than 24h ago
-            if ($instancesUpdatedAt && ((new Date().getTime() - $instancesUpdatedAt) > 24 * 60 * 60 * 1000)) {
-                log('$layout:updateInstances', '--- refreshing instances ---', 'dev')
-                $instances = await getInstances()
-                $instancesUpdatedAt = new Date().getTime()
-            }
-            $chosen = chooseInstance($instances)
-            if($settings && $settings.theme === 'light') document.documentElement.classList.toggle('light')
-            route()
-        })()
+    const refreshInstances = async () => {
+        //never fetched before
+        if(!$instancesUpdatedAt || !$instances.length) {
+            log('layout:refreshInstances', 'initial refresh', 'dev')
+            $instances = await getInstances()
+            $instancesUpdatedAt = new Date().getTime()
+        }
+        //instances lastUpdated more than 24h ago
+        if ($instancesUpdatedAt && ((new Date().getTime() - $instancesUpdatedAt) > 24 * 60 * 60 * 1000)) {
+            log('layout:refreshInstances', 'starting refresh', 'dev')
+            $instances = await getInstances($instances)
+            $instancesUpdatedAt = new Date().getTime()
+            log('layout:refreshInstances', $instances , 'dev')
+        }
+        $chosen = chooseInstance($instances)
+        refreshStarted = false
     }
-    onDestroy(() => {if($party) $party.leave()})
 
-    $: log('$layout:$instances', $instances, 'dev')
-    $: log('$layout:$settings', $settings, 'dev')
-    // $: log('p2p:party', party, 'dev')
-    $: log('p2p:peers', $peers, 'dev')
+	onMount(() => {
+        if($consent) {
+            refreshStarted = true
+            log('layout:onmount', refreshStarted, 'dev')
+            if($consent === 'party') initParty()
+            refreshInstances()
+        } else {
+            console.log($consent, $chosen, 'else')
+        }
+	})
+    afterUpdate(() => updating = false)
+    onDestroy(() => $party ? $party.leave() : null)
 </script>
 
-<Header {currentPage} {searchTerm} chosen={$chosen} status={false} consent={$consent}
-    on:changeInstance={() => $chosen = chooseInstance($instances)}
-    on:theme={changeTheme}
-/>
+<svelte:window on:sveltekit:navigation-start="{() => $chosen = chooseInstance($instances)}" />
 
+<Header consent={$consent} on:rotate={() => $chosen = chooseInstance($instances)} />
 <main>
-    {#if !$consent}
-        <Consent on:consent={e => $consent = e.detail} />
-    {:else}
-        <slot />
-    {/if}
+	<Sidebar />
+    <div class="content">
+        {#if !$consent}
+            {#if refreshStarted}
+                <Loader />
+            {:else}
+            {#if !updating}
+                <Consent on:consent={e => {
+                    log('layout:onConsent', 'refreshStarted', 'dev')
+                    $consent = e.detail
+                    refreshStarted = true
+                    if($consent === 'party') initParty()
+                    refreshInstances()
+                }}/>
+            {/if}{/if}
+        {:else}
+            <slot />
+        {/if}
+    </div>
 </main>
 
-
-<!-- <footer>
-donate to invidious<br>
-thanks...<br>
-</footer> -->
-
 <style>
-:global(body) {
-    background: var(--bg-dark);
-    color: var(--txt-dark);
+main {
+    display: flex;
+    height: calc(100% - 66px);
     position: relative;
 }
-:global(html.light) {
-    filter: invert(1) hue-rotate(180deg);
+.content {
+    padding: 0.5em;
+    overflow: auto;
+    width: 100%;
+    border-radius: 5px;
+    box-shadow: 0px 0px 1px 1px var(--border);
 }
-:global(html.light img) {
-    filter: invert(1) hue-rotate(180deg);
-}
-:global(main) {
-    max-width: 83.33333%;
-    margin: 0 auto;
-    padding-left: 94px;
-    padding-top: 1em;
+@media (min-width: 600px) {
+    .content {
+        padding: 11px 5%;
+    }
 }
 </style>

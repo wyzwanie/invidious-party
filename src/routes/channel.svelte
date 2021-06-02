@@ -1,146 +1,178 @@
 <script>
-    import { onMount } from 'svelte'
+    import { onMount, afterUpdate } from 'svelte'
 
-	import { chooseInstance, convertCount, getAuthorThumbnail } from '$lib/_helper'
-	import { chosen } from '$lib/_memoryStore'
-    import { instances, SUBs, SUBsCID, SUBsUpdatedAt } from '$lib/_localStore'
+    import { chooseInstance, convertCount, Fetcher, getAuthorThumbnail, instanceRequestStatus, log, validateChannelID } from '$lib/helper'
+	import { chosen } from '$lib/Stores/memoryStore'
+    import { instances } from '$lib/Stores/localStore'
 
-    import AsyncError from '$lib/AsyncError.svelte'
-	import AsyncLoading from '$lib/AsyncLoading.svelte'
-    import Playlists from '$lib/Playlists.svelte'
-    import Rotate from '$lib/Rotate.svelte'
-	import Videos from '$lib/Videos.svelte'	
+    import ImageLoader from '$lib/ImageLoader/ImageLoader.svelte'
+    import AsyncError from '$lib/Components/AsyncError.svelte'
+	import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
+    import Playlists from '$lib/Components/Playlists.svelte'
+    import Subscribe from '$lib/Components/Subscribe.svelte'
+	import Videos from '$lib/Components/Videos.svelte'
 
-    let channelID = ''
-    let retry = false
-    let subbed
-
+    let channel
+    let playlists
+    let channelID
+    let isChannelIDvalid
     let activeTab = 'videos'
 
-    onMount(() => {
+    let channelError
+    let playlistError
+    let loadingChannel = false
+    let loadingPlaylst = false
+    let retry = false
+
+    const updateAddress = () => {
         channelID = window.location.href.split('#')[1]
-        subbed = $SUBs.includes(channelID)
-    })
-
-let tmp
-
-    const sub = async channelID => {
-        if(!$SUBs.includes(channelID)) $SUBs = [...$SUBs, channelID]
-        else $SUBs = $SUBs.filter(x => x !== channelID)
-        subbed = !subbed
-        
-        try {
-            // const saveToIpfs = await $ipfs.dag.put({ SUBs: $SUBs })
-            // $SUBsCID = saveToIpfs.toString()
-            // $SUBsUpdatedAt = new Date().getTime()
-            // tmp = saveToIpfs.toString()
-        } catch(err) {
-            console.log('ipfs error', err)
-        }
+        isChannelIDvalid = validateChannelID(channelID)
     }
-
-    const fetchChannel = async (instance, channelID) => {
-        if(!channelID) return { error: 'This channel does not exist.'}
-        if(channelID.length > 24) return { error: 'wrong channel ID'}
-
-        try {
-            const req = await fetch(`https://${instance}/api/v1/channels/${channelID}`)
-            const res = await req.json()
-            if(res.error) throw new Error(res.error)
-            return res
-        } catch(err) {
-            retry = true
+    const handleError = err => {
+        if(fetcher.what === 'videos') {
+            loadingChannel = false
+            channelError = err
         }
-    }
-
-    const fetchPlaylists = async (instance, channelID) => {
-        try {
-            const req = await fetch(`https://${instance}/api/v1/channels/${channelID}/playlists`)
-            const res = await req.json()
-            if(res.error) return res.error
-            else return res
-        } catch(err) {
-            retry = true
+        if(fetcher.what === 'playlists') {
+            loadingPlaylst = false
+            playlistError = err
         }
+        const updated = instanceRequestStatus($instances, $chosen, 'fail')
+        if(updated) $instances = updated
+        retry = true
     }
-
     const getAuthorBanner = authorBanners => {
-        console.log(authorBanners)
+        log('channel:getAuthorBanner', authorBanners, 'dev')
         const link = authorBanners[authorBanners.findIndex(x => x.width == 1060)].url
         const extracted = link.split('/')[3]
         return `https://${$chosen}/ggpht/${extracted}`
     }
+    
+    const fetcher = new Fetcher($chosen, ``)
 
-	const disableInstance = chosen => {
-		console.log('disable started')
-		new AbortController().abort()
-		const index = $instances.findIndex(x => x[0] === chosen)
-		$instances[index][1].enabled = false
-		$instances = $instances
-	}
+    fetcher.on('start', url => {
+        if(!url) return
+        if(fetcher.what === 'videos') loadingChannel = true
+        if(fetcher.what === 'playlists') loadingPlaylst = true
+    })
+    fetcher.on('ok', result => {
+        if(fetcher.what === 'videos') {
+            loadingChannel = false
+            channelError = false
+            channel = result
+        }
+        if(fetcher.what === 'playlists') {
+            loadingPlaylst = false
+            playlistError = false
+            playlists = result.playlists
+        }
+        const updated = instanceRequestStatus($instances, $chosen, 'ok')
+        if(updated) $instances = updated
+    })
+    fetcher.on('err', err => handleError(err, fetcher.what))
+    
+    const runFetcher = (instance, channelID, what) => {
+        if(!instance || !isChannelIDvalid || !what) return
+        if(activeTab === 'videos' && channel) return
+        if(activeTab === 'playlists' && playlists) return
 
-    $: if(retry) {
-        $chosen = chooseInstance($instances)
-        retry = false
+        fetcher.what = what
+        fetcher.instance = instance
+        if(fetcher.what === 'videos') fetcher.url = `/channels/${channelID}`
+        if(fetcher.what === 'playlists') fetcher.url = `/channels/${channelID}/playlists`
+        fetcher.go()
     }
-    $: subbed = (x => x.includes(channelID))($SUBs)
+
+    onMount(() => updateAddress())
+    afterUpdate(() => updateAddress())
+
+    $: runFetcher($chosen, channelID, activeTab)
+	$: if(retry) {
+        retry = false
+        $chosen = chooseInstance($instances)
+        runFetcher($chosen, channelID, activeTab)
+    }
 </script>
 
-{tmp}|subbed: {subbed}
-{#await fetchChannel($chosen, channelID)}
-    <AsyncLoading chosen={$chosen} on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
-{:then channel}
-    <div class="banner">
-        <img src="{getAuthorBanner(channel.authorBanners)}" alt="author banner" />
-        <div class="info">
-            <img src="{getAuthorThumbnail($chosen, channel.authorThumbnails)}" alt="author icon" />
-            <span class="author">{channel.author}</span>
-        </div>
-        <div class="sub" class:subbed on:click={sub(channelID)}>
-            <span class="subCount">Subscribe <span>{convertCount(channel.subCount)}</span></span>
-            <!-- <span class="totalViews">Total views: {channel.totalViews}</span> -->
-        </div>
+<svelte:window on:hashchange={updateAddress}/>
+
+{#if isChannelIDvalid}
+    <div class="wrapper">
+        {#if loadingChannel}
+            <AsyncLoading chosen={$chosen} />
+        {:else}
+            {#if !channelError}
+                <div class="banner">
+                    {#if channel?.authorBanners?.length}
+                        <ImageLoader src={getAuthorBanner(channel.authorBanners)} size=2560x424 alt={`${channel.author} banner`} />
+                    {:else}
+                        <div class="noBanner">no banner :)</div>
+                    {/if}
+                    <div class="info">
+                        <ImageLoader src={getAuthorThumbnail($chosen, channel.authorThumbnails)} size=100x100 alt={`${channel.author} icon`} />
+                        <span class="author">{channel.author}</span>
+                    </div>
+                    <div class="sub">
+                        <Subscribe {channelID} subCount={convertCount(channel.subCount)} />
+                    </div>
+                </div>
+                <nav>
+                    <ul>
+                        <li on:click={() => activeTab = 'videos'} class="videos {activeTab === 'videos' ? 'active' : ''}">Videos</li>
+                        <li on:click={() => activeTab = 'playlists'} class="{activeTab === 'playlists' ? 'active' : ''}">Playlists</li>
+                        <li on:click={() => activeTab = 'community'} class="{activeTab === 'community' ? 'active' : ''}">Community</li>
+                        <li on:click={() => activeTab = 'info'} class="{activeTab === 'info' ? 'active' : ''}">Info</li>
+                    </ul>
+                </nav>
+                {#if activeTab === 'videos'}
+                    <Videos chosen={$chosen} videos={channel.latestVideos} />
+                {/if}
+                {#if activeTab === 'playlists'}
+                    {#if loadingPlaylst}
+                        <AsyncLoading chosen={$chosen} />
+                    {:else}
+                        {#if !playlistError}
+                            <Playlists chosen={$chosen} {playlists} />
+                        {:else}
+                            <AsyncError error={playlistError} />
+                        {/if}
+                    {/if}
+                {/if}
+                {#if activeTab === 'info'}
+                    <div class="description">
+                        <h3>Channel description:</h3>
+                        {channel.description}
+                        <h3 style="margin-top: 0.618em;">Total view count: <span style="font-weight: normal">{convertCount(channel.totalViews)}</span></h3>
+                    </div>
+                {/if}
+            {:else}
+                <AsyncError error={channelError} />
+            {/if}
+        {/if}
     </div>
-    <nav>
-        <ul>
-            <li on:click={() => activeTab = 'videos'} class="videos {activeTab === 'videos' ? 'active' : ''}">Videos</li>
-            <li on:click={() => activeTab = 'playlists'} class="{activeTab === 'playlists' ? 'active' : ''}">Playlists</li>
-            <li on:click={() => activeTab = 'community'} class="{activeTab === 'community' ? 'active' : ''}">Community</li>
-            <li on:click={() => activeTab = 'info'} class="{activeTab === 'info' ? 'active' : ''}">Info</li>
-        </ul>
-    </nav>
-    {#if activeTab === 'videos'}
-        <Videos chosen={$chosen} videos={channel.latestVideos}  on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
-    {/if}
-    {#if activeTab === 'playlists'}
-        {#await fetchPlaylists($chosen, channelID)}
-            <AsyncLoading chosen={$chosen} on:rotate={() => $chosen = chooseInstance($instances)}  on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
-        {:then playlists}
-            <Playlists chosen={$chosen} playlists={playlists.playlists} />
-        {:catch error}
-            <AsyncError {error} on:rotate={() => $chosen = chooseInstance($instances)}  on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
-        {/await}
-    {/if}
-    {#if activeTab === 'info'}
-        <div class="description">
-            <h3>Channel description:</h3>
-            {channel.description}
-            <h3 style="margin-top: 0.618em;">Total view count: <span style="font-weight: normal">{convertCount(channel.totalViews)}</span></h3>
-        </div>
-    {/if}
-{:catch error}
-    <AsyncError {error} on:rotate={() => $chosen = chooseInstance($instances)}  on:disable={() => {disableInstance($chosen);$chosen = chooseInstance($instances)}} />
-{/await}
+{:else}
+    ERROR: invalid channelID
+{/if}
 
 <style>
 /* banner */
 .banner {
     position: relative;
 }
-.banner > img {
+:global(.banner div img) {
     width: 100%;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
+    filter: brightness(0.69)
+}
+.noBanner {
+    height: 225px;
+    background: var(--accent-dim);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .info {
     display: flex;
@@ -149,9 +181,14 @@ let tmp
     bottom: 1em;
     left: 1em;
 }
-.info > img {
+.sub {
+    position: absolute;
+    right: 1em;
+    bottom: 34px;
+    display: flex;
+}
+:global(.info div img) {
     width: 69px;
-    /* border: 3px solid white; */
     border-radius: 50%;
 }
 .author {
@@ -159,31 +196,9 @@ let tmp
     font-size: 1.3em;
     font-weight: bold;
 }
-.sub {
-    position: absolute;
-    right: 1em;
-    bottom: 34px;
-    display: flex;
-}
-.subCount {
-    background: var(--accent);
-    padding: 6px;
-    border-radius: 3px;
-    color: var(--bg-dark);
-    font-weight: bold;
-    cursor: pointer;
-}
-.subCount span {
-    background: white;
-    padding: 6px;
-    margin-right: -6px;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
-    font-weight: normal;
-}
 /* navigation */
 nav {
-    background: var(--bg-dark-second);
+    background: var(--bg-1);
     width: 100%;
     margin-top: -3px;
     margin-bottom: 1em;
@@ -200,13 +215,14 @@ nav ul li {
 }
 .active {
     color: var(--accent);
-    background: rgb(0 0 0 / 35%);
+    font-weight: bold;
+    background: var(--bg-2);
 }
 .active.videos {
     border-bottom-left-radius: 5px;
 }
 .description {
-    background: rgb(0 0 0 / 35%);
+    background: var(--bg-2);
     padding: 1em;
 }
 h3 {
