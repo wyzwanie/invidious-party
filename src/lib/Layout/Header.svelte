@@ -23,6 +23,7 @@
     let loading
     let error
     let component
+    let inputChanged
     
     const fetcher = new Fetcher($chosen, `/search/suggestions/?q=${searchTerm}`)
     fetcher.on('start', () => loading = true)
@@ -46,15 +47,13 @@
         fetcher.url = `/search/suggestions/?q=${query}`
         fetcher.go()
     }
-
-////
-$: if(typeof document !== 'undefined') {
+    
+    $: if(typeof document !== 'undefined') {
         if (suggestions.length) ['click', 'touchstart', 'keyup'].forEach(event =>
                 document.addEventListener(event, handleDocumentClick, true))
         else ['click', 'touchstart', 'keyup'].forEach(event =>
                 document.removeEventListener(event, handleDocumentClick, true))
-	}
-
+    }
 	const handleDocumentClick = e => {
 		if(e && (e.which === 3 || (e.type === 'keyup' && e.which !== 9))) return
 		if(component && component.contains(e.target) && component !== e.target && (e.type !== 'keyup' || e.which === 9)) return
@@ -62,7 +61,9 @@ $: if(typeof document !== 'undefined') {
 	}
 
     const handleSearch = async e => {
+        inputChanged = true
         if(e.keyCode === 13) {
+            inputChanged = false
             if($page.path !== '/playlists') await goto(`/search?q=${searchTerm}`)
             // else return $searchQuery = searchTerm
         } else if (e.keyCode === 27) suggestions = []
@@ -79,7 +80,7 @@ $: if(typeof document !== 'undefined') {
         retry = false
         runFetcher(chooseInstance($instances), searchTerm)
     }
-    $: runFetcher($chosen, searchTerm)
+    $: if(inputChanged) runFetcher($chosen, searchTerm)
 </script>
 
 <header>

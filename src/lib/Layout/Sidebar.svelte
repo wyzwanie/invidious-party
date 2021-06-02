@@ -12,9 +12,9 @@
 </script>
 
 {#if !isOpen}
-	<div class="toggle" on:click={() => isOpen = !isOpen} transition:fade>
+<div class="toggle" on:mousedown={() => isOpen = !isOpen} transition:fade>
 		<MenuIcon fill=var(--bg--1) width=16px />
-	</div>
+    </div>
 {/if}
 
 <div class="sidebar" class:isOpen>

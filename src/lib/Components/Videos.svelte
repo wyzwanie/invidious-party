@@ -13,29 +13,25 @@
 
 {#if videos && videos.length > 0}
     <div class="videos">
-        {#each videos as video, index}
-            <!-- {#if index === videos.length - 4} -->
-            <!-- <IntersectionObserver once={true} let:intersecting={intersecting} on:intersecting={() => console.log('yay')}> -->
-                <div class="video-outer" bind:this={video.el}>
-                    <div class="video-inner">
-                        <div class="card">
-                            <a class="thumbnail" href="/watch?v={video.videoId}">
-                                <ImageLoader size=320x180 src={`https://${chosen}/vi/${video.videoId}/mqdefault.jpg`} alt={video.title} />
-                                <div class="duration">{secToMin(video.lengthSeconds)}</div>
-                            </a>
-                            <div class="infoBox">
-                                <h3 class="title"><a href="/watch?v={video.videoId}">{video.title}</a></h3>
-                                <h4 class="author"><a href="/channel#{video.authorId}">{video.author}</a></h4>
-                                <div class="stats">
-                                    <span>Shared {howLongAgo(video.published)}</span>
-                                    <span>{convertCount(video.viewCount)} views</span>
-                                </div>
+        {#each videos as video}
+            <div class="video-outer" bind:this={video.el}>
+                <div class="video-inner">
+                    <div class="card">
+                        <a class="thumbnail" href="/watch?v={video.videoId}">
+                            <ImageLoader size=320x180 src={`https://${chosen}/vi/${video.videoId}/mqdefault.jpg`} alt={video.title} />
+                            <div class="duration">{secToMin(video.lengthSeconds)}</div>
+                        </a>
+                        <div class="infoBox">
+                            <h3 class="title"><a href="/watch?v={video.videoId}">{video.title}</a></h3>
+                            <h4 class="author"><a href="/channel#{video.authorId}">{video.author}</a></h4>
+                            <div class="stats">
+                                <span>Shared {howLongAgo(video.published)}</span>
+                                <span>{convertCount(video.viewCount)} views</span>
                             </div>
                         </div>
                     </div>
                 </div>
-            <!-- </IntersectionObserver> -->
-            <!-- {/if} -->
+            </div>
         {/each}
         {#if videos.length % 4 > 0}
             <div style="width: calc({25 * (videos.length % 4)}% - 0.5em)"></div>
