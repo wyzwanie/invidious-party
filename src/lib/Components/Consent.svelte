@@ -1,15 +1,16 @@
 <script>
     import { createEventDispatcher } from 'svelte'
+    import { domain } from '$lib/config'
     const dispatch = createEventDispatcher()
 </script>
 
 <h1>Greetings Explorer!</h1>
 <div class="row">
     <div class="left">
-        <p>You have reached <span>invidious.party</span> a site where <a href="https://github.com/iv-org/invidious">invidious</a> instances have a party 🎉<br>
+        <p>You have reached {domain} a site where <a href="https://github.com/iv-org/invidious">invidious</a> instances have a party 🎉<br>
         [DONATE->list of all instances and their donation addresses + project donation links]<br>
         <!-- This party would not be possible if not for brilliant invidious, which allows you to watch youtube videos, without them ever knowing who requested that video.<br> -->
-        <span>invidious.party</span> is a fully static site build using <a href="https://svelte.dev">SvelteKit</a> and hosted on <a href="https://ipfs.io">IPFS</a><br>
+        {domain} is a fully static site build using <a href="https://svelte.dev">SvelteKit</a> and hosted on <a href="https://ipfs.io">IPFS</a><br>
         as there are no central servers to store any of your data (by design and principle)<br>
         here you own your data. with freedom comes responsibility.</p>
         [...]
@@ -21,7 +22,7 @@
 <div class="row">
     <div class="left">
         <br>
-        <h3>there are couple ways you can use <span>invidious.party</span>:</h3>
+        <h3>there are couple ways you can use {domain}:</h3>
         <br>
         <h4>soloMODE</h4>
         <p>in soloMODE your browser communicates only with invidious instances to serve you content.<br>
@@ -46,7 +47,7 @@
         that will help browsers (peers) to discover themselfs</p>
         <p>made possible thanks to brilliant package <a href="https://github.com/dmotz/trystero">trystero</a><br>
         in partyMODE we use torrent trackers to find tunnels in order for party to happen, after a tunnel is established between peers communication is direct peer2peer.<br>
-        when you are in partyMODE ?? <span>invidious.party</span> broadcasts videoId you watch,<br>
+        when you are in partyMODE ?? {domain} broadcasts videoId you watch,<br>
         so other peers having a party at the same time,<br>
         can see dynamically what other party members are watching, what is watched the most etc.<br>
         and have fun in (to be encrypted) global public p2p chat<br>

@@ -47,6 +47,7 @@ export const chooseInstance = instances => {
         if(i[1].enabled) {
             if(total > 0) {
                 if(successRatio > 0.3) filteredInstances.push(i[0])
+                else if(total === 1) filteredInstances.push(i[0])
             } else {
                 filteredInstances.push(i[0])
             }

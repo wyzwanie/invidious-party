@@ -3,8 +3,6 @@
     import { instances } from '$lib/Stores/localStore'
     import { chooseInstance, Fetcher, filterTable, instanceRequestStatus, log } from '$lib/helper'
     
-    import AsyncError from '$lib/Components/AsyncError.svelte'
-	import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
 	import Videos from '$lib/Components/Videos.svelte'
     import Filter from '$lib/UI/Filter.svelte'
 
@@ -68,14 +66,9 @@
             }} search margin />
     </div>
 
-    {#if loading}
-        <AsyncLoading chosen={$chosen} />
-    {:else}
-        {#if !error}
-            <Videos videos={popular} chosen={$chosen} />
-        {:else}
-            ERROR: {JSON.stringify(error)}
-        {/if}
+    <Videos videos={popular} chosen={$chosen} {loading} />
+    {#if error}
+        ERROR: {JSON.stringify(error)}
     {/if}
 </div>
 

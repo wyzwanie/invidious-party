@@ -1,5 +1,8 @@
+<script>
+    export let size = 1
+</script>
 <div class="loader">
-    <svg version="1.1" x="0px" y="0px" width="24px" height="30px" viewBox="0 0 24 30">
+    <svg version="1.1" x="0px" y="0px" width="24px" height="30px" viewBox="0 0 24 30" style="zoom: {size}">
         <rect x="0" y="13" width="4" height="5" fill="#333">
             <animate attributeName="height" attributeType="XML"
             values="5;21;5" 

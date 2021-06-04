@@ -5,8 +5,6 @@
 
     import countryCodes from '$lib/iso3166countryCodes'
     
-    import AsyncError from '$lib/Components/AsyncError.svelte'
-	import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
 	import Videos from '$lib/Components/Videos.svelte'
     import Filter from '$lib/UI/Filter.svelte'
     
@@ -76,14 +74,9 @@
             }} search margin flex=2 />
     </div>
 
-    {#if loading}
-        <AsyncLoading chosen={$chosen} />
-    {:else}
-        {#if !error}
-            <Videos videos={trending} chosen={$chosen} />
-        {:else}
-            ERROR: {JSON.stringify(error)}
-        {/if}
+    <Videos videos={trending} chosen={$chosen} {loading} />
+    {#if error}
+        ERROR: {JSON.stringify(error)}
     {/if}
 </div>
 

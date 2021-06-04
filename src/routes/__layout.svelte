@@ -1,7 +1,6 @@
 <script>
     import '../app.css'
     import { onDestroy, onMount, afterUpdate } from 'svelte'
-    import { joinRoom, selfId } from 'trystero/torrent'
 
     import { chosen, peers, party, actions } from '$lib/Stores/memoryStore'
     import { consent, nick, settings, instances, instancesUpdatedAt, SUBsUpdatedAt } from '$lib/Stores/localStore'

@@ -1,14 +1,13 @@
 <script>
-    import { createEventDispatcher } from 'svelte'
     import { convertCount, howLongAgo, secToMin } from '$lib/helper'
 
     import ImageLoader from '$lib/ImageLoader/ImageLoader.svelte'
-    import IntersectionObserver from '$lib/ImageLoader/IntersectionObserver.svelte'
+    import Loading from '$lib/UI/Loading.svelte'
+    import Loader from '$lib/UI/Loader.svelte'
 
     export let chosen
+    export let loading
     export let videos
-
-    const dispatch = createEventDispatcher()
 </script>
 
 {#if videos && videos.length > 0}
@@ -37,23 +36,18 @@
             <div style="width: calc({25 * (videos.length % 4)}% - 0.5em)"></div>
         {/if} 
     </div>
-{:else}
-    <div class="df">
-        <p><span style="font-weight: bold">ERROR:</span> Instance returned empty result.</p>
-        <p>Click Rotate icon in top right corner, to try on next invidious instance, or</p>
-        <button on:click={() => dispatch('disable')}>Disable instance</button><br>so it will not be used, you can change that later in settings.
-    </div>
+{:else if videos && !videos.length}
+    ERROR: instance returned empty result
+{/if}
+{#if loading}
+    {#if videos?.length}
+        <Loading size=1.618 />
+    {:else}
+        <Loader />
+    {/if}
 {/if}
 
-
 <style>
-.df {
-    flex-direction: column;
-    align-items: flex-start;
-}
-.df p {
-    margin-bottom: 7px;
-}
 .videos {
     display: flex;
     flex-wrap: wrap;

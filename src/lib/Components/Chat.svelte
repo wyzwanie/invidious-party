@@ -1,11 +1,14 @@
 <script>
-    import randomColor from 'randomcolor'
     import { afterUpdate, beforeUpdate, onDestroy, onMount } from 'svelte'
     
-    import { chosen, party, peers, actions } from '$lib/Stores/memoryStore'
-    import { nick } from '$lib/Stores/localStore'
+    import randomColor from 'randomcolor'
+    import { joinRoom, selfId } from 'trystero/torrent'
     
-    // export let roomID
+    import { domain } from '$lib/config'
+    import { nick, settings } from '$lib/Stores/localStore'
+    import { chosen, peers, party, actions } from '$lib/Stores/memoryStore'
+    
+    export let roomID
     export let height
 
     let names = {}
@@ -20,12 +23,26 @@
     
     let nameContainer
     let chatHelp
+    let autoscroll
+    let chatBox
+
+    let chatRoom
+
+    const initChat = roomID => {
+        const config = { appId: domain }
+
+        if(!chatRoom) chatRoom = joinRoom(config, roomID)
+    }
+
+
+
+
 
     const setName = n => {
         $nick = n
         $peers['self'] = { nick: n }
         $peers = $peers
-        namesColors['self'] = randomColor()//"#" + ((1<<24)*Math.random() | 0).toString(16)
+        namesColors['self'] = randomColor({ luminosity: 'bright' })
     }
     const sendMessage = (msg, id) => {
         const msgObj = {
@@ -38,6 +55,18 @@
         message = ''
     }
 
+    onMount(() => {
+        console.log($party)
+        $party.joinRoom({ appId: 'invidious.party' }, roomID)
+    })
+    beforeUpdate(() => {
+        autoscroll = chatBox && chatBox.offsetHeight + chatBox.scrollTop > chatBox.scrollHeight - 50
+    })
+    afterUpdate(() => {
+        if(autoscroll) chatBox.scrollTo(0, chatBox.scrollHeight);
+    })
+    
+    $: if($nick) $peers['self'] = { nick: $nick }
     $: if($actions) {
         $actions.chat[1]((msg, id) => {
             console.log('msg', msg)
@@ -47,19 +76,11 @@
                 text,
                 timestamp
             }]
-            if(!namesColors[id]) namesColors[id] = randomColor()//"#" + ((1<<24)*Math.random() | 0).toString(16)
+            if(!namesColors[id]) namesColors[id] = randomColor({ luminosity: 'bright' })
         })
     }
-    $: if($nick) $peers['self'] = { nick: $nick }
 
-    let autoscroll
-    let chatBox
-    beforeUpdate(() => {
-        autoscroll = chatBox && chatBox.offsetHeight + chatBox.scrollTop > chatBox.scrollHeight - 50
-    })
-    afterUpdate(() => {
-        if(autoscroll) chatBox.scrollTo(0, chatBox.scrollHeight);
-    })
+    $: console.log($party)
 </script>
 
 <div class="chat">

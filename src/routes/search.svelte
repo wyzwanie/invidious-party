@@ -7,6 +7,7 @@
     import { chooseInstance, Fetcher, instanceRequestStatus } from '$lib/helper'
     import countryCodes from '$lib/iso3166countryCodes'
 
+    import IntersectionObserver from '$lib/ImageLoader/IntersectionObserver.svelte'
     import AsyncError from '$lib/Components/AsyncError.svelte'
     import AsyncLoading from '$lib/Components/AsyncLoading.svelte'
     import Videos from '$lib/Components/Videos.svelte'
@@ -16,14 +17,15 @@
     let loading
     let retry = false
 
-    let searchQuery
+    let searchQuery = ''
     let searchResult
     let searchFilters = {
         sortBy: '',
         uploadDate: '',
         duration: '',
         type: 'video',
-        country: ''
+        country: '',
+        page: 1,
     }
 
     const buildSearchQuery = params => {
@@ -38,7 +40,8 @@
     fetcher.on('start', () => loading = true)
     fetcher.on('ok', data => {
         error = loading = false
-        searchResult = data
+        if(searchFilters.page > 1) searchResult = [...searchResult, ...data]
+        else searchResult = data
         const updated = instanceRequestStatus($instances, $chosen, 'ok')
         if(updated) $instances = updated
     })
@@ -52,6 +55,7 @@
     })
 
     const runFetcher = (instance, query, params) => {
+        console.log(params)
         if(!instance || !query) return
         fetcher.instance = instance
         fetcher.url = `/search/?q=${searchQuery}${buildSearchQuery(params)}`
@@ -89,14 +93,16 @@
     </div>
     <div class="search">
         {#if searchQuery}
-            {#if loading}
-                <AsyncLoading chosen={$chosen} />
-            {:else}
-                {#if !error}
-                    <Videos videos={searchResult} chosen={$chosen} />
-                {:else}
-                    <AsyncError {error} />
-                {/if}
+            <Videos videos={searchResult} chosen={$chosen} {loading} />
+            {#if !loading}
+                <IntersectionObserver once={true} on:loadMore={() => {
+                    runFetcher($chosen, searchQuery, {...searchFilters, page: searchFilters.page++ })
+                }}>
+                    <button load-more="true">Load more</button>
+                </IntersectionObserver>
+            {/if}
+            {#if error}
+                ERROR: {JSON.stringify(error)}
             {/if}
         {/if}
     </div>

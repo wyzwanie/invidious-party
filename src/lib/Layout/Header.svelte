@@ -3,7 +3,7 @@
     import { goto } from '$app/navigation'
     import { page } from '$app/stores'
     
-    import { version } from '$lib/config'
+    import { domain, version } from '$lib/config'
     import { chosen, searchQuery } from '$lib/Stores/memoryStore'
     import { instances } from '$lib/Stores/localStore'
     import { chooseInstance, Fetcher, instanceRequestStatus } from '$lib/helper'
@@ -64,6 +64,8 @@
         inputChanged = true
         if(e.keyCode === 13) {
             inputChanged = false
+            fetcher.abort()
+            suggestions = []
             if($page.path !== '/playlists') await goto(`/search?q=${searchTerm}`)
             // else return $searchQuery = searchTerm
         } else if (e.keyCode === 27) suggestions = []
@@ -85,7 +87,7 @@
 
 <header>
     <div class="logo">
-        invidious.party<span style="font-size: 69%; color: unset;">&nbsp;v{version}</span><br>
+        {domain}<span style="font-size: 69%; color: unset;">&nbsp;v{version}</span><br>
         <span>instance: {#if $chosen}<a style="color: white;" href="{$chosen}">{$chosen}</a>{:else}...initializing...{/if}</span>
         <br><span>mode: {consent ? consent : 'no consent'}</span>
     </div>
